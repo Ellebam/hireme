@@ -1,0 +1,48 @@
+# Development Infrastructure Only
+# This runs PostgreSQL and Gotenberg for local development
+# The API and Web services run directly on your machine
+#
+# Usage:
+#   task infra:up      # Start services
+#   task infra:down    # Stop services
+#   task infra:logs    # View logs
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: hireme-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: hireme
+      POSTGRES_PASSWORD: hireme_dev_password
+      POSTGRES_DB: hireme
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hireme -d hireme"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    container_name: hireme-gotenberg
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    command:
+      - "gotenberg"
+      - "--api-timeout=60s"
+      - "--chromium-disable-javascript=true"
+      - "--chromium-allow-list=file:///tmp/.*"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+networks:
+  default:
+    name: hireme-dev

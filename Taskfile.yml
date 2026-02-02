@@ -1,0 +1,406 @@
+# https://taskfile.dev
+version: "3"
+
+vars:
+  API_DIR: ./api
+  WEB_DIR: ./web
+  DOCKER_COMPOSE_INFRA: ./docker/docker-compose.infra.yml
+
+dotenv: [".env.local", ".env"]
+
+tasks:
+  # ══════════════════════════════════════════════════════════════════════════
+  # DEFAULT
+  # ══════════════════════════════════════════════════════════════════════════
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list-all
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # SETUP
+  # ══════════════════════════════════════════════════════════════════════════
+  setup:
+    desc: Initial project setup (run once after cloning)
+    cmds:
+      - task: setup:check-deps
+      - task: setup:env
+      - task: setup:dirs
+      - task: infra:up
+      - task: db:migrate
+      - task: db:seed
+      - task: api:deps
+      - task: web:deps
+      - echo "✅ Setup complete! Run 'task dev' to start development."
+
+  setup:check-deps:
+    desc: Check required dependencies are installed
+    cmds:
+      - |
+        echo "Checking dependencies..."
+        command -v go >/dev/null 2>&1 || { echo "❌ Go is required but not installed."; exit 1; }
+        command -v node >/dev/null 2>&1 || { echo "❌ Node.js is required but not installed."; exit 1; }
+        command -v docker >/dev/null 2>&1 || { echo "❌ Docker is required but not installed."; exit 1; }
+        command -v docker-compose >/dev/null 2>&1 || command -v "docker compose" >/dev/null 2>&1 || { echo "❌ Docker Compose is required but not installed."; exit 1; }
+        echo "✅ All dependencies installed."
+
+  setup:env:
+    desc: Create .env.local from example if not exists
+    cmds:
+      - |
+        if [ ! -f .env.local ]; then
+          cp .env.example .env.local
+          echo "✅ Created .env.local from .env.example"
+        else
+          echo "ℹ️  .env.local already exists, skipping"
+        fi
+    silent: true
+
+  setup:dirs:
+    desc: Create required directories
+    cmds:
+      - mkdir -p data/uploads
+      - mkdir -p data/postgres
+      - echo "✅ Created data directories"
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # INFRASTRUCTURE (Docker)
+  # ══════════════════════════════════════════════════════════════════════════
+  infra:up:
+    desc: Start infrastructure services (PostgreSQL, Gotenberg)
+    cmds:
+      - docker compose -f {{.DOCKER_COMPOSE_INFRA}} up -d
+      - echo "⏳ Waiting for PostgreSQL to be ready..."
+      - |
+        for i in $(seq 1 30); do
+          if docker compose -f {{.DOCKER_COMPOSE_INFRA}} exec -T postgres pg_isready -U hireme > /dev/null 2>&1; then
+            echo "✅ PostgreSQL is ready!"
+            exit 0
+          fi
+          sleep 1
+        done
+        echo "❌ PostgreSQL failed to start"
+        exit 1
+
+  infra:down:
+    desc: Stop infrastructure services
+    cmds:
+      - docker compose -f {{.DOCKER_COMPOSE_INFRA}} down
+
+  infra:logs:
+    desc: View infrastructure logs
+    cmds:
+      - docker compose -f {{.DOCKER_COMPOSE_INFRA}} logs -f
+
+  infra:status:
+    desc: Show infrastructure status
+    cmds:
+      - docker compose -f {{.DOCKER_COMPOSE_INFRA}} ps
+
+  infra:clean:
+    desc: Stop infrastructure and remove volumes (DESTRUCTIVE)
+    prompt: This will delete all data. Are you sure?
+    cmds:
+      - docker compose -f {{.DOCKER_COMPOSE_INFRA}} down -v
+      - rm -rf data/postgres
+      - echo "✅ Infrastructure cleaned"
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # DATABASE
+  # ══════════════════════════════════════════════════════════════════════════
+  db:migrate:
+    desc: Run database migrations
+    dir: "{{.API_DIR}}"
+    cmds:
+      - go run -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest -path db/migrations -database "${DATABASE_URL}" up
+      - echo "✅ Migrations applied"
+
+  db:migrate:down:
+    desc: Rollback last migration
+    dir: "{{.API_DIR}}"
+    cmds:
+      - go run -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest -path db/migrations -database "${DATABASE_URL}" down 1
+
+  db:migrate:status:
+    desc: Show migration status
+    dir: "{{.API_DIR}}"
+    cmds:
+      - go run -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest -path db/migrations -database "${DATABASE_URL}" version
+
+  db:migration:create:
+    desc: "Create a new migration (usage: task db:migration:create name=add_feature)"
+    dir: "{{.API_DIR}}"
+    requires:
+      vars: [name]
+    cmds:
+      - go run -tags postgres github.com/golang-migrate/migrate/v4/cmd/migrate@latest create -ext sql -dir db/migrations -seq {{.name}}
+      - echo "Created migration {{.name}}"
+
+  db:seed:
+    desc: Seed development data (dev user)
+    cmds:
+      - ./scripts/seed-dev-user.sh
+      - echo "✅ Dev user seeded"
+
+  db:reset:
+    desc: Reset database (drop and recreate)
+    prompt: This will delete all data. Are you sure?
+    cmds:
+      - ./scripts/reset-db.sh
+      - task: db:migrate
+      - task: db:seed
+      - echo "✅ Database reset complete"
+
+  db:psql:
+    desc: Open psql shell
+    cmds:
+      - docker compose -f {{.DOCKER_COMPOSE_INFRA}} exec postgres psql -U hireme -d hireme
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # API (Go Backend)
+  # ══════════════════════════════════════════════════════════════════════════
+  api:deps:
+    desc: Install Go dependencies
+    dir: "{{.API_DIR}}"
+    cmds:
+      - go mod download
+      - go mod tidy
+      - echo "✅ Go dependencies installed"
+
+  api:dev:
+    desc: Run API server with hot reload
+    dir: "{{.API_DIR}}"
+    cmds:
+      - |
+        if command -v air >/dev/null 2>&1; then
+          air
+        else
+          echo "Installing air for hot reload..."
+          go install github.com/air-verse/air@latest
+          air
+        fi
+
+  api:run:
+    desc: Run API server (no hot reload)
+    dir: "{{.API_DIR}}"
+    cmds:
+      - go run ./cmd/server
+
+  api:build:
+    desc: Build API binary
+    dir: "{{.API_DIR}}"
+    cmds:
+      - go build -o bin/server ./cmd/server
+      - cmd: echo "✅ Binary built api/bin/server"
+
+  api:test:
+    desc: Run API tests
+    dir: "{{.API_DIR}}"
+    cmds:
+      - go test -v ./...
+
+  api:test:coverage:
+    desc: Run API tests with coverage
+    dir: "{{.API_DIR}}"
+    cmds:
+      - go test -v -coverprofile=coverage.out ./...
+      - go tool cover -html=coverage.out -o coverage.html
+      - 'echo "✅ Coverage report: api/coverage.html"'
+
+  api:lint:
+    desc: Run Go linter
+    dir: "{{.API_DIR}}"
+    cmds:
+      - |
+        if command -v golangci-lint >/dev/null 2>&1; then
+          golangci-lint run
+        else
+          echo "Installing golangci-lint..."
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+          golangci-lint run
+        fi
+
+  api:sqlc:
+    desc: Generate sqlc code
+    dir: "{{.API_DIR}}"
+    cmds:
+      - |
+        if command -v sqlc >/dev/null 2>&1; then
+          sqlc generate
+        else
+          echo "Installing sqlc..."
+          go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+          sqlc generate
+        fi
+      - echo "✅ sqlc code generated"
+
+  api:fmt:
+    desc: Format Go code
+    dir: "{{.API_DIR}}"
+    cmds:
+      - go fmt ./...
+      - echo "✅ Code formatted"
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # WEB (Next.js Frontend)
+  # ══════════════════════════════════════════════════════════════════════════
+  web:deps:
+    desc: Install Node.js dependencies
+    dir: "{{.WEB_DIR}}"
+    cmds:
+      - npm install
+      - echo "✅ Node dependencies installed"
+
+  web:dev:
+    desc: Run Next.js dev server
+    dir: "{{.WEB_DIR}}"
+    cmds:
+      - npm run dev
+
+  web:build:
+    desc: Build Next.js for production
+    dir: "{{.WEB_DIR}}"
+    cmds:
+      - npm run build
+      - echo "✅ Next.js built"
+
+  web:start:
+    desc: Start Next.js production server
+    dir: "{{.WEB_DIR}}"
+    cmds:
+      - npm run start
+
+  web:test:
+    desc: Run frontend tests
+    dir: "{{.WEB_DIR}}"
+    cmds:
+      - npm run test
+
+  web:test:watch:
+    desc: Run frontend tests in watch mode
+    dir: "{{.WEB_DIR}}"
+    cmds:
+      - npm run test:watch
+
+  web:lint:
+    desc: Run ESLint
+    dir: "{{.WEB_DIR}}"
+    cmds:
+      - npm run lint
+
+  web:fmt:
+    desc: Format frontend code with Prettier
+    dir: "{{.WEB_DIR}}"
+    cmds:
+      - npm run format
+
+  web:typecheck:
+    desc: Run TypeScript type checking
+    dir: "{{.WEB_DIR}}"
+    cmds:
+      - npm run typecheck
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # DEVELOPMENT (Combined)
+  # ══════════════════════════════════════════════════════════════════════════
+  dev:
+    desc: Start full development environment
+    deps: [infra:up]
+    cmds:
+      - echo "🚀 Starting development servers..."
+      - echo "   API will run on http://localhost:8080"
+      - echo "   Web will run on http://localhost:3000"
+      - echo ""
+      - echo "Run in separate terminals:"
+      - echo "   task api:dev"
+      - echo "   task web:dev"
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # CODE GENERATION
+  # ══════════════════════════════════════════════════════════════════════════
+  generate:
+    desc: Run all code generation
+    cmds:
+      - task: api:sqlc
+      - task: generate:types
+      - echo "✅ All code generated"
+
+  generate:types:
+    desc: Generate TypeScript types from JSON Schema
+    cmds:
+      - ./scripts/generate-types.sh
+      - echo "✅ TypeScript types generated"
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # TESTING
+  # ══════════════════════════════════════════════════════════════════════════
+  test:
+    desc: Run all tests
+    cmds:
+      - task: api:test
+      - task: web:test
+      - echo "✅ All tests passed"
+
+  test:coverage:
+    desc: Run all tests with coverage
+    cmds:
+      - task: api:test:coverage
+      - echo "✅ Coverage reports generated"
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # LINTING & FORMATTING
+  # ══════════════════════════════════════════════════════════════════════════
+  lint:
+    desc: Run all linters
+    cmds:
+      - task: api:lint
+      - task: web:lint
+      - echo "✅ Linting complete"
+
+  fmt:
+    desc: Format all code
+    cmds:
+      - task: api:fmt
+      - task: web:fmt
+      - echo "✅ Formatting complete"
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # DOCKER (Production Builds)
+  # ══════════════════════════════════════════════════════════════════════════
+  docker:build:api:
+    desc: Build API Docker image
+    cmds:
+      - docker build -f docker/Dockerfile.api -t hireme-api:local .
+      - 'echo "✅ API image built: hireme-api:local"'
+
+  docker:build:web:
+    desc: Build Web Docker image
+    cmds:
+      - docker build -f docker/Dockerfile.web -t hireme-web:local .
+      - 'echo "✅ Web image built: hireme-web:local"'
+
+  docker:build:
+    desc: Build all Docker images
+    cmds:
+      - task: docker:build:api
+      - task: docker:build:web
+      - echo "✅ All images built"
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # UTILITIES
+  # ══════════════════════════════════════════════════════════════════════════
+  clean:
+    desc: Clean build artifacts
+    cmds:
+      - rm -rf api/bin
+      - rm -rf api/coverage.out api/coverage.html
+      - rm -rf web/.next
+      - rm -rf web/node_modules/.cache
+      - echo "✅ Cleaned build artifacts"
+
+  version:
+    desc: Show version information
+    cmds:
+      - echo "Go version:" && go version
+      - echo "Node version:" && node --version
+      - echo "Docker version:" && docker --version

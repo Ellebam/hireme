@@ -1,0 +1,77 @@
+{
+  "common": {
+    "appName": "HireMe",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success"
+  },
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "editor": "Editor",
+    "pricing": "Pricing",
+    "login": "Log In",
+    "logout": "Log Out"
+  },
+  "landing": {
+    "hero": {
+      "title": "Build Your Perfect CV",
+      "subtitle": "Create stunning, professional CVs in minutes with our intuitive drag-and-drop editor.",
+      "cta": "Start Building — It's Free",
+      "learnMore": "Learn More"
+    },
+    "features": {
+      "title": "Everything You Need",
+      "templates": {
+        "title": "3 Professional Templates",
+        "description": "Choose from Classic, Modern, or Minimal designs. Each template is optimized for ATS systems."
+      },
+      "editor": {
+        "title": "Drag & Drop Editor",
+        "description": "Easily rearrange sections, add custom content, and see changes in real-time."
+      },
+      "export": {
+        "title": "Multi-Format Export",
+        "description": "Export your CV as PDF, DOCX, or raw JSON. Perfect for any application requirement."
+      }
+    }
+  },
+  "editor": {
+    "sections": {
+      "personal": "Personal Info",
+      "summary": "Professional Summary",
+      "experience": "Work Experience",
+      "education": "Education",
+      "skills": "Skills",
+      "languages": "Languages",
+      "certifications": "Certifications",
+      "projects": "Projects",
+      "custom": "Custom Section"
+    },
+    "actions": {
+      "addSection": "Add Section",
+      "removeSection": "Remove Section",
+      "moveUp": "Move Up",
+      "moveDown": "Move Down",
+      "preview": "Preview",
+      "export": "Export"
+    },
+    "export": {
+      "title": "Export CV",
+      "pdf": "Download as PDF",
+      "docx": "Download as Word",
+      "json": "Download as JSON"
+    }
+  },
+  "dashboard": {
+    "title": "Your CVs",
+    "createNew": "Create New CV",
+    "empty": "You haven't created any CVs yet.",
+    "lastEdited": "Last edited"
+  }
+}

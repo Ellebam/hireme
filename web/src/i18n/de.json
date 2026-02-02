@@ -1,0 +1,77 @@
+{
+  "common": {
+    "appName": "HireMe",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "create": "Erstellen",
+    "loading": "Wird geladen...",
+    "error": "Ein Fehler ist aufgetreten",
+    "success": "Erfolgreich"
+  },
+  "navigation": {
+    "home": "Startseite",
+    "dashboard": "Dashboard",
+    "editor": "Editor",
+    "pricing": "Preise",
+    "login": "Anmelden",
+    "logout": "Abmelden"
+  },
+  "landing": {
+    "hero": {
+      "title": "Erstelle deinen perfekten Lebenslauf",
+      "subtitle": "Erstelle in wenigen Minuten beeindruckende, professionelle Lebensläufe mit unserem intuitiven Drag-and-Drop-Editor.",
+      "cta": "Jetzt starten — Kostenlos",
+      "learnMore": "Mehr erfahren"
+    },
+    "features": {
+      "title": "Alles was du brauchst",
+      "templates": {
+        "title": "3 Professionelle Vorlagen",
+        "description": "Wähle zwischen Klassisch, Modern oder Minimal. Jede Vorlage ist für ATS-Systeme optimiert."
+      },
+      "editor": {
+        "title": "Drag & Drop Editor",
+        "description": "Ordne Abschnitte einfach neu an, füge individuelle Inhalte hinzu und sieh Änderungen in Echtzeit."
+      },
+      "export": {
+        "title": "Multi-Format Export",
+        "description": "Exportiere deinen Lebenslauf als PDF, DOCX oder JSON. Perfekt für jede Bewerbung."
+      }
+    }
+  },
+  "editor": {
+    "sections": {
+      "personal": "Persönliche Daten",
+      "summary": "Profil",
+      "experience": "Berufserfahrung",
+      "education": "Ausbildung",
+      "skills": "Fähigkeiten",
+      "languages": "Sprachen",
+      "certifications": "Zertifikate",
+      "projects": "Projekte",
+      "custom": "Benutzerdefiniert"
+    },
+    "actions": {
+      "addSection": "Abschnitt hinzufügen",
+      "removeSection": "Abschnitt entfernen",
+      "moveUp": "Nach oben",
+      "moveDown": "Nach unten",
+      "preview": "Vorschau",
+      "export": "Exportieren"
+    },
+    "export": {
+      "title": "Lebenslauf exportieren",
+      "pdf": "Als PDF herunterladen",
+      "docx": "Als Word herunterladen",
+      "json": "Als JSON herunterladen"
+    }
+  },
+  "dashboard": {
+    "title": "Deine Lebensläufe",
+    "createNew": "Neuen Lebenslauf erstellen",
+    "empty": "Du hast noch keine Lebensläufe erstellt.",
+    "lastEdited": "Zuletzt bearbeitet"
+  }
+}
