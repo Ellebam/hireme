@@ -4,6 +4,7 @@ import (
 	"embed"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/santhosh-tekuri/jsonschema/v5"
 
@@ -28,7 +29,7 @@ func NewCVValidator() (*CVValidator, error) {
 
 	// Compile schema
 	compiler := jsonschema.NewCompiler()
-	if err := compiler.AddResource("cv-schema.json", string(schemaData)); err != nil {
+	if err := compiler.AddResource("cv-schema.json", strings.NewReader(string(schemaData))); err != nil {
 		return nil, fmt.Errorf("adding schema resource: %w", err)
 	}
 
