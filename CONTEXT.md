@@ -1,144 +1,142 @@
 # HireMe — Project Context
 
-## Project Overview
+## Current State
 
-HireMe is an open-source CV/resume generation web application. It allows professionals to build, manage, and export CVs using a schema-driven approach.
+**Status:** API backend functional, frontend not started
 
-**Philosophy:** "Pragmatic Quality" — high modularity and best practices without over-engineering.
+### What's Working
+- ✅ Infrastructure: PostgreSQL + Gotenberg via Docker
+- ✅ Database: Migrations applied, dev data seeded
+- ✅ API endpoints: Health, Users, CVs (full CRUD)
+- ✅ Auth bypass: Dev mode uses `dev-user-001`
+- ✅ Repository layer: sqlc queries wired to domain types
+
+### What's Not Working Yet
+- ❌ Asset upload (`POST /api/v1/assets`) — returns 500, needs file storage
+- ❌ Export (`POST /api/v1/export/{format}`) — returns 501, needs Gotenberg integration
+- ❌ Frontend — not started
+
+### API Endpoints (Verified Working)
+
+```
+GET  /health                    → {"status": "healthy"}
+GET  /ready                     → {"status": "ready", "services": {...}}
+GET  /api/v1/users/me           → Current user profile
+PATCH /api/v1/users/me          → Update user profile
+GET  /api/v1/cv                 → User's active CV
+POST /api/v1/cv                 → Create new CV
+PUT  /api/v1/cv/{id}            → Update CV
+DELETE /api/v1/cv/{id}          → Delete CV
+```
+
+---
 
 ## Tech Stack
 
-| Component | Technology | Notes |
-|-----------|------------|-------|
-| Language | Go 1.22+, TypeScript | Backend + Frontend |
-| Backend | Chi router, sqlc | Go REST API |
-| Frontend | Next.js 14 (App Router), React 18, Tailwind CSS, shadcn/ui | |
-| Database | PostgreSQL 16 | JSONB for CV content |
-| Export | Gotenberg | HTML → PDF/DOCX |
-| Storage | Local filesystem (dev), Cloudflare R2 (prod) | |
+| Component | Technology |
+|-----------|------------|
+| Backend | Go 1.22+, Chi router, sqlc |
+| Frontend | Next.js 14, React 18, Tailwind, shadcn/ui |
+| Database | PostgreSQL 16 (JSONB for CV content) |
+| Export | Gotenberg (HTML → PDF/DOCX) |
+| Storage | Local filesystem (dev), Cloudflare R2 (prod) |
 
 ## Project Structure
 
 ```
 hireme/
-├── api/          # Go backend (Chi + sqlc)
-├── web/          # Next.js frontend
-├── docker/       # Container configs
-├── schemas/      # Shared JSON schemas
-├── scripts/      # Dev utilities
-└── docs/         # Documentation
+├── api/                    # Go backend
+│   ├── cmd/server/         # Entry point
+│   ├── db/                 # Migrations, queries, seeds
+│   │   ├── migrations/     # SQL migrations
+│   │   ├── queries/        # sqlc query definitions
+│   │   └── seed/           # dev_seed.sql
+│   └── internal/
+│       ├── config/         # Environment loading
+│       ├── domain/         # Domain types (User, CV, Asset)
+│       ├── handler/        # HTTP handlers
+│       ├── middleware/     # Auth, logging
+│       ├── repository/     # Data access (postgres/)
+│       ├── service/        # Business logic
+│       └── validator/      # JSON schema validation
+├── web/                    # Next.js frontend (not started)
+├── docker/                 # Docker configs
+├── schemas/                # Shared JSON schemas
+└── scripts/                # Dev utilities
 ```
 
-## Conventions
+## Architecture
 
-### Code Style
-- Go: `gofmt`, `golangci-lint`
-- Frontend: ESLint, Prettier
-- Naming: Go standard, TypeScript camelCase
-
-### Git
-- Branch naming: `feature/`, `fix/`, `chore/`
-- Commit format: `[TAG] description`
-- Tags: FEAT, FIX, REFACTOR, DOCS, TEST, CHORE
-
-## Common Commands
-
-All commands via Taskfile:
-
-```bash
-# Infrastructure
-task infra:up      # Start PostgreSQL + Gotenberg
-task infra:down    # Stop infrastructure
-
-# Development
-task api:dev       # Run Go API with hot reload
-task web:dev       # Run Next.js dev server
-
-# Database
-task db:migrate    # Run database migrations
-task db:reset      # Reset database
-
-# Quality
-task test          # Run all tests
-task lint          # Run all linters
+```
+HTTP Request → Handler → Service → Repository → PostgreSQL
+                 ↓
+              Middleware (Auth, Logging)
 ```
 
-## Architecture Principles
-
-1. **Separation of Concerns**: Handlers → Services → Repositories
-2. **Domain-First**: Pure domain models with no external dependencies
-3. **Interface-Based**: All major components use interfaces for testability
-4. **Configuration-Driven**: Feature flags and limits via environment variables
+- **Handlers**: Parse HTTP, validate input, call services
+- **Services**: Business logic, orchestration
+- **Repositories**: Data access via sqlc-generated code
+- **Domain**: Pure types, no external dependencies
 
 ## Key Patterns
 
-### Backend (Go)
-- Handlers receive HTTP requests, validate input, call services
-- Services contain business logic, orchestrate repositories
-- Repositories handle data access (sqlc generated)
-- Middleware handles cross-cutting concerns (auth, logging)
+### Repository Implementation
+```go
+// pgx.ErrNoRows → domain.ErrNotFound
+user, err := r.q.GetUserByID(ctx, id)
+if errors.Is(err, pgx.ErrNoRows) {
+    return nil, domain.ErrNotFound
+}
+```
 
-### Frontend (Next.js)
-- App Router with locale-based routing
-- Server Components for static/marketing pages
-- Client Components for interactive editor
-- Zustand for client-side state management
+### Auth Bypass (Development)
+Set `AUTH_BYPASS_ENABLED=true` in `.env` — all requests use `dev-user-001`
 
-## Authentication
+### sqlc Workflow
+1. Write SQL in `api/db/queries/*.sql`
+2. Run `task api:sqlc`
+3. Use generated `queries.Queries` in repositories
 
-**Development Mode:** Auth bypass enabled via `AUTH_BYPASS_ENABLED=true`
-- Uses a seeded dev user (id: `dev-user-001`)
-- No OIDC provider needed for local development
+## Common Commands
 
-**Production:** Google OIDC via go-oidc library
+```bash
+# Infrastructure
+task infra:up          # Start PostgreSQL + Gotenberg
+task infra:down        # Stop infrastructure
 
-## Database
+# Development
+task api:dev           # Run API with hot reload
+task web:dev           # Run Next.js dev server
 
-PostgreSQL with:
-- JSONB for flexible CV content storage
-- Row Level Security for tenant isolation
-- pgcrypto for field-level encryption
+# Database
+task db:migrate        # Run migrations
+task db:seed           # Seed dev user + sample CV
+task db:psql           # Open psql shell
 
-Migrations in `api/db/migrations/`, managed by golang-migrate.
+# Code Generation
+task api:sqlc          # Generate sqlc code
+```
 
-## Testing Strategy
+## Development Setup
 
-- Go: `go test` with testify assertions
-- Frontend: Vitest + React Testing Library
-- E2E: Playwright (post-MVP)
+```bash
+task setup             # Full setup (infra, migrate, seed, deps)
+# OR manually:
+task infra:up
+task db:migrate
+task db:seed
+task api:dev
+```
 
-## Current Focus
+## Testing the API
 
-Check `docs/ROADMAP.md` for current development phase and priorities.
+```bash
+# Health check
+curl http://localhost:8080/health
 
-## Directory-Specific Context
+# Get current user (auth bypass must be enabled)
+curl http://localhost:8080/api/v1/users/me
 
-Each major directory has its own `CLAUDE.md` with specific guidance:
-- `api/CLAUDE.md` — Backend development context
-- `web/CLAUDE.md` — Frontend development context
-
-## Common Tasks
-
-### Adding a New API Endpoint
-1. Define types in `api/internal/domain/`
-2. Add sqlc query in `api/db/queries/`
-3. Run `task api:sqlc` to generate code
-4. Implement repository method in `api/internal/repository/postgres/`
-5. Implement service method in `api/internal/service/`
-6. Add handler in `api/internal/handler/`
-7. Register route in `api/cmd/server/main.go`
-8. Write tests
-
-### Adding a New CV Section Type
-1. Update `schemas/cv-schema.json`
-2. Run `task generate:types` to update TypeScript types
-3. Add section editor component in `web/src/components/editor/sections/`
-4. Update `SectionList.tsx` to render new type
-5. Update preview templates in `api/templates/`
-
-### Modifying Database Schema
-1. Create new migration: `task db:migration:create name=description`
-2. Write up/down SQL in `api/db/migrations/`
-3. Update sqlc queries if needed
-4. Run `task db:migrate`
-5. Regenerate sqlc: `task api:sqlc`
+# Get CV
+curl http://localhost:8080/api/v1/cv
+```

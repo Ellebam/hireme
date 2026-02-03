@@ -1,71 +1,57 @@
 # Work Log
 
-Chronological record of development activity. Update after each session.
+Chronological record of development activity.
+
+---
+
+## 2026-02-03
+
+### Session Focus
+Wire up repository layer to make API functional
+
+### Completed
+- [FIX] `api/db/sqlc.yaml` — fixed paths and type override syntax for sqlc v1.30
+- [FEAT] Implemented `UserRepository` with sqlc queries
+- [FEAT] Implemented `CVRepository` with sqlc queries
+- [FEAT] Implemented `AssetRepository` with sqlc queries
+- [FIX] `Taskfile.yml` — db:seed now runs full seed SQL (user + CV)
+- [DOCS] Updated `CLAUDE.md` with quick commands
+- [DOCS] Updated `CONTEXT.md` with current state
+
+### Notes
+**Root cause of 404s:** Repositories were stubs returning `ErrNotFound`. Auth bypass worked but `GetByID()` always failed.
+
+**Key mappings:**
+- `pgx.ErrNoRows` → `domain.ErrNotFound`
+- `pgtype.Timestamptz` → `time.Time` (check `.Valid`)
+- Nullable pointers → domain fields with nil checks
+
+### Next
+- Implement asset upload (file storage)
+- Implement export endpoints (Gotenberg)
+- Start frontend
 
 ---
 
 ## 2026-01-29
 
 ### Session Focus
-Initial Claude Code setup and project familiarization
+Initial Claude Code setup
 
 ### Completed
-- [CHORE] Customized all agent files in `.claude/agents/` for HireMe's specific tech stack
-- [DOCS] Updated engineer, architect, qa, devops, security, and pm agents with project-specific context
+- [CHORE] Customized agent files in `.claude/agents/`
+- [DOCS] Updated all agents with HireMe-specific context
 
 ### Notes
-**Project Discovery:**
-- Well-structured Go backend with clean layered architecture (Handler → Service → Repository)
-- sqlc for type-safe database queries — no raw SQL
-- Next.js 14 with App Router, following Server Components by default pattern
-- Taskfile.yml provides comprehensive dev commands (`task api:dev`, `task web:dev`, etc.)
-- Auth bypass enabled for local development, Google OIDC for production
-- Gotenberg integration for PDF/DOCX export via HTML templates
-- PostgreSQL with JSONB for flexible CV content storage
-
-**Agent Customizations:**
-- Engineer agent now includes HireMe-specific workflows (adding endpoints, CV sections)
-- Architect agent documents existing patterns (domain-first, interface-based)
-- QA agent covers Go testing with testify + Vitest/RTL for frontend
-- DevOps agent maps all Taskfile commands and Docker setup
-- Security agent highlights CV PII protection and auth patterns
-- PM agent includes HireMe-specific priority framework and MVP definition
-
-### Next
-- Review `docs/ROADMAP.md` when created to understand current development phase
-- Begin implementing features based on roadmap priorities
-- Consider adding `api/CLAUDE.md` and `web/CLAUDE.md` for directory-specific context
+Project discovery — well-structured Go backend, sqlc for queries, Next.js 14 frontend planned.
 
 ---
 
-## [DATE]
-
-### Session Focus
-[What you set out to accomplish]
-
-### Completed
-- [FEAT] 
-- [FIX] 
-- [REFACTOR] 
-- [DOCS] 
-- [TEST] 
-- [CHORE] 
-
-### Notes
-[Any observations, learnings, or context for future you]
-
-### Next
-[What to pick up next session]
-
----
-
-<!-- 
-TEMPLATE FOR NEW ENTRIES (copy above the line):
-
+<!-- TEMPLATE:
 ## YYYY-MM-DD
 
 ### Session Focus
-[What you set out to accomplish]
+[Goal]
 
 ### Completed
 - [TAG] Item
@@ -75,6 +61,4 @@ TEMPLATE FOR NEW ENTRIES (copy above the line):
 
 ### Next
 [Continue with...]
-
----
 -->

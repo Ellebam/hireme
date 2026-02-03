@@ -137,10 +137,10 @@ tasks:
       - echo "Created migration {{.name}}"
 
   db:seed:
-    desc: Seed development data (dev user)
+    desc: Seed development data (dev user + sample CV)
     cmds:
-      - ./scripts/seed-dev-user.sh
-      - echo "✅ Dev user seeded"
+      - docker compose -f {{.DOCKER_COMPOSE_INFRA}} exec -T postgres psql -U hireme -d hireme < api/db/seed/dev_seed.sql
+      - echo "✅ Development data seeded"
 
   db:reset:
     desc: Reset database (drop and recreate)
