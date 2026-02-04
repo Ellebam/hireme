@@ -7,9 +7,9 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/yourusername/hireme/api/internal/domain"
-	"github.com/yourusername/hireme/api/internal/repository"
-	"github.com/yourusername/hireme/api/internal/repository/postgres/queries"
+	"github.com/ellebam/hireme/api/internal/domain"
+	"github.com/ellebam/hireme/api/internal/repository"
+	"github.com/ellebam/hireme/api/internal/repository/postgres/queries"
 )
 
 // UserRepository implements repository.UserRepository using PostgreSQL

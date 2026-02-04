@@ -10,10 +10,12 @@
 - ✅ API endpoints: Health, Users, CVs (full CRUD)
 - ✅ Auth bypass: Dev mode uses `dev-user-001`
 - ✅ Repository layer: sqlc queries wired to domain types
+- ✅ Asset management: Upload, retrieve, delete with local storage
+- ✅ Storage abstraction: LocalStorage implemented, R2 placeholder ready
 
 ### What's Not Working Yet
-- ❌ Asset upload (`POST /api/v1/assets`) — returns 500, needs file storage
 - ❌ Export (`POST /api/v1/export/{format}`) — returns 501, needs Gotenberg integration
+- ❌ R2 cloud storage — placeholder only, needs AWS SDK implementation
 - ❌ Frontend — not started
 
 ### API Endpoints (Verified Working)
@@ -27,6 +29,9 @@ GET  /api/v1/cv                 → User's active CV
 POST /api/v1/cv                 → Create new CV
 PUT  /api/v1/cv/{id}            → Update CV
 DELETE /api/v1/cv/{id}          → Delete CV
+POST /api/v1/assets             → Upload asset (image)
+GET  /api/v1/assets/{id}        → Get asset metadata (or file with Accept: image/*)
+DELETE /api/v1/assets/{id}      → Delete asset
 ```
 
 ---

@@ -7,8 +7,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 
-	"github.com/yourusername/hireme/api/internal/middleware"
-	"github.com/yourusername/hireme/api/pkg/httputil"
+	"github.com/ellebam/hireme/api/internal/middleware"
+	"github.com/ellebam/hireme/api/pkg/httputil"
 )
 
 // CVResponse represents a CV in API responses

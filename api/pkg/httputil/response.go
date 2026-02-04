@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/yourusername/hireme/api/internal/domain"
+	"github.com/ellebam/hireme/api/internal/domain"
 )
 
 // Response is the standard API response wrapper

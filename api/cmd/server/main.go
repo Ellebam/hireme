@@ -15,12 +15,13 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/yourusername/hireme/api/internal/config"
-	"github.com/yourusername/hireme/api/internal/handler"
-	appMiddleware "github.com/yourusername/hireme/api/internal/middleware"
-	"github.com/yourusername/hireme/api/internal/repository/postgres"
-	"github.com/yourusername/hireme/api/internal/service"
-	"github.com/yourusername/hireme/api/internal/validator"
+	"github.com/ellebam/hireme/api/internal/config"
+	"github.com/ellebam/hireme/api/internal/handler"
+	appMiddleware "github.com/ellebam/hireme/api/internal/middleware"
+	"github.com/ellebam/hireme/api/internal/repository/postgres"
+	"github.com/ellebam/hireme/api/internal/service"
+	"github.com/ellebam/hireme/api/internal/storage"
+	"github.com/ellebam/hireme/api/internal/validator"
 )
 
 func main() {
@@ -60,6 +61,14 @@ func main() {
 	cvRepo := postgres.NewCVRepository(db)
 	assetRepo := postgres.NewAssetRepository(db)
 
+	// Initialize storage backend
+	store, err := storage.NewStorage(&cfg.Storage)
+	if err != nil {
+		slog.Error("failed to initialize storage", "error", err)
+		os.Exit(1)
+	}
+	slog.Info("storage initialized", "backend", cfg.Storage.Backend, "path", cfg.Storage.LocalPath)
+
 	// Initialize validator
 	cvValidator, err := validator.NewCVValidator()
 	if err != nil {
@@ -70,7 +79,7 @@ func main() {
 	// Initialize services
 	userSvc := service.NewUserService(userRepo)
 	cvSvc := service.NewCVService(cvRepo, userRepo, cvValidator)
-	assetSvc := service.NewAssetService(assetRepo, userRepo, cfg)
+	assetSvc := service.NewAssetService(assetRepo, userRepo, store, cfg)
 
 	// Initialize handlers
 	h := handler.New(handler.Dependencies{

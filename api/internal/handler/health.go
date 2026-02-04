@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/yourusername/hireme/api/pkg/httputil"
+	"github.com/ellebam/hireme/api/pkg/httputil"
 )
 
 // HealthResponse represents the health check response

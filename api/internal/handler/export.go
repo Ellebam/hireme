@@ -5,8 +5,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"github.com/yourusername/hireme/api/internal/domain"
-	"github.com/yourusername/hireme/api/pkg/httputil"
+	"github.com/ellebam/hireme/api/internal/domain"
+	"github.com/ellebam/hireme/api/pkg/httputil"
 )
 
 // ExportResponse represents an export job in API responses

@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/yourusername/hireme/api/internal/domain"
+	"github.com/ellebam/hireme/api/internal/domain"
 )
 
 // UserRepository defines data access methods for users

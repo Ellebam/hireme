@@ -6,8 +6,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 
-	"github.com/yourusername/hireme/api/internal/middleware"
-	"github.com/yourusername/hireme/api/pkg/httputil"
+	"github.com/ellebam/hireme/api/internal/middleware"
+	"github.com/ellebam/hireme/api/pkg/httputil"
 )
 
 // AssetResponse represents an asset in API responses
@@ -84,8 +84,13 @@ func (h *Handler) GetAsset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check if client wants file content or metadata
-	if r.Header.Get("Accept") == "application/json" {
+	// Check if client wants file content (explicit image accept header) or metadata (default)
+	// Only serve file when explicitly requesting the image MIME type or image/*
+	accept := r.Header.Get("Accept")
+	wantsFile := accept == asset.MimeType || accept == "image/*"
+
+	if !wantsFile {
+		// Default: return JSON metadata
 		response := AssetResponse{
 			ID:               asset.ID.String(),
 			Filename:         asset.Filename,
@@ -101,7 +106,7 @@ func (h *Handler) GetAsset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Serve the file
+	// Serve the file (only when explicitly requesting image content)
 	fileContent, err := h.assetService.GetFileContent(ctx, asset)
 	if err != nil {
 		httputil.HandleError(w, err)

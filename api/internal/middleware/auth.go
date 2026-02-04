@@ -8,8 +8,8 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 
-	"github.com/yourusername/hireme/api/internal/config"
-	"github.com/yourusername/hireme/api/pkg/httputil"
+	"github.com/ellebam/hireme/api/internal/config"
+	"github.com/ellebam/hireme/api/pkg/httputil"
 )
 
 type contextKey string

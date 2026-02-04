@@ -6,6 +6,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/ellebam/hireme/api/internal/config"
 )
 
 // Storage defines the interface for file storage backends
@@ -102,4 +104,22 @@ func (s *LocalStorage) Exists(ctx context.Context, path string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+// NewStorage creates the appropriate storage backend based on configuration
+func NewStorage(cfg *config.StorageConfig) (Storage, error) {
+	switch cfg.Backend {
+	case "local":
+		return NewLocalStorage(cfg.LocalPath)
+	case "r2":
+		return NewR2Storage(R2Config{
+			AccountID: cfg.R2AccountID,
+			AccessKey: cfg.R2AccessKey,
+			SecretKey: cfg.R2SecretKey,
+			Bucket:    cfg.R2Bucket,
+			PublicURL: cfg.R2PublicURL,
+		})
+	default:
+		return NewLocalStorage(cfg.LocalPath)
+	}
 }

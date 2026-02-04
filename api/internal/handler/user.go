@@ -3,8 +3,8 @@ package handler
 import (
 	"net/http"
 
-	"github.com/yourusername/hireme/api/internal/middleware"
-	"github.com/yourusername/hireme/api/pkg/httputil"
+	"github.com/ellebam/hireme/api/internal/middleware"
+	"github.com/ellebam/hireme/api/pkg/httputil"
 )
 
 // UserResponse represents a user in API responses

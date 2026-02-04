@@ -8,7 +8,7 @@ import (
 
 	"github.com/santhosh-tekuri/jsonschema/v5"
 
-	"github.com/yourusername/hireme/api/internal/domain"
+	"github.com/ellebam/hireme/api/internal/domain"
 )
 
 //go:embed schema/cv-schema.json

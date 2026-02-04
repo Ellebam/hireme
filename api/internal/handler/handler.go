@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"github.com/yourusername/hireme/api/internal/config"
-	"github.com/yourusername/hireme/api/internal/service"
+	"github.com/ellebam/hireme/api/internal/config"
+	"github.com/ellebam/hireme/api/internal/service"
 )
 
 // Handler holds all HTTP handlers and their dependencies

@@ -7,9 +7,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/yourusername/hireme/api/internal/domain"
-	"github.com/yourusername/hireme/api/internal/repository"
-	"github.com/yourusername/hireme/api/internal/validator"
+	"github.com/ellebam/hireme/api/internal/domain"
+	"github.com/ellebam/hireme/api/internal/repository"
+	"github.com/ellebam/hireme/api/internal/validator"
 )
 
 // CVService handles CV-related business logic

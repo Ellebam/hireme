@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
-	"github.com/yourusername/hireme/api/internal/domain"
-	"github.com/yourusername/hireme/api/internal/repository"
+	"github.com/ellebam/hireme/api/internal/domain"
+	"github.com/ellebam/hireme/api/internal/repository"
 )
 
 // UserService handles user-related business logic

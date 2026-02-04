@@ -1,4 +1,4 @@
-module github.com/yourusername/hireme/api
+module github.com/ellebam/hireme/api
 
 go 1.22
 
