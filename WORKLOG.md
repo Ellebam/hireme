@@ -4,6 +4,42 @@ Chronological record of development activity.
 
 ---
 
+## 2026-02-04 (Session 3)
+
+### Session Focus
+Frontend MVP architecture planning
+
+### Completed
+- [DOCS] Created comprehensive `web/FRONTEND_MVP_PLAN.md` with full architecture
+- [DOCS] Designed three-column editor layout (palette | preview | properties)
+- [DOCS] Defined component hierarchy and state management strategy
+- [DOCS] Planned drag & drop implementation with dnd-kit
+- [DOCS] Established testing strategy with Vitest
+- [DOCS] Created 7-phase implementation roadmap
+
+### Notes
+**Key architectural decisions:**
+- Three-column layout: Section palette (left), CV preview (center), Properties panel (right)
+- Zustand for state: `EditorStore` (CV data, undo/redo) + `UIStore` (panels, modals)
+- Auto-save with 2s debounce + optimistic updates
+- dnd-kit for section and entry reordering
+- Responsive: Desktop (3-col) → Tablet (2-col) → Mobile (single + FAB)
+
+**MVP scope:**
+- 6 section types: Personal, Summary, Experience, Education, Skills, Languages
+- Single CV editing with live preview
+- Drag & drop reordering
+- Export to PDF/DOCX/JSON
+- Basic i18n (en/de)
+
+### Next
+- Phase 1: TypeScript types from CV schema
+- Phase 1: API client with typed methods
+- Phase 1: Zustand stores (editor + UI)
+- Phase 1: Vitest setup and store tests
+
+---
+
 ## 2026-02-04 (Session 2)
 
 ### Session Focus

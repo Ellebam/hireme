@@ -16,7 +16,15 @@
 ### What's Not Working Yet
 - ❌ Export (`POST /api/v1/export/{format}`) — returns 501, needs Gotenberg integration
 - ❌ R2 cloud storage — placeholder only, needs AWS SDK implementation
-- ❌ Frontend — not started
+- ⏳ Frontend — architecture planned, implementation starting
+
+### Frontend MVP Plan
+See `web/FRONTEND_MVP_PLAN.md` for full details:
+- **Layout:** Three-column editor (palette | preview | properties)
+- **Pages:** Landing, Dashboard, Editor
+- **State:** Zustand stores (editor + UI)
+- **DnD:** dnd-kit for section/entry reordering
+- **Testing:** Vitest + React Testing Library
 
 ### To-Do (MVP API)
 
