@@ -82,34 +82,77 @@ export function PropertiesPanel() {
   );
 }
 
-import type { CVSection } from '@/types/cv';
+import type { CVSection, PersonalContent, SummaryContent, ExperienceContent, EducationContent, SkillsContent, LanguagesContent } from '@/types/cv';
+import {
+  PersonalEditor,
+  SummaryEditor,
+  ExperienceEditor,
+  EducationEditor,
+  SkillsEditor,
+  LanguagesEditor,
+} from './editors';
 
 function SectionEditor({ section }: { section: CVSection }) {
-  const { updateSectionContent } = useEditorStore();
-
-  // For MVP, show a simple form based on section type
-  // This will be expanded with proper form fields later
-
-  return (
-    <div className="space-y-4">
-      <div className="p-4 rounded-lg bg-muted/50 border border-dashed">
-        <p className="text-sm text-muted-foreground text-center">
-          Edit {SECTION_LABELS[section.type]} content
-        </p>
-        <p className="text-xs text-muted-foreground text-center mt-2">
-          Full editing forms will be implemented in Phase 4
-        </p>
-      </div>
-
-      {/* Quick preview of current content */}
-      <div>
-        <h3 className="text-xs font-medium text-muted-foreground mb-2">
-          Current Content
-        </h3>
-        <pre className="text-xs bg-muted p-3 rounded overflow-auto max-h-[300px]">
-          {JSON.stringify(section.content, null, 2)}
-        </pre>
-      </div>
-    </div>
-  );
+  switch (section.type) {
+    case 'personal':
+      return (
+        <PersonalEditor
+          sectionId={section.id}
+          content={section.content as PersonalContent}
+        />
+      );
+    case 'summary':
+      return (
+        <SummaryEditor
+          sectionId={section.id}
+          content={section.content as SummaryContent}
+        />
+      );
+    case 'experience':
+      return (
+        <ExperienceEditor
+          sectionId={section.id}
+          content={section.content as ExperienceContent}
+        />
+      );
+    case 'education':
+      return (
+        <EducationEditor
+          sectionId={section.id}
+          content={section.content as EducationContent}
+        />
+      );
+    case 'skills':
+      return (
+        <SkillsEditor
+          sectionId={section.id}
+          content={section.content as SkillsContent}
+        />
+      );
+    case 'languages':
+      return (
+        <LanguagesEditor
+          sectionId={section.id}
+          content={section.content as LanguagesContent}
+        />
+      );
+    default:
+      return (
+        <div className="space-y-4">
+          <div className="p-4 rounded-lg bg-muted/50 border border-dashed">
+            <p className="text-sm text-muted-foreground text-center">
+              Edit {SECTION_LABELS[section.type]} content
+            </p>
+          </div>
+          <div>
+            <h3 className="text-xs font-medium text-muted-foreground mb-2">
+              Current Content
+            </h3>
+            <pre className="text-xs bg-muted p-3 rounded overflow-auto max-h-[300px]">
+              {JSON.stringify(section.content, null, 2)}
+            </pre>
+          </div>
+        </div>
+      );
+  }
 }

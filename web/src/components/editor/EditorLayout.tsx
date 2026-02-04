@@ -5,6 +5,7 @@ import { EditorToolbar } from './EditorToolbar';
 import { SectionPalette } from './SectionPalette';
 import { CVPreview } from './CVPreview';
 import { PropertiesPanel } from './PropertiesPanel';
+import { ExportModal, DeleteConfirmModal } from './modals';
 import { cn } from '@/lib/utils';
 
 export function EditorLayout() {
@@ -40,6 +41,10 @@ export function EditorLayout() {
           <PropertiesPanel />
         </div>
       </div>
+
+      {/* Modals */}
+      <ExportModal />
+      <DeleteConfirmModal />
     </div>
   );
 }

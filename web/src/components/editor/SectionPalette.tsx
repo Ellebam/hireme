@@ -13,7 +13,15 @@ import {
   BookOpen,
   Users,
   Plus,
+  GripVertical,
 } from 'lucide-react';
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+} from '@dnd-kit/core';
+import { SortableContext } from '@dnd-kit/sortable';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -21,8 +29,10 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useEditorStore, useSortedSections } from '@/stores';
-import { SECTION_LABELS, type SectionType } from '@/types/cv';
+import { SECTION_LABELS, type SectionType, type CVSection } from '@/types/cv';
 import { cn } from '@/lib/utils';
+import { useDndSensors, collisionDetection, sortStrategy, useSortableItem } from '@/lib/dnd';
+import { useState } from 'react';
 
 const sectionIcons: Record<SectionType, React.ElementType> = {
   personal: User,
@@ -50,8 +60,10 @@ const mvpSectionTypes: SectionType[] = [
 ];
 
 export function SectionPalette() {
-  const { addSection, cvContent } = useEditorStore();
+  const { addSection, reorderSections, selectSection, selectedSectionId } = useEditorStore();
   const sections = useSortedSections();
+  const sensors = useDndSensors();
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   // Check which sections already exist
   const existingSectionTypes = new Set(sections.map((s) => s.type));
@@ -59,6 +71,23 @@ export function SectionPalette() {
   const handleAddSection = (type: SectionType) => {
     addSection(type);
   };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveId(null);
+
+    if (over && active.id !== over.id) {
+      reorderSections(active.id as string, over.id as string);
+    }
+  };
+
+  const activeSection = activeId
+    ? sections.find((s) => s.id === activeId)
+    : null;
 
   return (
     <div className="h-full flex flex-col bg-muted/30">
@@ -119,39 +148,108 @@ export function SectionPalette() {
         {/* Divider */}
         <div className="my-4 border-t" />
 
-        {/* Structure View */}
+        {/* Structure View with Drag & Drop */}
         <div>
           <h3 className="text-xs font-medium text-muted-foreground mb-2 px-1">
             CV Structure
+            <span className="ml-2 text-muted-foreground/70">(drag to reorder)</span>
           </h3>
-          <div className="space-y-1">
-            {sections.map((section) => {
-              const Icon = sectionIcons[section.type] || Plus;
-              return (
-                <div
-                  key={section.id}
-                  className={cn(
-                    'flex items-center gap-2 px-2 py-1.5 rounded text-sm',
-                    section.visible !== false
-                      ? 'text-foreground'
-                      : 'text-muted-foreground'
-                  )}
-                >
-                  <Icon className="h-3.5 w-3.5 shrink-0" />
-                  <span className="truncate">
-                    {section.title || SECTION_LABELS[section.type]}
-                  </span>
-                  {section.visible === false && (
-                    <span className="text-xs text-muted-foreground ml-auto">
-                      hidden
-                    </span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={collisionDetection}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext items={sections.map((s) => s.id)} strategy={sortStrategy}>
+              <div className="space-y-1">
+                {sections.map((section) => (
+                  <SortableSectionItem
+                    key={section.id}
+                    section={section}
+                    isSelected={section.id === selectedSectionId}
+                    onSelect={() => selectSection(section.id)}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+
+            {/* Drag Overlay */}
+            <DragOverlay>
+              {activeSection && (
+                <SectionItemContent
+                  section={activeSection}
+                  isSelected={false}
+                  isDragging
+                />
+              )}
+            </DragOverlay>
+          </DndContext>
         </div>
       </div>
+    </div>
+  );
+}
+
+interface SortableSectionItemProps {
+  section: CVSection;
+  isSelected: boolean;
+  onSelect: () => void;
+}
+
+function SortableSectionItem({ section, isSelected, onSelect }: SortableSectionItemProps) {
+  const { ref, style, isDragging, dragHandleProps } = useSortableItem(section.id);
+
+  return (
+    <div ref={ref} style={style}>
+      <SectionItemContent
+        section={section}
+        isSelected={isSelected}
+        isDragging={isDragging}
+        dragHandleProps={dragHandleProps}
+        onClick={onSelect}
+      />
+    </div>
+  );
+}
+
+interface SectionItemContentProps {
+  section: CVSection;
+  isSelected: boolean;
+  isDragging?: boolean;
+  dragHandleProps?: Record<string, unknown>;
+  onClick?: () => void;
+}
+
+function SectionItemContent({
+  section,
+  isSelected,
+  isDragging,
+  dragHandleProps,
+  onClick,
+}: SectionItemContentProps) {
+  const Icon = sectionIcons[section.type] || Plus;
+
+  return (
+    <div
+      className={cn(
+        'flex items-center gap-2 px-2 py-1.5 rounded text-sm cursor-pointer',
+        'hover:bg-accent transition-colors',
+        isSelected && 'bg-primary/10 text-primary',
+        section.visible === false && 'opacity-60',
+        isDragging && 'bg-accent shadow-lg ring-2 ring-primary/20'
+      )}
+      onClick={onClick}
+    >
+      <div {...dragHandleProps} className="cursor-grab touch-none">
+        <GripVertical className="h-3.5 w-3.5 text-muted-foreground" />
+      </div>
+      <Icon className="h-3.5 w-3.5 shrink-0" />
+      <span className="truncate flex-1">
+        {section.title || SECTION_LABELS[section.type]}
+      </span>
+      {section.visible === false && (
+        <span className="text-xs text-muted-foreground">hidden</span>
+      )}
     </div>
   );
 }
