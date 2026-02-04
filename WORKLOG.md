@@ -4,6 +4,58 @@ Chronological record of development activity.
 
 ---
 
+## 2026-02-04 (Session 4)
+
+### Session Focus
+Frontend MVP implementation - Phases 1 & 2
+
+### Completed
+
+**Phase 1: Foundation**
+- [FEAT] TypeScript types from CV schema (`types/cv.ts`, `types/api.ts`)
+- [FEAT] API client with typed methods (`lib/api/client.ts`)
+- [FEAT] Zustand editor store with undo/redo, section operations
+- [FEAT] Zustand UI store for panels, modals, preview scale
+- [TEST] Vitest setup with 55 passing store tests
+
+**Phase 2: Layout & Navigation**
+- [FEAT] Layout components (AppShell, Header with mobile menu)
+- [FEAT] UI components (Button, Card, Tooltip, Skeleton, Separator)
+- [FEAT] Dashboard page (`/dashboard`) - CV list with create/edit
+- [FEAT] Editor page (`/editor`) - full three-column layout
+- [FEAT] EditorToolbar - undo/redo, zoom, save status, export
+- [FEAT] SectionPalette - add sections, structure view
+- [FEAT] CVPreview - live A4 preview with section renderers
+- [FEAT] PropertiesPanel - section properties (placeholder for Phase 4)
+- [FEAT] Auto-save hook (2s debounce)
+- [FEAT] Keyboard shortcuts (Ctrl+Z/Y, Ctrl+/-/0)
+
+### Notes
+**File count:** 37 new files across types, stores, components, hooks
+
+**Key features working:**
+- Three-column editor layout with collapsible sidebars
+- Live CV preview with A4 aspect ratio and zoom (50-200%)
+- Section selection with visual feedback
+- Undo/redo with 50-step history
+- Auto-save with debounce
+- Save status indicator (saving/saved/error)
+- Keyboard shortcuts
+
+**Still needed (Phases 3-7):**
+- Full section content editors (Phase 4)
+- Drag & drop reordering (Phase 5)
+- Export modal (Phase 6)
+- Additional component tests
+
+### Next
+- Phase 4: Section editors (PersonalEditor, ExperienceEntryEditor, etc.)
+- Phase 5: Drag & drop with dnd-kit
+- Phase 6: Polish (export modal, template selector)
+- Phase 7: Component tests
+
+---
+
 ## 2026-02-04 (Session 3)
 
 ### Session Focus
