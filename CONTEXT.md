@@ -18,6 +18,26 @@
 - ❌ R2 cloud storage — placeholder only, needs AWS SDK implementation
 - ❌ Frontend — not started
 
+### To-Do (MVP API)
+
+- [ ] **Finishing touches on MVP API**
+  - Gotenberg integration for export endpoint
+  - Error response consistency audit
+  - Input validation coverage
+
+- [ ] **Testing** → See [TESTING_PLAN.md](./TESTING_PLAN.md)
+  - Phase 1: Domain, Validator, HTTP Utils (P0)
+  - Phase 2: Service layer with mocks (P0)
+  - Phase 3: Handler layer (P1)
+  - Phase 4: Auth middleware (P1)
+  - Phase 5: Repository integration (P2)
+  - Phase 6: Storage tests (P2)
+
+- [ ] **CI/CD improvements**
+  - Add `go vet` to lint job
+  - Run migrations before integration tests
+  - Coverage threshold (60% minimum)
+
 ### API Endpoints (Verified Working)
 
 ```

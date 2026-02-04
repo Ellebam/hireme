@@ -4,6 +4,42 @@ Chronological record of development activity.
 
 ---
 
+## 2026-02-04 (Session 2)
+
+### Session Focus
+Testing strategy and planning for MVP API
+
+### Completed
+- [DOCS] Created comprehensive `TESTING_PLAN.md` with phased approach
+- [DOCS] Updated `CONTEXT.md` with testing to-dos referencing plan
+- [CHORE] Assessed current test coverage (zero tests exist)
+- [CHORE] Identified CI/CD improvements needed
+
+### Notes
+**Current state:** Zero test files in `api/` directory. CI passes vacuously.
+
+**Testing phases:**
+| Phase | Focus | Priority |
+|-------|-------|----------|
+| 1 | Domain, Validator, HTTP Utils | P0 |
+| 2 | Service layer (mocked repos) | P0 |
+| 3 | Handler layer (httptest) | P1 |
+| 4 | Auth middleware | P1 |
+| 5 | Repository integration | P2 |
+| 6 | Storage tests | P2 |
+
+**CI/CD gaps:**
+- Missing `go vet` in lint job
+- No migration step before integration tests
+- No coverage threshold enforcement
+
+### Next
+- Start Phase 1: Domain layer tests (`domain/*_test.go`)
+- Create test infrastructure (mocks, fixtures)
+- Implement service layer tests
+
+---
+
 ## 2026-02-04
 
 ### Session Focus
