@@ -2,29 +2,37 @@
 
 ## Current State
 
-**Status:** API backend functional, frontend not started
+**Status:** API backend functional, Frontend MVP complete
 
 ### What's Working
+
+**Backend:**
 - ✅ Infrastructure: PostgreSQL + Gotenberg via Docker
 - ✅ Database: Migrations applied, dev data seeded
-- ✅ API endpoints: Health, Users, CVs (full CRUD)
+- ✅ API endpoints: Health, Users, CVs (full CRUD), Assets
 - ✅ Auth bypass: Dev mode uses `dev-user-001`
 - ✅ Repository layer: sqlc queries wired to domain types
 - ✅ Asset management: Upload, retrieve, delete with local storage
 - ✅ Storage abstraction: LocalStorage implemented, R2 placeholder ready
 
+**Frontend:**
+- ✅ Three-column editor layout (palette | preview | properties)
+- ✅ Dashboard page with CV list
+- ✅ 6 section editors (Personal, Summary, Experience, Education, Skills, Languages)
+- ✅ Drag & drop section reordering (dnd-kit)
+- ✅ Live A4 CV preview with zoom (50-200%)
+- ✅ Undo/redo with 50-step history
+- ✅ Auto-save with 2s debounce
+- ✅ Export modal (PDF, DOCX, JSON)
+- ✅ Keyboard shortcuts (Ctrl+Z/Y, Ctrl+/-/0)
+- ✅ 64 passing tests (Vitest)
+
 ### What's Not Working Yet
 - ❌ Export (`POST /api/v1/export/{format}`) — returns 501, needs Gotenberg integration
 - ❌ R2 cloud storage — placeholder only, needs AWS SDK implementation
-- ⏳ Frontend — architecture planned, implementation starting
 
-### Frontend MVP Plan
-See `web/FRONTEND_MVP_PLAN.md` for full details:
-- **Layout:** Three-column editor (palette | preview | properties)
-- **Pages:** Landing, Dashboard, Editor
-- **State:** Zustand stores (editor + UI)
-- **DnD:** dnd-kit for section/entry reordering
-- **Testing:** Vitest + React Testing Library
+### Frontend Architecture
+See `web/FRONTEND_MVP_PLAN.md` for full details.
 
 ### To-Do (MVP API)
 
@@ -92,7 +100,21 @@ hireme/
 │       ├── repository/     # Data access (postgres/)
 │       ├── service/        # Business logic
 │       └── validator/      # JSON schema validation
-├── web/                    # Next.js frontend (not started)
+├── web/                    # Next.js frontend
+│   └── src/
+│       ├── app/            # Next.js pages (dashboard, editor)
+│       ├── components/
+│       │   ├── ui/         # shadcn/ui components
+│       │   ├── layout/     # AppShell, Header
+│       │   └── editor/     # CV editor components
+│       │       ├── editors/  # Section editors
+│       │       └── modals/   # Export, Delete modals
+│       ├── stores/         # Zustand (editor + UI)
+│       ├── hooks/          # useAutoSave, useKeyboardShortcuts
+│       ├── lib/
+│       │   ├── api/        # Typed HTTP client
+│       │   └── dnd/        # dnd-kit configuration
+│       └── types/          # TypeScript types
 ├── docker/                 # Docker configs
 ├── schemas/                # Shared JSON schemas
 └── scripts/                # Dev utilities
