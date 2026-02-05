@@ -26,6 +26,7 @@
 - ✅ Export modal (PDF, DOCX, JSON)
 - ✅ Keyboard shortcuts (Ctrl+Z/Y, Ctrl+/-/0)
 - ✅ 64 passing tests (Vitest)
+- ✅ Build verified, ready for stakeholder review
 
 ### What's Not Working Yet
 - ❌ Export (`POST /api/v1/export/{format}`) — returns 501, needs Gotenberg integration
@@ -155,13 +156,18 @@ Set `AUTH_BYPASS_ENABLED=true` in `.env` — all requests use `dev-user-001`
 ## Common Commands
 
 ```bash
+# Full Development (recommended)
+task dev               # Start infra + API + web together
+task dev:stop          # Stop everything + kill dev ports
+task dev:restart       # Full stop and restart
+
+# Partial Development
+task dev:api           # Start infra + API only
+task dev:web           # Start infra + web only
+
 # Infrastructure
 task infra:up          # Start PostgreSQL + Gotenberg
 task infra:down        # Stop infrastructure
-
-# Development
-task api:dev           # Run API with hot reload
-task web:dev           # Run Next.js dev server
 
 # Database
 task db:migrate        # Run migrations
@@ -176,11 +182,7 @@ task api:sqlc          # Generate sqlc code
 
 ```bash
 task setup             # Full setup (infra, migrate, seed, deps)
-# OR manually:
-task infra:up
-task db:migrate
-task db:seed
-task api:dev
+task dev               # Start everything (API :8080, Web :3000)
 ```
 
 ## Testing the API
