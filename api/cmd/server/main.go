@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -170,14 +171,25 @@ func setupRouter(cfg *config.Config, h *handler.Handler) *chi.Mux {
 	r.Use(middleware.RealIP)
 
 	// CORS
-	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "https://*.hireme.io"},
+	corsOptions := cors.Options{
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-Request-ID"},
 		ExposedHeaders:   []string{"X-Request-ID"},
 		AllowCredentials: true,
 		MaxAge:           300,
-	}))
+	}
+
+	if cfg.Environment == "development" {
+		// In development, allow any localhost origin (any port)
+		corsOptions.AllowOriginFunc = func(r *http.Request, origin string) bool {
+			return strings.HasPrefix(origin, "http://localhost:") ||
+				strings.HasPrefix(origin, "http://127.0.0.1:")
+		}
+	} else {
+		corsOptions.AllowedOrigins = []string{"https://*.hireme.io"}
+	}
+
+	r.Use(cors.Handler(corsOptions))
 
 	// Health endpoints (no auth)
 	r.Get("/health", h.Health)

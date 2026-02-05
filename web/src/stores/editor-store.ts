@@ -17,6 +17,7 @@ import type {
 } from '@/types/cv';
 import { getDefaultContent, SCHEMA_VERSION } from '@/types/cv';
 import { generateId } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // Types
@@ -120,6 +121,18 @@ export const useEditorStore = create<EditorStore>()(
       // ========================================================================
 
       setCV: (cv) => {
+        logger.info('Store', 'setCV called', {
+          id: cv.id,
+          title: cv.title,
+          hasContent: !!cv.content,
+          sectionCount: cv.content?.sections?.length ?? 0,
+        });
+
+        if (!cv.content) {
+          logger.error('Store', 'CV content is missing!', cv);
+          return;
+        }
+
         set((state) => {
           state.cv = cv;
           state.cvContent = cv.content;
@@ -131,6 +144,10 @@ export const useEditorStore = create<EditorStore>()(
           // Initialize history with current content
           state.history = [cv.content];
           state.historyIndex = 0;
+        });
+
+        logger.debug('Store', 'CV loaded successfully', {
+          sections: cv.content.sections.map((s) => s.type),
         });
       },
 

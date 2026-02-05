@@ -4,6 +4,70 @@ Chronological record of development activity.
 
 ---
 
+## 2026-02-05 (Session 6)
+
+### Session Focus
+CV templates, logging system, and API client fixes
+
+### Completed
+
+**Template System**
+- [FEAT] Created `web/src/lib/templates/` module with extensible template registry
+- [FEAT] Added `starterTemplate` - complete example CV with realistic sample data
+- [FEAT] Added `blankTemplate` - empty structure for starting from scratch
+- [FEAT] Template registry with metadata (id, name, description, factory function)
+
+**Logging System**
+- [FEAT] Created `web/src/lib/logger.ts` - configurable logging with levels (debug/info/warn/error)
+- [FEAT] Log level configurable via `localStorage.setItem('LOG_LEVEL', 'debug')` or env var
+- [FEAT] Added logging to API client, editor store, and editor page for debugging
+
+**API Client Fix**
+- [FIX] API client now correctly unwraps `{ data: ... }` responses from backend
+- [FIX] Error handling extracts messages from `{ error: { message, code } }` format
+- [FIX] Network errors now properly caught and reported
+
+**Testing**
+- [TEST] 81 tests passing (13 template tests, updated API client tests)
+
+### Files Created/Modified
+```
+web/src/lib/
+├── templates/
+│   ├── index.ts         # Public exports
+│   ├── starter.ts       # Starter template with example data
+│   ├── blank.ts         # Blank template
+│   ├── registry.ts      # Template registry and lookup
+│   └── templates.test.ts # Template tests
+└── logger.ts            # Configurable logging utility
+
+web/src/lib/api/client.ts  # Fixed response unwrapping
+web/src/stores/editor-store.ts  # Added logging
+web/src/app/editor/page.tsx  # Added logging
+```
+
+### Verification Results
+| Check | Status |
+|-------|--------|
+| Tests (81) | ✅ All passing |
+| TypeScript | ✅ No errors |
+| Build | ✅ Successful |
+| Editor loads CV | ✅ Working |
+| Full stack integration | ✅ Verified |
+
+### Notes
+- API returns wrapped responses `{ data: ... }` which client now unwraps
+- Logging helps debug data flow: Editor → API → Store → Preview
+- Templates generate unique IDs on each call (no ID collisions)
+
+### Next Session
+- Extensive editor testing (add/edit/delete sections)
+- Verify auto-save works end-to-end
+- Bug fixes based on user testing
+- Mobile responsive improvements
+
+---
+
 ## 2026-02-05 (Session 5)
 
 ### Session Focus

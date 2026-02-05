@@ -11,6 +11,7 @@ import type {
   Asset,
   ExportFormat,
 } from '@/types/api';
+import { logger } from '@/lib/logger';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
@@ -42,8 +43,22 @@ export class ApiError extends Error {
   }
 
   get isValidationError(): boolean {
-    return this.status === 422;
+    return this.status === 422 || this.status === 400;
   }
+}
+
+// ============================================================================
+// API Response Types
+// ============================================================================
+
+/** Standard API response wrapper from backend */
+interface ApiResponse<T> {
+  data?: T;
+  error?: {
+    code: string;
+    message: string;
+    field?: string;
+  };
 }
 
 // ============================================================================
@@ -62,34 +77,66 @@ class ApiClient {
     options?: RequestInit
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
+    const method = options?.method || 'GET';
 
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
-      credentials: 'include', // For cookies/auth
-    });
+    logger.debug('API', `${method} ${endpoint}`);
 
-    // Handle no-content responses
-    if (response.status === 204) {
-      return undefined as T;
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...options?.headers,
+        },
+        credentials: 'include', // For cookies/auth
+      });
+
+      // Handle no-content responses
+      if (response.status === 204) {
+        logger.debug('API', `${method} ${endpoint} -> 204 No Content`);
+        return undefined as T;
+      }
+
+      // Parse response body
+      const body: ApiResponse<T> = await response.json().catch(() => ({}));
+
+      logger.debug('API', `${method} ${endpoint} -> ${response.status}`, {
+        hasData: !!body.data,
+        hasError: !!body.error,
+      });
+
+      // Check for error response
+      if (!response.ok || body.error) {
+        const error = body.error;
+        const errorMessage = error?.message || 'Request failed';
+        const errorCode = error?.code;
+
+        logger.error('API', `${method} ${endpoint} failed: ${errorMessage}`, {
+          status: response.status,
+          code: errorCode,
+        });
+
+        throw new ApiError(response.status, errorMessage, errorCode);
+      }
+
+      // Unwrap the data from the response wrapper
+      if (body.data !== undefined) {
+        return body.data;
+      }
+
+      // Fallback: return body directly if no wrapper (shouldn't happen with our API)
+      logger.warn('API', `Response missing data wrapper for ${endpoint}`);
+      return body as unknown as T;
+    } catch (err) {
+      // Re-throw ApiErrors as-is
+      if (err instanceof ApiError) {
+        throw err;
+      }
+
+      // Handle network errors
+      logger.error('API', `Network error for ${method} ${endpoint}`, err);
+      throw new ApiError(0, 'Network error - please check your connection');
     }
-
-    // Parse response body
-    const body = await response.json().catch(() => ({}));
-
-    if (!response.ok) {
-      throw new ApiError(
-        response.status,
-        body.message || 'Request failed',
-        body.code,
-        body.details
-      );
-    }
-
-    return body as T;
   }
 
   async get<T>(endpoint: string): Promise<T> {
@@ -97,6 +144,7 @@ class ApiClient {
   }
 
   async post<T>(endpoint: string, data?: unknown): Promise<T> {
+    logger.debug('API', `POST ${endpoint} payload`, data);
     return this.request<T>(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
@@ -104,6 +152,7 @@ class ApiClient {
   }
 
   async put<T>(endpoint: string, data: unknown): Promise<T> {
+    logger.debug('API', `PUT ${endpoint} payload`, data);
     return this.request<T>(endpoint, {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -119,23 +168,38 @@ class ApiClient {
     formData.append('file', file);
 
     const url = `${this.baseUrl}${endpoint}`;
-    const response = await fetch(url, {
-      method: 'POST',
-      body: formData,
-      credentials: 'include',
-    });
+    logger.debug('API', `UPLOAD ${endpoint}`, { filename: file.name, size: file.size });
 
-    const body = await response.json().catch(() => ({}));
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      });
 
-    if (!response.ok) {
-      throw new ApiError(
-        response.status,
-        body.message || 'Upload failed',
-        body.code
-      );
+      const body: ApiResponse<T> = await response.json().catch(() => ({}));
+
+      if (!response.ok || body.error) {
+        const error = body.error;
+        logger.error('API', `Upload failed: ${error?.message || 'Unknown error'}`);
+        throw new ApiError(
+          response.status,
+          error?.message || 'Upload failed',
+          error?.code
+        );
+      }
+
+      // Unwrap the data
+      if (body.data !== undefined) {
+        return body.data;
+      }
+
+      return body as unknown as T;
+    } catch (err) {
+      if (err instanceof ApiError) throw err;
+      logger.error('API', 'Upload network error', err);
+      throw new ApiError(0, 'Upload failed - network error');
     }
-
-    return body as T;
   }
 }
 
@@ -151,7 +215,7 @@ const client = new ApiClient(API_BASE);
 
 export const userApi = {
   /** Get current authenticated user */
-  getMe: () => client.get<User>('/api/v1/user/me'),
+  getMe: () => client.get<User>('/api/v1/users/me'),
 };
 
 // ============================================================================
@@ -200,6 +264,8 @@ export const exportApi = {
   /** Export CV to specified format */
   export: async (cvId: string, format: ExportFormat): Promise<Blob> => {
     const url = `${API_BASE}/api/v1/export/${format}`;
+    logger.debug('API', `Export ${format}`, { cvId });
+
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -209,10 +275,12 @@ export const exportApi = {
 
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
+      const error = body.error || body;
+      logger.error('API', `Export failed: ${error.message || 'Unknown error'}`);
       throw new ApiError(
         response.status,
-        body.message || 'Export failed',
-        body.code
+        error.message || 'Export failed',
+        error.code
       );
     }
 

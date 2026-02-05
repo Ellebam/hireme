@@ -8,80 +8,8 @@ import { EditorLayout } from '@/components/editor';
 import { useEditorStore } from '@/stores';
 import { useAutoSave, useKeyboardShortcuts } from '@/hooks';
 import { api, ApiError } from '@/lib/api';
-import type { CV } from '@/types/api';
-import type { CVContent } from '@/types/cv';
-
-// Default CV content for new CVs
-const defaultCVContent: CVContent = {
-  schemaVersion: '1.0.0',
-  templateId: 'modern',
-  locale: 'en',
-  title: 'My CV',
-  sections: [
-    {
-      id: 'sec-personal',
-      type: 'personal',
-      order: 0,
-      visible: true,
-      content: {
-        firstName: '',
-        lastName: '',
-        jobTitle: '',
-        email: '',
-        phone: '',
-        location: '',
-        links: [],
-      },
-    },
-    {
-      id: 'sec-summary',
-      type: 'summary',
-      order: 1,
-      visible: true,
-      content: {
-        text: '',
-      },
-    },
-    {
-      id: 'sec-experience',
-      type: 'experience',
-      order: 2,
-      visible: true,
-      title: 'Experience',
-      content: {
-        entries: [],
-      },
-    },
-    {
-      id: 'sec-education',
-      type: 'education',
-      order: 3,
-      visible: true,
-      title: 'Education',
-      content: {
-        entries: [],
-      },
-    },
-    {
-      id: 'sec-skills',
-      type: 'skills',
-      order: 4,
-      visible: true,
-      title: 'Skills',
-      content: {
-        categories: [],
-      },
-    },
-  ],
-  styling: {
-    primaryColor: '#2563eb',
-    secondaryColor: '#64748b',
-    fontFamily: 'inter',
-    fontSize: 'medium',
-    lineHeight: 'normal',
-    showIcons: true,
-  },
-};
+import { starterTemplate } from '@/lib/templates';
+import { logger } from '@/lib/logger';
 
 export default function EditorPage() {
   const router = useRouter();
@@ -95,25 +23,38 @@ export default function EditorPage() {
 
   useEffect(() => {
     async function loadOrCreateCV() {
+      logger.info('Editor', 'Loading CV...');
+
       try {
         // Try to load existing CV
         const cv = await api.cv.get();
+        logger.info('Editor', 'CV loaded from API', {
+          id: cv.id,
+          title: cv.title,
+          sectionCount: cv.content?.sections?.length,
+        });
         setCV(cv);
       } catch (err) {
         if (err instanceof ApiError && err.isNotFound) {
-          // No CV exists, create one with default content
+          logger.info('Editor', 'No CV found, creating new one');
+          // No CV exists, create one with starter template
           try {
-            const newCV = await api.cv.create({
-              title: 'My CV',
-              content: defaultCVContent,
+            const template = starterTemplate();
+            logger.debug('Editor', 'Using starter template', {
+              sectionCount: template.sections.length,
             });
+            const newCV = await api.cv.create({
+              title: template.title || 'My CV',
+              content: template,
+            });
+            logger.info('Editor', 'New CV created', { id: newCV.id });
             setCV(newCV);
           } catch (createErr) {
-            console.error('Failed to create CV:', createErr);
+            logger.error('Editor', 'Failed to create CV', createErr);
             setError('Failed to create CV. Please try again.');
           }
         } else {
-          console.error('Failed to load CV:', err);
+          logger.error('Editor', 'Failed to load CV', err);
           setError('Failed to load CV. Please try again.');
         }
       } finally {
