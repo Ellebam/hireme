@@ -44,7 +44,7 @@ func Error(w http.ResponseWriter, status int, message string) {
 			Message: message,
 		},
 	}
-	json.NewEncoder(w).Encode(response)
+	_ = json.NewEncoder(w).Encode(response)
 }
 
 // ErrorWithCode writes an error response with a custom error code
@@ -58,7 +58,7 @@ func ErrorWithCode(w http.ResponseWriter, status int, code, message string) {
 			Message: message,
 		},
 	}
-	json.NewEncoder(w).Encode(response)
+	_ = json.NewEncoder(w).Encode(response)
 }
 
 // ValidationError writes a validation error response
@@ -73,7 +73,7 @@ func ValidationError(w http.ResponseWriter, field, message string) {
 			Field:   field,
 		},
 	}
-	json.NewEncoder(w).Encode(response)
+	_ = json.NewEncoder(w).Encode(response)
 }
 
 // HandleError maps domain errors to HTTP responses
@@ -124,7 +124,7 @@ func DecodeJSON(r *http.Request, v interface{}) error {
 	if r.Body == nil {
 		return errors.New("empty request body")
 	}
-	defer r.Body.Close()
+	defer func() { _ = r.Body.Close() }()
 
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
