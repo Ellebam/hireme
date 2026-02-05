@@ -15,6 +15,8 @@
 - ✅ Asset management: Upload, retrieve, delete with local storage
 - ✅ Storage abstraction: LocalStorage implemented, R2 placeholder ready
 - ✅ API response format: `{ data: ... }` wrapper with proper error handling
+- ✅ Go tests: Domain, service, handler, middleware, repository, storage layers tested
+- ✅ CI/CD: GitHub Actions with lint, test, build for both API and web
 
 **Frontend:**
 - ✅ Three-column editor layout (palette | preview | properties)
@@ -34,7 +36,6 @@
 ### What's Not Working Yet
 - ❌ Export (`POST /api/v1/export/{format}`) — returns 501, needs Gotenberg integration
 - ❌ R2 cloud storage — placeholder only, needs AWS SDK implementation
-- ❌ Backend tests — no Go tests yet
 
 ---
 
@@ -210,18 +211,19 @@ task api:sqlc          # Generate sqlc code
 ## To-Do
 
 ### High Priority
-- [ ] Backend testing (domain, service, handler layers)
 - [ ] Gotenberg integration for PDF/DOCX export
-- [ ] Error response consistency audit
+- [ ] Production security hardening (see Security Recommendations)
+- [ ] Branch protection rules for main branch
 
 ### Medium Priority
-- [ ] CI/CD improvements (`go vet`, coverage threshold)
+- [ ] Upgrade Next.js to patch security vulnerabilities
 - [ ] Mobile responsive improvements
 - [ ] Additional section types (certifications, projects)
+- [ ] CI/CD: Add coverage thresholds
 
 ### Low Priority
 - [ ] R2 cloud storage implementation
-- [ ] OAuth authentication
+- [ ] OAuth authentication (Google OIDC)
 - [ ] Multiple CV support
 
 ---
