@@ -78,7 +78,7 @@ export function LanguagesEditor({ sectionId, content }: LanguagesEditorProps) {
         <div className="space-y-2">
           {entries.map((entry, index) => (
             <LanguageEntryRow
-              key={index}
+              key={`${entry.language}-${entry.proficiency}-${index}`}
               entry={entry}
               onUpdate={(updates) => updateEntry(index, updates)}
               onDelete={() => deleteEntry(index)}

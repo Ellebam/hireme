@@ -66,7 +66,7 @@ describe('blankTemplate', () => {
     const template = blankTemplate();
 
     expect(template.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(template.templateId).toBe('modern');
+    expect(template.templateId).toBe('blank');
     expect(template.sections).toBeInstanceOf(Array);
   });
 

@@ -26,30 +26,37 @@ export function CVPreview() {
     <div className="flex-1 overflow-auto bg-muted/50 p-8">
       <div className="flex justify-center">
         <div
-          className="bg-white shadow-lg rounded origin-top"
           style={{
-            width: A4_WIDTH,
-            minHeight: A4_HEIGHT,
-            transform: `scale(${previewScale})`,
-            transformOrigin: 'top center',
+            width: A4_WIDTH * previewScale,
+            minHeight: A4_HEIGHT * previewScale,
           }}
         >
-          {/* CV Content */}
-          <div className="p-12">
-            {sections.length === 0 ? (
-              <EmptyPreview />
-            ) : (
-              <div className="space-y-6">
-                {sections.map((section) => (
-                  <PreviewSection
-                    key={section.id}
-                    section={section}
-                    isSelected={section.id === selectedSectionId}
-                    onClick={() => selectSection(section.id)}
-                  />
-                ))}
-              </div>
-            )}
+          <div
+            className="bg-white shadow-lg rounded"
+            style={{
+              width: A4_WIDTH,
+              minHeight: A4_HEIGHT,
+              transform: `scale(${previewScale})`,
+              transformOrigin: 'top center',
+            }}
+          >
+            {/* CV Content */}
+            <div className="p-12">
+              {sections.length === 0 ? (
+                <EmptyPreview />
+              ) : (
+                <div className="space-y-6">
+                  {sections.map((section) => (
+                    <PreviewSection
+                      key={section.id}
+                      section={section}
+                      isSelected={section.id === selectedSectionId}
+                      onClick={() => selectSection(section.id)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

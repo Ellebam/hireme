@@ -107,14 +107,18 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
 // Crypto Mock (for generateId)
 // ============================================================================
 
+let uuidCounter = 0;
 Object.defineProperty(global, 'crypto', {
   value: {
-    randomUUID: () => `test-uuid-${Math.random().toString(36).substr(2, 9)}`,
+    randomUUID: () => {
+      uuidCounter++;
+      return `test-uuid-${uuidCounter.toString().padStart(4, '0')}`;
+    },
     getRandomValues: <T extends ArrayBufferView | null>(array: T): T => {
       if (array) {
         const uint8Array = array as unknown as Uint8Array;
         for (let i = 0; i < uint8Array.length; i++) {
-          uint8Array[i] = Math.floor(Math.random() * 256);
+          uint8Array[i] = (i * 17 + 42) % 256;
         }
       }
       return array;
@@ -130,6 +134,8 @@ Object.defineProperty(global, 'crypto', {
 beforeEach(() => {
   // Clear localStorage to reset persisted store state
   window.localStorage.clear();
+  // Reset UUID counter for deterministic IDs
+  uuidCounter = 0;
 });
 
 afterEach(() => {

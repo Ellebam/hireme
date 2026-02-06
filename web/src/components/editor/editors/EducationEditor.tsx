@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Plus, Trash2, Edit, GripVertical, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -170,11 +170,11 @@ function EducationEntryModal({ entry, open, onClose, onSave }: EducationEntryMod
   const [formData, setFormData] = useState<EducationEntry | null>(null);
 
   // Sync form data when entry changes
-  useState(() => {
+  useEffect(() => {
     if (entry) {
       setFormData({ ...entry });
     }
-  });
+  }, [entry]);
 
   if (!entry) return null;
 

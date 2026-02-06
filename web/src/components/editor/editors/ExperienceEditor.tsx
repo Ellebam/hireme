@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Plus, Trash2, Edit, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -166,12 +166,12 @@ function ExperienceEntryModal({ entry, open, onClose, onSave }: ExperienceEntryM
   const [highlightsText, setHighlightsText] = useState('');
 
   // Sync form data when entry changes
-  useState(() => {
+  useEffect(() => {
     if (entry) {
       setFormData({ ...entry });
       setHighlightsText((entry.highlights || []).join('\n'));
     }
-  });
+  }, [entry]);
 
   if (!entry) return null;
 

@@ -22,9 +22,10 @@ export function useKeyboardShortcuts() {
 
       const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
       const modifier = isMac ? e.metaKey : e.ctrlKey;
+      const key = e.key.toLowerCase();
 
       // Undo: Ctrl/Cmd + Z
-      if (modifier && e.key === 'z' && !e.shiftKey) {
+      if (modifier && key === 'z' && !e.shiftKey) {
         e.preventDefault();
         if (canUndo()) {
           undo();
@@ -34,8 +35,8 @@ export function useKeyboardShortcuts() {
 
       // Redo: Ctrl/Cmd + Y or Ctrl/Cmd + Shift + Z
       if (
-        (modifier && e.key === 'y') ||
-        (modifier && e.key === 'z' && e.shiftKey)
+        (modifier && key === 'y') ||
+        (modifier && key === 'z' && e.shiftKey)
       ) {
         e.preventDefault();
         if (canRedo()) {
@@ -45,21 +46,21 @@ export function useKeyboardShortcuts() {
       }
 
       // Zoom in: Ctrl/Cmd + =
-      if (modifier && (e.key === '=' || e.key === '+')) {
+      if (modifier && (key === '=' || key === '+')) {
         e.preventDefault();
         zoomIn();
         return;
       }
 
       // Zoom out: Ctrl/Cmd + -
-      if (modifier && e.key === '-') {
+      if (modifier && key === '-') {
         e.preventDefault();
         zoomOut();
         return;
       }
 
       // Reset zoom: Ctrl/Cmd + 0
-      if (modifier && e.key === '0') {
+      if (modifier && key === '0') {
         e.preventDefault();
         resetZoom();
         return;

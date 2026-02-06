@@ -11,7 +11,7 @@ import { generateId } from '@/lib/utils';
 export function blankTemplate(): CVContent {
   return {
     schemaVersion: '1.0.0',
-    templateId: 'modern',
+    templateId: 'blank',
     locale: 'en',
     title: 'My CV',
     sections: [

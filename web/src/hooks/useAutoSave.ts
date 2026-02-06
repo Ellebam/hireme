@@ -45,11 +45,10 @@ export function useAutoSave() {
     }
   }, [isDirty, cv, cvContent, debouncedSave]);
 
-  // Cleanup on unmount
+  // Cancel pending saves on unmount
   useEffect(() => {
     return () => {
-      // Note: debounce function from utils doesn't return a cancel method
-      // In a real app, you'd want to use lodash.debounce or add cancel support
+      debouncedSave.cancel();
     };
-  }, []);
+  }, [debouncedSave]);
 }
