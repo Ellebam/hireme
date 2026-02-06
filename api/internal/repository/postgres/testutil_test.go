@@ -93,11 +93,6 @@ func withTestTx(t *testing.T, pool *pgxpool.Pool, fn func(ctx context.Context, t
 	fn(ctx, tx)
 }
 
-// testQueries creates a queries.Queries instance backed by a transaction
-func testQueries(tx pgx.Tx) *queries.Queries {
-	return queries.New(tx)
-}
-
 // createTestUser creates a test user in the database within the given transaction
 func createTestUserInTx(t *testing.T, ctx context.Context, q *queries.Queries, overrides ...func(*queries.CreateUserParams)) queries.User {
 	t.Helper()
@@ -190,7 +185,3 @@ func createTestAssetInTx(t *testing.T, ctx context.Context, q *queries.Queries, 
 	return asset
 }
 
-// ptr is a helper to create pointers to values
-func ptr[T any](v T) *T {
-	return &v
-}

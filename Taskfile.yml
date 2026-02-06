@@ -304,16 +304,59 @@ tasks:
   # DEVELOPMENT (Combined)
   # ══════════════════════════════════════════════════════════════════════════
   dev:
-    desc: Start full development environment
+    desc: Start full development environment (infra + API + web)
     deps: [infra:up]
     cmds:
       - echo "🚀 Starting development servers..."
-      - echo "   API will run on http://localhost:8080"
-      - echo "   Web will run on http://localhost:3000"
+      - echo "   API → http://localhost:8080"
+      - echo "   Web → http://localhost:3000"
       - echo ""
-      - echo "Run in separate terminals:"
-      - echo "   task api:dev"
-      - echo "   task web:dev"
+      - task: dev:services
+
+  dev:services:
+    desc: Run API and Web dev servers in parallel
+    deps:
+      - task: api:dev
+      - task: web:dev
+
+  dev:api:
+    desc: Start infra + API only (no frontend)
+    deps: [infra:up]
+    cmds:
+      - task: api:dev
+
+  dev:web:
+    desc: Start infra + web only (no API)
+    deps: [infra:up]
+    cmds:
+      - task: web:dev
+
+  dev:stop:
+    desc: Stop all development services
+    cmds:
+      - task: infra:down
+      - task: dev:kill-ports
+      - echo "✅ All dev services stopped"
+
+  dev:kill-ports:
+    desc: Kill processes on dev ports (3000, 3001, 8080)
+    cmds:
+      - |
+        for port in 3000 3001 8080; do
+          pid=$(lsof -ti :$port 2>/dev/null || true)
+          if [ -n "$pid" ]; then
+            echo "Killing process on port $port (PID: $pid)"
+            kill -9 $pid 2>/dev/null || true
+          fi
+        done
+    silent: true
+
+  dev:restart:
+    desc: Stop and restart full development environment
+    cmds:
+      - task: dev:stop
+      - sleep 2
+      - task: dev
 
   # ══════════════════════════════════════════════════════════════════════════
   # CODE GENERATION

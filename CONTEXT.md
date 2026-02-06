@@ -2,57 +2,40 @@
 
 ## Current State
 
-**Status:** API backend functional, frontend not started
+**Status:** MVP functional — API backend + Frontend editor working end-to-end
 
 ### What's Working
+
+**Backend:**
 - ✅ Infrastructure: PostgreSQL + Gotenberg via Docker
 - ✅ Database: Migrations applied, dev data seeded
-- ✅ API endpoints: Health, Users, CVs (full CRUD)
+- ✅ API endpoints: Health, Users, CVs (full CRUD), Assets
 - ✅ Auth bypass: Dev mode uses `dev-user-001`
 - ✅ Repository layer: sqlc queries wired to domain types
 - ✅ Asset management: Upload, retrieve, delete with local storage
 - ✅ Storage abstraction: LocalStorage implemented, R2 placeholder ready
+- ✅ API response format: `{ data: ... }` wrapper with proper error handling
+- ✅ Go tests: Domain, service, handler, middleware, repository, storage layers tested
+- ✅ CI/CD: GitHub Actions with lint, test, build for both API and web
+
+**Frontend:**
+- ✅ Three-column editor layout (palette | preview | properties)
+- ✅ Dashboard page with CV list
+- ✅ 6 section editors (Personal, Summary, Experience, Education, Skills, Languages)
+- ✅ Drag & drop section reordering (dnd-kit)
+- ✅ Live A4 CV preview with zoom (50-200%)
+- ✅ Undo/redo with 50-step history
+- ✅ Auto-save with 2s debounce
+- ✅ Export modal (PDF, DOCX, JSON)
+- ✅ Keyboard shortcuts (Ctrl+Z/Y, Ctrl+/-/0)
+- ✅ CV templates system (starter + blank templates)
+- ✅ Logging system with configurable levels
+- ✅ 81 passing tests (Vitest)
+- ✅ Build verified, full stack integration tested
 
 ### What's Not Working Yet
 - ❌ Export (`POST /api/v1/export/{format}`) — returns 501, needs Gotenberg integration
 - ❌ R2 cloud storage — placeholder only, needs AWS SDK implementation
-- ❌ Frontend — not started
-
-### To-Do (MVP API)
-
-- [ ] **Finishing touches on MVP API**
-  - Gotenberg integration for export endpoint
-  - Error response consistency audit
-  - Input validation coverage
-
-- [ ] **Testing** → See [TESTING_PLAN.md](./TESTING_PLAN.md)
-  - Phase 1: Domain, Validator, HTTP Utils (P0)
-  - Phase 2: Service layer with mocks (P0)
-  - Phase 3: Handler layer (P1)
-  - Phase 4: Auth middleware (P1)
-  - Phase 5: Repository integration (P2)
-  - Phase 6: Storage tests (P2)
-
-- [ ] **CI/CD improvements**
-  - Add `go vet` to lint job
-  - Run migrations before integration tests
-  - Coverage threshold (60% minimum)
-
-### API Endpoints (Verified Working)
-
-```
-GET  /health                    → {"status": "healthy"}
-GET  /ready                     → {"status": "ready", "services": {...}}
-GET  /api/v1/users/me           → Current user profile
-PATCH /api/v1/users/me          → Update user profile
-GET  /api/v1/cv                 → User's active CV
-POST /api/v1/cv                 → Create new CV
-PUT  /api/v1/cv/{id}            → Update CV
-DELETE /api/v1/cv/{id}          → Delete CV
-POST /api/v1/assets             → Upload asset (image)
-GET  /api/v1/assets/{id}        → Get asset metadata (or file with Accept: image/*)
-DELETE /api/v1/assets/{id}      → Delete asset
-```
 
 ---
 
@@ -61,41 +44,70 @@ DELETE /api/v1/assets/{id}      → Delete asset
 | Component | Technology |
 |-----------|------------|
 | Backend | Go 1.22+, Chi router, sqlc |
-| Frontend | Next.js 14, React 18, Tailwind, shadcn/ui |
+| Frontend | Next.js 14, React 18, Tailwind, shadcn/ui, Zustand, dnd-kit |
 | Database | PostgreSQL 16 (JSONB for CV content) |
 | Export | Gotenberg (HTML → PDF/DOCX) |
 | Storage | Local filesystem (dev), Cloudflare R2 (prod) |
+| Testing | Vitest (frontend), Go testing (backend - planned) |
 
-## Project Structure
+---
 
+## Frontend Architecture
+
+### Editor Layout
 ```
-hireme/
-├── api/                    # Go backend
-│   ├── cmd/server/         # Entry point
-│   ├── db/                 # Migrations, queries, seeds
-│   │   ├── migrations/     # SQL migrations
-│   │   ├── queries/        # sqlc query definitions
-│   │   └── seed/           # dev_seed.sql
-│   └── internal/
-│       ├── config/         # Environment loading
-│       ├── domain/         # Domain types (User, CV, Asset)
-│       ├── handler/        # HTTP handlers
-│       ├── middleware/     # Auth, logging
-│       ├── repository/     # Data access (postgres/)
-│       ├── service/        # Business logic
-│       └── validator/      # JSON schema validation
-├── web/                    # Next.js frontend (not started)
-├── docker/                 # Docker configs
-├── schemas/                # Shared JSON schemas
-└── scripts/                # Dev utilities
++------------------------------------------------------------------+
+|                         Top Toolbar                               |
+|  [Undo] [Redo] | Zoom [50-200%] | [Export v]                     |
++------------------------------------------------------------------+
+|           |                              |                        |
+|  Section  |      CV Preview              |    Properties          |
+|  Palette  |      (Live A4 Render)        |    Panel               |
+|  (240px)  |      (Flex)                  |    (320px)             |
+|           |                              |                        |
++------------------------------------------------------------------+
 ```
 
-## Architecture
+### State Management (Zustand)
+- **EditorStore**: CV data, sections, undo/redo history, save status
+- **UIStore**: Sidebar toggles, modals, preview scale
+
+### Key Frontend Files
+```
+web/src/
+├── stores/
+│   ├── editor-store.ts    # CV content + history
+│   └── ui-store.ts        # UI state
+├── lib/
+│   ├── api/client.ts      # Typed API client (unwraps responses)
+│   ├── logger.ts          # Configurable logging
+│   └── templates/         # CV templates (starter, blank)
+├── components/editor/
+│   ├── EditorLayout.tsx   # Main layout
+│   ├── CVPreview.tsx      # Live preview
+│   ├── SectionPalette.tsx # Add sections
+│   ├── PropertiesPanel.tsx# Edit section content
+│   └── editors/           # Section-specific editors
+└── hooks/
+    ├── useAutoSave.ts     # 2s debounced save
+    └── useKeyboardShortcuts.ts
+```
+
+### Frontend Debugging
+```js
+// Enable debug logs in browser console:
+localStorage.setItem('LOG_LEVEL', 'debug');
+location.reload();
+```
+
+---
+
+## Backend Architecture
 
 ```
 HTTP Request → Handler → Service → Repository → PostgreSQL
                  ↓
-              Middleware (Auth, Logging)
+              Middleware (Auth, Logging, CORS)
 ```
 
 - **Handlers**: Parse HTTP, validate input, call services
@@ -103,16 +115,120 @@ HTTP Request → Handler → Service → Repository → PostgreSQL
 - **Repositories**: Data access via sqlc-generated code
 - **Domain**: Pure types, no external dependencies
 
-## Key Patterns
+### API Response Format
+All responses wrapped in standard format:
+```json
+// Success
+{ "data": { ... } }
 
-### Repository Implementation
-```go
-// pgx.ErrNoRows → domain.ErrNotFound
-user, err := r.q.GetUserByID(ctx, id)
-if errors.Is(err, pgx.ErrNoRows) {
-    return nil, domain.ErrNotFound
-}
+// Error
+{ "error": { "code": "...", "message": "..." } }
 ```
+
+### Key Backend Files
+```
+api/
+├── cmd/server/main.go     # Entry point, router setup
+├── internal/
+│   ├── handler/           # HTTP handlers
+│   ├── service/           # Business logic
+│   ├── repository/        # Data access
+│   ├── domain/            # Types + errors
+│   └── middleware/        # Auth, CORS
+└── db/
+    ├── migrations/        # SQL migrations
+    ├── queries/           # sqlc queries
+    └── seed/              # Dev seed data
+```
+
+---
+
+## Project Structure
+
+```
+hireme/
+├── api/                    # Go backend
+├── web/                    # Next.js frontend
+├── docker/                 # Docker configs
+├── schemas/                # Shared JSON schemas
+├── scripts/                # Dev utilities
+├── CONTEXT.md              # This file
+├── WORKLOG.md              # Session history
+└── CLAUDE.md               # AI assistant instructions
+```
+
+---
+
+## API Endpoints
+
+```
+GET  /health                    → {"data": {"status": "healthy"}}
+GET  /ready                     → {"data": {"status": "ready"}}
+GET  /api/v1/users/me           → Current user profile
+PATCH /api/v1/users/me          → Update user profile
+GET  /api/v1/cv                 → User's active CV
+POST /api/v1/cv                 → Create new CV
+PUT  /api/v1/cv/{id}            → Update CV
+DELETE /api/v1/cv/{id}          → Delete CV
+POST /api/v1/assets             → Upload asset (image)
+GET  /api/v1/assets/{id}        → Get asset metadata
+DELETE /api/v1/assets/{id}      → Delete asset
+```
+
+---
+
+## Common Commands
+
+```bash
+# Full Development (recommended)
+task dev               # Start infra + API + web together
+task dev:stop          # Stop everything + kill dev ports
+task dev:restart       # Full stop and restart
+
+# Partial Development
+task dev:api           # Start infra + API only
+task dev:web           # Start infra + web only
+
+# Infrastructure
+task infra:up          # Start PostgreSQL + Gotenberg
+task infra:down        # Stop infrastructure
+
+# Database
+task db:migrate        # Run migrations
+task db:seed           # Seed dev user + sample CV
+task db:psql           # Open psql shell
+
+# Testing
+npm test               # Frontend tests (in web/)
+task api:test          # Backend tests (when implemented)
+
+# Code Generation
+task api:sqlc          # Generate sqlc code
+```
+
+---
+
+## To-Do
+
+### High Priority
+- [ ] Gotenberg integration for PDF/DOCX export
+- [ ] Production security hardening (see Security Recommendations)
+- [ ] Branch protection rules for main branch
+
+### Medium Priority
+- [ ] Upgrade Next.js to patch security vulnerabilities
+- [ ] Mobile responsive improvements
+- [ ] Additional section types (certifications, projects)
+- [ ] CI/CD: Add coverage thresholds
+
+### Low Priority
+- [ ] R2 cloud storage implementation
+- [ ] OAuth authentication (Google OIDC)
+- [ ] Multiple CV support
+
+---
+
+## Key Patterns
 
 ### Auth Bypass (Development)
 Set `AUTH_BYPASS_ENABLED=true` in `.env` — all requests use `dev-user-001`
@@ -122,46 +238,33 @@ Set `AUTH_BYPASS_ENABLED=true` in `.env` — all requests use `dev-user-001`
 2. Run `task api:sqlc`
 3. Use generated `queries.Queries` in repositories
 
-## Common Commands
-
-```bash
-# Infrastructure
-task infra:up          # Start PostgreSQL + Gotenberg
-task infra:down        # Stop infrastructure
-
-# Development
-task api:dev           # Run API with hot reload
-task web:dev           # Run Next.js dev server
-
-# Database
-task db:migrate        # Run migrations
-task db:seed           # Seed dev user + sample CV
-task db:psql           # Open psql shell
-
-# Code Generation
-task api:sqlc          # Generate sqlc code
+### Repository Error Mapping
+```go
+// pgx.ErrNoRows → domain.ErrNotFound
+user, err := r.q.GetUserByID(ctx, id)
+if errors.Is(err, pgx.ErrNoRows) {
+    return nil, domain.ErrNotFound
+}
 ```
+
+---
 
 ## Development Setup
 
 ```bash
 task setup             # Full setup (infra, migrate, seed, deps)
-# OR manually:
-task infra:up
-task db:migrate
-task db:seed
-task api:dev
+task dev               # Start everything (API :8080, Web :3000)
 ```
 
-## Testing the API
+## Testing
 
 ```bash
-# Health check
+# Frontend
+cd web && npm test
+
+# API Health check
 curl http://localhost:8080/health
 
-# Get current user (auth bypass must be enabled)
-curl http://localhost:8080/api/v1/users/me
-
-# Get CV
+# Get CV (auth bypass must be enabled)
 curl http://localhost:8080/api/v1/cv
 ```

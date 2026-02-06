@@ -159,7 +159,7 @@ func (s *AssetService) GetFileContent(ctx context.Context, asset *domain.Asset) 
 	if err != nil {
 		return nil, fmt.Errorf("retrieving file: %w", err)
 	}
-	defer reader.Close()
+	defer func() { _ = reader.Close() }()
 
 	content, err := io.ReadAll(reader)
 	if err != nil {

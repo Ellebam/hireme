@@ -1,0 +1,47 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "dashboard": {
+    "title": "My CVs",
+    "createNew": "Create New CV",
+    "lastEdited": "Last edited",
+    "noCVs": "No CVs yet. Create your first one!"
+  },
+  "editor": {
+    "title": "CV Editor",
+    "preview": "Preview",
+    "sections": "Sections",
+    "properties": "Properties",
+    "export": "Export",
+    "undo": "Undo",
+    "redo": "Redo",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "resetZoom": "Reset Zoom"
+  },
+  "sections": {
+    "personal": "Personal Information",
+    "summary": "Summary",
+    "experience": "Work Experience",
+    "education": "Education",
+    "skills": "Skills",
+    "languages": "Languages"
+  },
+  "export": {
+    "title": "Export CV",
+    "format": "Format",
+    "pdf": "PDF",
+    "docx": "Word Document",
+    "json": "JSON",
+    "download": "Download"
+  }
+}

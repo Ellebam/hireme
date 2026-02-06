@@ -54,11 +54,11 @@ func (s *LocalStorage) Put(ctx context.Context, key string, reader io.Reader) (s
 	if err != nil {
 		return "", fmt.Errorf("creating file: %w", err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	// Copy content
 	if _, err := io.Copy(file, reader); err != nil {
-		os.Remove(path) // Clean up on error
+		_ = os.Remove(path) // Clean up on error
 		return "", fmt.Errorf("writing file: %w", err)
 	}
 

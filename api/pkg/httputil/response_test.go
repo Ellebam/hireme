@@ -19,7 +19,7 @@ func TestJSON_Success(t *testing.T) {
 	JSON(recorder, http.StatusOK, data)
 
 	result := recorder.Result()
-	defer result.Body.Close()
+	defer func() { _ = result.Body.Close() }()
 
 	// Check status code
 	if result.StatusCode != http.StatusOK {
@@ -59,7 +59,7 @@ func TestJSON_WithStruct(t *testing.T) {
 	JSON(recorder, http.StatusCreated, data)
 
 	result := recorder.Result()
-	defer result.Body.Close()
+	defer func() { _ = result.Body.Close() }()
 
 	if result.StatusCode != http.StatusCreated {
 		t.Errorf("status code = %d, want %d", result.StatusCode, http.StatusCreated)
@@ -80,7 +80,7 @@ func TestError_NotFound(t *testing.T) {
 	Error(recorder, http.StatusNotFound, "resource not found")
 
 	result := recorder.Result()
-	defer result.Body.Close()
+	defer func() { _ = result.Body.Close() }()
 
 	// Check status code
 	if result.StatusCode != http.StatusNotFound {
@@ -119,7 +119,7 @@ func TestError_BadRequest(t *testing.T) {
 	Error(recorder, http.StatusBadRequest, "invalid input")
 
 	result := recorder.Result()
-	defer result.Body.Close()
+	defer func() { _ = result.Body.Close() }()
 
 	if result.StatusCode != http.StatusBadRequest {
 		t.Errorf("status code = %d, want %d", result.StatusCode, http.StatusBadRequest)
@@ -141,7 +141,7 @@ func TestHandleError_ErrNotFound(t *testing.T) {
 	HandleError(recorder, domain.ErrNotFound)
 
 	result := recorder.Result()
-	defer result.Body.Close()
+	defer func() { _ = result.Body.Close() }()
 
 	if result.StatusCode != http.StatusNotFound {
 		t.Errorf("status code = %d, want %d", result.StatusCode, http.StatusNotFound)
@@ -163,7 +163,7 @@ func TestHandleError_ErrForbidden(t *testing.T) {
 	HandleError(recorder, domain.ErrForbidden)
 
 	result := recorder.Result()
-	defer result.Body.Close()
+	defer func() { _ = result.Body.Close() }()
 
 	if result.StatusCode != http.StatusForbidden {
 		t.Errorf("status code = %d, want %d", result.StatusCode, http.StatusForbidden)
@@ -176,7 +176,7 @@ func TestHandleError_ErrUnauthorized(t *testing.T) {
 	HandleError(recorder, domain.ErrUnauthorized)
 
 	result := recorder.Result()
-	defer result.Body.Close()
+	defer func() { _ = result.Body.Close() }()
 
 	if result.StatusCode != http.StatusUnauthorized {
 		t.Errorf("status code = %d, want %d", result.StatusCode, http.StatusUnauthorized)
@@ -190,7 +190,7 @@ func TestHandleError_ValidationError(t *testing.T) {
 	HandleError(recorder, validationErr)
 
 	result := recorder.Result()
-	defer result.Body.Close()
+	defer func() { _ = result.Body.Close() }()
 
 	if result.StatusCode != http.StatusBadRequest {
 		t.Errorf("status code = %d, want %d", result.StatusCode, http.StatusBadRequest)
@@ -218,7 +218,7 @@ func TestHandleError_ErrCVLimitReached(t *testing.T) {
 	HandleError(recorder, domain.ErrCVLimitReached)
 
 	result := recorder.Result()
-	defer result.Body.Close()
+	defer func() { _ = result.Body.Close() }()
 
 	if result.StatusCode != http.StatusForbidden {
 		t.Errorf("status code = %d, want %d", result.StatusCode, http.StatusForbidden)
@@ -240,7 +240,7 @@ func TestHandleError_ErrStorageLimitReached(t *testing.T) {
 	HandleError(recorder, domain.ErrStorageLimitReached)
 
 	result := recorder.Result()
-	defer result.Body.Close()
+	defer func() { _ = result.Body.Close() }()
 
 	if result.StatusCode != http.StatusForbidden {
 		t.Errorf("status code = %d, want %d", result.StatusCode, http.StatusForbidden)
@@ -262,7 +262,7 @@ func TestHandleError_UnknownError(t *testing.T) {
 	HandleError(recorder, errors.New("some random error"))
 
 	result := recorder.Result()
-	defer result.Body.Close()
+	defer func() { _ = result.Body.Close() }()
 
 	// Unknown errors should return 500
 	if result.StatusCode != http.StatusInternalServerError {
@@ -366,7 +366,7 @@ func TestNoContent(t *testing.T) {
 	NoContent(recorder)
 
 	result := recorder.Result()
-	defer result.Body.Close()
+	defer func() { _ = result.Body.Close() }()
 
 	if result.StatusCode != http.StatusNoContent {
 		t.Errorf("status code = %d, want %d", result.StatusCode, http.StatusNoContent)
@@ -385,7 +385,7 @@ func TestCreated(t *testing.T) {
 	Created(recorder, data)
 
 	result := recorder.Result()
-	defer result.Body.Close()
+	defer func() { _ = result.Body.Close() }()
 
 	if result.StatusCode != http.StatusCreated {
 		t.Errorf("status code = %d, want %d", result.StatusCode, http.StatusCreated)
@@ -407,7 +407,7 @@ func TestValidationError_Response(t *testing.T) {
 	ValidationError(recorder, "email", "invalid email format")
 
 	result := recorder.Result()
-	defer result.Body.Close()
+	defer func() { _ = result.Body.Close() }()
 
 	if result.StatusCode != http.StatusBadRequest {
 		t.Errorf("status code = %d, want %d", result.StatusCode, http.StatusBadRequest)
@@ -438,7 +438,7 @@ func TestErrorWithCode(t *testing.T) {
 	ErrorWithCode(recorder, http.StatusForbidden, "custom_code", "custom message")
 
 	result := recorder.Result()
-	defer result.Body.Close()
+	defer func() { _ = result.Body.Close() }()
 
 	if result.StatusCode != http.StatusForbidden {
 		t.Errorf("status code = %d, want %d", result.StatusCode, http.StatusForbidden)

@@ -342,7 +342,7 @@ func (h *TestHandler) UploadAsset(w http.ResponseWriter, r *http.Request) {
 		httputil.Error(w, http.StatusBadRequest, "file is required")
 		return
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	// Upload via service
 	asset, err := h.assetService.Upload(ctx, userID, file, header)
@@ -416,7 +416,7 @@ func (h *TestHandler) GetAsset(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", asset.MimeType)
 	w.Header().Set("Content-Disposition", "inline; filename=\""+asset.Filename+"\"")
-	w.Write(fileContent)
+	_, _ = w.Write(fileContent)
 }
 
 // DeleteAsset deletes an asset

@@ -1,0 +1,57 @@
+# HireMe CODEOWNERS
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# These owners will be requested for review when someone opens a pull request
+# that modifies code that they own.
+
+# Default owner for everything - solo maintainer
+* @ellebam
+
+# ============================================================================
+# BACKEND (Go API)
+# ============================================================================
+
+# Core API code
+/api/ @ellebam
+
+# Database migrations require extra care
+/api/db/migrations/ @ellebam
+
+# Security-sensitive: authentication middleware
+/api/internal/middleware/ @ellebam
+
+# ============================================================================
+# FRONTEND (Next.js)
+# ============================================================================
+
+# Frontend application
+/web/ @ellebam
+
+# ============================================================================
+# INFRASTRUCTURE & CONFIGURATION
+# ============================================================================
+
+# Docker configurations
+/docker/ @ellebam
+
+# CI/CD workflows
+/.github/workflows/ @ellebam
+
+# Environment configuration templates
+/.env.example @ellebam
+
+# Taskfile (development automation)
+/Taskfile.yml @ellebam
+
+# ============================================================================
+# SCHEMAS & DOCUMENTATION
+# ============================================================================
+
+# CV JSON schema (shared contract)
+/schemas/ @ellebam
+
+# Project documentation
+/docs/ @ellebam
+/CONTEXT.md @ellebam
+/WORKLOG.md @ellebam
+/README.md @ellebam

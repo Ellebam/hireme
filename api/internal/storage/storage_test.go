@@ -79,7 +79,7 @@ func TestLocalStorage_Get_Success(t *testing.T) {
 	// Get the file
 	reader, err := storage.Get(ctx, key)
 	require.NoError(t, err)
-	defer reader.Close()
+	defer func() { _ = reader.Close() }()
 
 	// Read and verify content
 	retrievedContent, err := io.ReadAll(reader)
