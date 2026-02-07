@@ -4,6 +4,70 @@ Chronological record of development activity.
 
 ---
 
+## 2026-02-07 (Session 10)
+
+### Session Focus
+Sprint 2 implementation — template renderers, responsive layout, UX improvements
+
+### Completed
+
+**Sprint 2, Task #3 — 3 CV template renderers** ✅
+- [FEAT] Created `ClassicTemplate.tsx` — traditional layout, centered header, uppercase section titles with thin primary-color borders, comma-separated skills, inline languages
+- [FEAT] Created `ModernTemplate.tsx` — left-aligned name, timeline experience (vertical line + dots), colored skill pill badges, language proficiency bars (5 segments)
+- [FEAT] Created `VisionaryTemplate.tsx` — two-column layout with primary-color sidebar (personal/skills/languages) and white main area (summary/experience/education)
+- [FEAT] Created `templates/index.ts` — exports all templates and `TemplateProps` interface
+- [FEAT] `CVPreview.tsx` — dispatches to correct template based on `cvContent.templateId`
+- [FEAT] `EditorToolbar.tsx` — template selector dropdown (Classic/Modern/Visionary) + color picker (native HTML color input with Palette icon)
+- [FEAT] `editor-store.ts` — added `updateStyling()` and `updateTemplateId()` actions
+- [FEAT] `types/cv.ts` — replaced 'minimal' with 'visionary' in TEMPLATE_IDS
+- [FEAT] All templates apply `CVStyling.primaryColor` and `secondaryColor` via inline styles + CSS custom properties
+
+**Sprint 2, Task #4 — Responsive editor layout** ✅
+- [FEAT] `EditorLayout.tsx` — auto-collapse sidebars at breakpoints (<768px: both, <1024px: left)
+- [FEAT] Resize listener with proper cleanup on unmount
+- [FEAT] Toolbar text labels hidden on small screens (sm:inline)
+
+**Sprint 2, Task #5 — Double-click to edit sections** ✅
+- [FEAT] `CVPreview.tsx` — `onSectionDoubleClick` handler selects section and opens properties panel
+- [FEAT] All template components pass double-click events through section wrappers
+
+**Sprint 2, Task #6 — Education description/location display** ✅
+- [FIX] All three template renderers display education `location`, `description`, `grade`, and `current` status
+- [FIX] Previously only showed degree, institution, and dates
+
+**Sprint 2, Task #7 — Smooth DnD animation** ✅
+- [FIX] `SortableItem.tsx` — added `animateLayoutChanges` with `wasDragging: true` for post-drop animation
+- [FIX] Fallback transition (`transform 200ms ease`) when dnd-kit doesn't provide one
+
+**Testing** ✅
+- [TEST] 7 new tests: `updateStyling` (4 tests), `updateTemplateId` (3 tests)
+- [TEST] All 101 tests passing (was 94), TypeScript clean, lint clean
+
+### Files Changed
+
+**Created:**
+- `web/src/components/templates/ClassicTemplate.tsx`
+- `web/src/components/templates/ModernTemplate.tsx`
+- `web/src/components/templates/VisionaryTemplate.tsx`
+- `web/src/components/templates/index.ts`
+
+**Modified:**
+- `web/src/components/editor/CVPreview.tsx` — Template dispatch + double-click
+- `web/src/components/editor/EditorLayout.tsx` — Responsive breakpoints
+- `web/src/components/editor/EditorToolbar.tsx` — Template selector + color picker
+- `web/src/lib/dnd/SortableItem.tsx` — Smooth animation
+- `web/src/stores/editor-store.ts` — updateStyling, updateTemplateId
+- `web/src/stores/editor-store.test.ts` — 7 new tests
+- `web/src/types/cv.ts` — TEMPLATE_IDS update
+
+### Next Session
+- **Browser test Sprint 2 visually** (template switching, color picker, double-click, responsive collapse, DnD animation)
+- **Begin Sprint 3:**
+  - Task #8: Implement Gotenberg PDF/DOCX export (generate HTML from templates, POST to Gotenberg)
+  - Task #9: Add template switching for existing CVs (template selector in editor)
+
+---
+
 ## 2026-02-07 (Session 9)
 
 ### Session Focus
