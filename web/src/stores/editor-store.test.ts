@@ -2,7 +2,7 @@
  * Editor Store Tests
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useEditorStore } from './editor-store';
 import { mockCV, minimalCV, createMockCV } from '@/test/mocks/cv';
 import type { CVContent } from '@/types/cv';
@@ -19,6 +19,7 @@ describe('EditorStore', () => {
       saveStatus: 'idle',
       lastSavedAt: null,
       saveError: null,
+      saveNow: null,
       history: [],
       historyIndex: -1,
     });
@@ -409,6 +410,36 @@ describe('EditorStore', () => {
       useEditorStore.getState().markSaved();
 
       expect(useEditorStore.getState().saveError).toBeNull();
+    });
+  });
+
+  // ========================================================================
+  // setSaveNow
+  // ========================================================================
+
+  describe('setSaveNow', () => {
+    it('should store a callback function', () => {
+      const mockSave = vi.fn();
+      useEditorStore.getState().setSaveNow(mockSave);
+
+      expect(useEditorStore.getState().saveNow).toBe(mockSave);
+    });
+
+    it('should allow clearing with null', () => {
+      useEditorStore.getState().setSaveNow(vi.fn());
+      useEditorStore.getState().setSaveNow(null);
+
+      expect(useEditorStore.getState().saveNow).toBeNull();
+    });
+
+    it('should replace existing callback', () => {
+      const first = vi.fn();
+      const second = vi.fn();
+
+      useEditorStore.getState().setSaveNow(first);
+      useEditorStore.getState().setSaveNow(second);
+
+      expect(useEditorStore.getState().saveNow).toBe(second);
     });
   });
 });

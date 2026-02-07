@@ -1,0 +1,15 @@
+- it seems saving does not work anymore. The autosave button shows an Error but we do not get feedback what does not work
+- an own button for saving or alternatively clicking on autosave to trigger the save would be helpful?
+- the sliding of the elements in the cv works but when you let go of the slider the element in the middle of the editor snaps to its new location. maybe it should rather also have a nice animation to make it more smooth
+- the cv itself looks really bland and it also lacks any color picker. We have added 3 templates in the data directory of this repository showing our main templates we want to use. Their accent color is the same in all, we might want to have our editor be able to use either of them and also set up the color
+- when the editor is only filling half the screen you can only make the middle part smaller but not the sidebars. This seems unresponsive
+- when I have a section I want to edit i should be able to also edit it by double clicking on it. Currently I can only edit with clicking on the button on the right sidebar
+- the additional information in education does not display, should it be visible in the cv?
+- the pdf export does not work yet
+- the word export does not work yet
+- the json export actually works
+- the editor lacks any way to returning to the dashboard
+- the landing page itself is built very weirdly. It looks like a landing page for marketing which it should not. we should build it as an actual starting point like the dashboard. maybe we should merge the two 
+- the edit button on the dashboard gives a 404
+- the burger menu on an existing cv does nothing
+- there is no way to change a template for a cv

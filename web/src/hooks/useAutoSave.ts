@@ -8,35 +8,48 @@ import { debounce } from '@/lib/utils';
 const AUTOSAVE_DELAY = 2000; // 2 seconds
 
 export function useAutoSave() {
-  const { cv, cvContent, isDirty, markSaving, markSaved, markError } = useEditorStore();
+  const { cv, cvContent, isDirty, markSaving, markSaved, markError, setSaveNow } = useEditorStore();
   const saveInProgressRef = useRef(false);
+
+  // Immediate save (no debounce) — used by saveNow
+  const saveImmediately = useCallback(async () => {
+    const currentCV = useEditorStore.getState().cv;
+    const currentContent = useEditorStore.getState().cvContent;
+    const currentIsDirty = useEditorStore.getState().isDirty;
+
+    if (!currentCV || !currentContent || !currentIsDirty || saveInProgressRef.current) {
+      return;
+    }
+
+    saveInProgressRef.current = true;
+    markSaving();
+
+    try {
+      await api.cv.update(currentCV.id, { content: currentContent });
+      markSaved();
+    } catch (error) {
+      console.error('Save failed:', error);
+      markError(error instanceof Error ? error.message : 'Failed to save');
+    } finally {
+      saveInProgressRef.current = false;
+    }
+  }, [markSaving, markSaved, markError]);
 
   // Create debounced save function
   const debouncedSave = useCallback(
     debounce(async () => {
-      const currentCV = useEditorStore.getState().cv;
-      const currentContent = useEditorStore.getState().cvContent;
-      const currentIsDirty = useEditorStore.getState().isDirty;
-
-      if (!currentCV || !currentContent || !currentIsDirty || saveInProgressRef.current) {
-        return;
-      }
-
-      saveInProgressRef.current = true;
-      markSaving();
-
-      try {
-        await api.cv.update(currentCV.id, { content: currentContent });
-        markSaved();
-      } catch (error) {
-        console.error('Auto-save failed:', error);
-        markError(error instanceof Error ? error.message : 'Failed to save');
-      } finally {
-        saveInProgressRef.current = false;
-      }
+      await saveImmediately();
     }, AUTOSAVE_DELAY),
-    [markSaving, markSaved, markError]
+    [saveImmediately]
   );
+
+  // Register saveNow with the store
+  useEffect(() => {
+    setSaveNow(saveImmediately);
+    return () => {
+      setSaveNow(null);
+    };
+  }, [saveImmediately, setSaveNow]);
 
   // Trigger auto-save when content changes
   useEffect(() => {

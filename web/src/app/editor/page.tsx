@@ -107,7 +107,7 @@ export default function EditorPage() {
               Try Again
             </button>
             <button
-              onClick={() => router.push('/dashboard')}
+              onClick={() => router.push('/')}
               className="px-4 py-2 bg-muted text-muted-foreground rounded-md text-sm font-medium hover:bg-muted/80"
             >
               Go to Dashboard
