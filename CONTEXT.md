@@ -216,15 +216,38 @@ task api:sqlc          # Generate sqlc code
 - [ ] Branch protection rules for main branch
 
 ### Medium Priority
-- [ ] Upgrade Next.js to patch security vulnerabilities
 - [ ] Mobile responsive improvements
 - [ ] Additional section types (certifications, projects)
-- [ ] CI/CD: Add coverage thresholds
+- [x] ~~Upgrade Next.js to patch security vulnerabilities~~ (pinned to 14.2.35)
+- [x] ~~CI/CD: Add coverage thresholds~~ (configured in vitest.config.ts)
 
 ### Low Priority
 - [ ] R2 cloud storage implementation
 - [ ] OAuth authentication (Google OIDC)
 - [ ] Multiple CV support
+
+### Frontend Testing (add alongside refactors/bugfixes)
+
+Current state: 81 tests cover stores, API client, and templates. Zero component or interaction tests. The items below are ordered by impact — each one catches a different class of bug.
+
+**P0 — Catch render/type breakage:**
+- [ ] Smoke tests for all 6 section editors (Personal, Summary, Experience, Education, Skills, Languages) — render with mock data, verify key elements appear. Catches broken imports, missing props, and type mismatches after refactors.
+- [ ] Smoke tests for page-level components (Dashboard, Editor) — render with mocked stores, verify basic structure loads.
+
+**P1 — Catch interaction bugs:**
+- [ ] `useAutoSave` hook test — verify debounce timing, dirty-state triggers, and cleanup on unmount. This hook has real async logic that can silently break.
+- [ ] Editor interaction tests — add/edit/delete entries in ExperienceEditor and SkillsEditor (these have modal forms and the most complex user flows). Use `@testing-library/user-event`.
+- [ ] Export API error path tests — verify abort timeout and network error map to `ApiError` (new code, currently 0% covered).
+
+**P2 — Catch UX regressions:**
+- [ ] Keyboard shortcut tests — verify Ctrl+Z/Y trigger undo/redo on the store.
+- [ ] Drag-and-drop section reorder test — verify `SectionPalette` reorder callback updates store order.
+
+**Testing notes:**
+- Use `@testing-library/react` + `@testing-library/user-event` (already installed)
+- Mock `useEditorStore`/`useUIStore` via Zustand's test pattern (see `src/test/setup.ts`)
+- Component tests go next to their source: `ComponentName.test.tsx`
+- Target: reach 35% statement coverage with P0+P1 items, which makes the threshold meaningful
 
 ---
 

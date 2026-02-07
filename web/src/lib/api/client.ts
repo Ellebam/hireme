@@ -312,6 +312,14 @@ export const exportApi = {
       }
 
       return response.blob();
+    } catch (err) {
+      if (err instanceof ApiError) throw err;
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        logger.error('API', `Export timeout for ${format}`);
+        throw new ApiError(0, 'Export timed out - please try again');
+      }
+      logger.error('API', 'Export network error');
+      throw new ApiError(0, 'Export failed - network error');
     } finally {
       clearTimeout(timeoutId);
     }

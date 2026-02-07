@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useEditorStore } from '@/stores';
+import { generateId } from '@/lib/utils';
 import type { LanguagesContent, LanguageEntry, LanguageProficiency } from '@/types/cv';
 
 const PROFICIENCY_LEVELS: { value: LanguageProficiency; label: string }[] = [
@@ -27,6 +28,7 @@ export function LanguagesEditor({ sectionId, content }: LanguagesEditorProps) {
 
   const addEntry = useCallback(() => {
     const newEntry: LanguageEntry = {
+      id: generateId(),
       language: '',
       proficiency: 'intermediate',
     };
@@ -78,7 +80,7 @@ export function LanguagesEditor({ sectionId, content }: LanguagesEditorProps) {
         <div className="space-y-2">
           {entries.map((entry, index) => (
             <LanguageEntryRow
-              key={`${entry.language}-${entry.proficiency}-${index}`}
+              key={entry.id}
               entry={entry}
               onUpdate={(updates) => updateEntry(index, updates)}
               onDelete={() => deleteEntry(index)}

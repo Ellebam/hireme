@@ -155,6 +155,7 @@ export interface SkillsContent {
 
 /** Language entry */
 export interface LanguageEntry {
+  id: string;
   language: string;
   proficiency: LanguageProficiency;
   certification?: string;

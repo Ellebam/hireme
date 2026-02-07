@@ -124,9 +124,9 @@ export const mockSkillsContent: SkillsContent = {
 
 export const mockLanguagesContent: LanguagesContent = {
   entries: [
-    { language: 'English', proficiency: 'native' },
-    { language: 'German', proficiency: 'fluent' },
-    { language: 'Spanish', proficiency: 'intermediate' },
+    { id: 'lang-1', language: 'English', proficiency: 'native' },
+    { id: 'lang-2', language: 'German', proficiency: 'fluent' },
+    { id: 'lang-3', language: 'Spanish', proficiency: 'intermediate' },
   ],
 };
 
