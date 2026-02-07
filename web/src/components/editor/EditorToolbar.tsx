@@ -14,6 +14,7 @@ import {
   AlertCircle,
   Save,
   ArrowLeft,
+  Palette,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,9 +24,16 @@ import {
 } from '@/components/ui/tooltip';
 import { Separator } from '@/components/ui/separator';
 import { useEditorStore, useUIStore, usePreviewScalePercent } from '@/stores';
+import type { TemplateId } from '@/types/cv';
+
+const TEMPLATE_OPTIONS: { id: TemplateId; label: string }[] = [
+  { id: 'classic', label: 'Classic' },
+  { id: 'modern', label: 'Modern' },
+  { id: 'visionary', label: 'Visionary' },
+];
 
 export function EditorToolbar() {
-  const { canUndo, canRedo, undo, redo, saveStatus, saveError, saveNow, isDirty } = useEditorStore();
+  const { canUndo, canRedo, undo, redo, saveStatus, saveError, saveNow, isDirty, cvContent, updateTemplateId, updateStyling } = useEditorStore();
   const {
     leftSidebarOpen,
     rightSidebarOpen,
@@ -37,6 +45,9 @@ export function EditorToolbar() {
     openExportModal,
   } = useUIStore();
   const scalePercent = usePreviewScalePercent();
+
+  const currentTemplateId = cvContent?.templateId || 'classic';
+  const currentPrimaryColor = cvContent?.styling?.primaryColor || '#2563eb';
 
   return (
     <div className="h-12 border-b bg-background px-2 flex items-center gap-1">
@@ -144,6 +155,42 @@ export function EditorToolbar() {
         <TooltipContent>Zoom in</TooltipContent>
       </Tooltip>
 
+      <Separator orientation="vertical" className="h-6 mx-1" />
+
+      {/* Template Selector */}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <select
+            value={currentTemplateId}
+            onChange={(e) => updateTemplateId(e.target.value as TemplateId)}
+            className="h-8 px-2 text-xs border rounded bg-background hover:bg-accent cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring"
+          >
+            {TEMPLATE_OPTIONS.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.label}
+              </option>
+            ))}
+          </select>
+        </TooltipTrigger>
+        <TooltipContent>CV template style</TooltipContent>
+      </Tooltip>
+
+      {/* Color Picker */}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <label className="h-8 w-8 flex items-center justify-center cursor-pointer rounded hover:bg-accent transition-colors relative">
+            <Palette className="h-4 w-4" />
+            <input
+              type="color"
+              value={currentPrimaryColor}
+              onChange={(e) => updateStyling({ primaryColor: e.target.value })}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            />
+          </label>
+        </TooltipTrigger>
+        <TooltipContent>Accent color</TooltipContent>
+      </Tooltip>
+
       {/* Spacer */}
       <div className="flex-1" />
 
@@ -152,13 +199,13 @@ export function EditorToolbar() {
         {saveStatus === 'saving' && (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
-            <span>Saving...</span>
+            <span className="hidden sm:inline">Saving...</span>
           </>
         )}
         {saveStatus === 'saved' && !isDirty && (
           <>
             <Check className="h-4 w-4 text-green-600" />
-            <span>Saved</span>
+            <span className="hidden sm:inline">Saved</span>
           </>
         )}
         {saveStatus === 'error' && (
@@ -169,7 +216,7 @@ export function EditorToolbar() {
                 className="flex items-center gap-2 text-destructive hover:text-destructive/80 transition-colors"
               >
                 <AlertCircle className="h-4 w-4" />
-                <span>Save failed — click to retry</span>
+                <span className="hidden sm:inline">Save failed — click to retry</span>
               </button>
             </TooltipTrigger>
             <TooltipContent>
@@ -178,7 +225,7 @@ export function EditorToolbar() {
           </Tooltip>
         )}
         {(saveStatus === 'idle' && isDirty) && (
-          <span>Unsaved changes</span>
+          <span className="hidden sm:inline">Unsaved changes</span>
         )}
       </div>
 
@@ -211,7 +258,7 @@ export function EditorToolbar() {
             onClick={openExportModal}
           >
             <Download className="h-4 w-4 mr-2" />
-            Export
+            <span className="hidden sm:inline">Export</span>
           </Button>
         </TooltipTrigger>
         <TooltipContent>Export as PDF, DOCX, or JSON</TooltipContent>

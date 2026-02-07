@@ -442,4 +442,69 @@ describe('EditorStore', () => {
       expect(useEditorStore.getState().saveNow).toBe(second);
     });
   });
+
+  // ========================================================================
+  // Styling & Template
+  // ========================================================================
+
+  describe('updateStyling', () => {
+    it('should update styling properties', () => {
+      useEditorStore.getState().setCV(mockCV);
+
+      useEditorStore.getState().updateStyling({ primaryColor: '#ff0000' });
+
+      const state = useEditorStore.getState();
+      expect(state.cvContent?.styling?.primaryColor).toBe('#ff0000');
+      expect(state.isDirty).toBe(true);
+    });
+
+    it('should merge with existing styling', () => {
+      useEditorStore.getState().setCV(mockCV);
+      useEditorStore.getState().updateStyling({ primaryColor: '#ff0000' });
+      useEditorStore.getState().updateStyling({ secondaryColor: '#00ff00' });
+
+      const styling = useEditorStore.getState().cvContent?.styling;
+      expect(styling?.primaryColor).toBe('#ff0000');
+      expect(styling?.secondaryColor).toBe('#00ff00');
+    });
+
+    it('should do nothing when no CV is loaded', () => {
+      useEditorStore.getState().updateStyling({ primaryColor: '#ff0000' });
+      expect(useEditorStore.getState().cvContent).toBeNull();
+    });
+
+    it('should push to history', () => {
+      useEditorStore.getState().setCV(mockCV);
+      const historyLenBefore = useEditorStore.getState().history.length;
+
+      useEditorStore.getState().updateStyling({ primaryColor: '#ff0000' });
+
+      expect(useEditorStore.getState().history.length).toBe(historyLenBefore + 1);
+    });
+  });
+
+  describe('updateTemplateId', () => {
+    it('should update templateId', () => {
+      useEditorStore.getState().setCV(mockCV);
+
+      useEditorStore.getState().updateTemplateId('visionary');
+
+      expect(useEditorStore.getState().cvContent?.templateId).toBe('visionary');
+      expect(useEditorStore.getState().isDirty).toBe(true);
+    });
+
+    it('should do nothing when no CV is loaded', () => {
+      useEditorStore.getState().updateTemplateId('classic');
+      expect(useEditorStore.getState().cvContent).toBeNull();
+    });
+
+    it('should push to history', () => {
+      useEditorStore.getState().setCV(mockCV);
+      const historyLenBefore = useEditorStore.getState().history.length;
+
+      useEditorStore.getState().updateTemplateId('modern');
+
+      expect(useEditorStore.getState().history.length).toBe(historyLenBefore + 1);
+    });
+  });
 });
