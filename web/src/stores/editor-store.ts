@@ -40,6 +40,9 @@ interface EditorState {
   lastSavedAt: Date | null;
   saveError: string | null;
 
+  // Manual save callback (registered by useAutoSave)
+  saveNow: (() => void) | null;
+
   // History (undo/redo)
   history: CVContent[];
   historyIndex: number;
@@ -81,6 +84,7 @@ interface EditorActions {
   markSaving: () => void;
   markSaved: () => void;
   markError: (error: string) => void;
+  setSaveNow: (fn: (() => void) | null) => void;
 
   // Direct content update (for batch operations)
   setContent: (content: CVContent) => void;
@@ -103,6 +107,7 @@ const initialState: EditorState = {
   saveStatus: 'idle',
   lastSavedAt: null,
   saveError: null,
+  saveNow: null,
   history: [],
   historyIndex: -1,
 };
@@ -468,6 +473,12 @@ export const useEditorStore = create<EditorStore>()(
         set((state) => {
           state.saveStatus = 'error';
           state.saveError = error;
+        });
+      },
+
+      setSaveNow: (fn) => {
+        set((state) => {
+          state.saveNow = fn;
         });
       },
 

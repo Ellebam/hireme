@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** MVP functional — API backend + Frontend editor working end-to-end
+**Status:** Sprint 1 complete (browser tests still pending) — Sprint 2 next (template renderers, responsive, UX fixes)
 
 ### What's Working
 
@@ -25,17 +25,36 @@
 - ✅ Drag & drop section reordering (dnd-kit)
 - ✅ Live A4 CV preview with zoom (50-200%)
 - ✅ Undo/redo with 50-step history
-- ✅ Auto-save with 2s debounce
+- ✅ Auto-save with 2s debounce + manual save button
 - ✅ Export modal (PDF, DOCX, JSON)
 - ✅ Keyboard shortcuts (Ctrl+Z/Y, Ctrl+/-/0)
 - ✅ CV templates system (starter + blank templates)
 - ✅ Logging system with configurable levels
-- ✅ 81 passing tests (Vitest)
+- ✅ Save error feedback — tooltip on error icon, click-to-retry
+- ✅ Dashboard is root page (`/`), `/dashboard` redirects
+- ✅ Edit button links to `/editor` (not `/editor/${cv.id}`)
+- ✅ Burger menu (MoreVertical) has DropdownMenu with Edit/Delete
+- ✅ Delete confirmation dialog on CV card
+- ✅ Back-to-dashboard link in editor toolbar
+- ✅ shadcn/ui dropdown-menu component
+- ✅ 94 passing tests (Vitest)
 - ✅ Build verified, full stack integration tested
 
-### What's Not Working Yet
+### What's Not Working Yet (Remaining from Stakeholder Review)
+- ❌ CV preview is bland — needs 3 template renderers (classic, modern, visionary)
+- ❌ No color picker / accent color system
+- ❌ Editor sidebars not collapsible (unresponsive at small widths)
+- ❌ No double-click to edit sections in preview
+- ❌ Education `description` and `location` not displayed in preview
+- ❌ DnD section reorder snaps instead of animating
+- ❌ No template switching for existing CVs
 - ❌ Export (`POST /api/v1/export/{format}`) — returns 501, needs Gotenberg integration
 - ❌ R2 cloud storage — placeholder only, needs AWS SDK implementation
+
+### Sprint Plan (see WORKLOG.md Session 8/9 for details)
+- **Sprint 1:** ~~Fix saving + error feedback, merge landing into dashboard~~ ✅ DONE
+- **Sprint 2 (next):** Template renderers, responsive layout, double-click edit, education fix, DnD animation
+- **Sprint 3:** Gotenberg export, template switching
 
 ---
 
@@ -228,14 +247,14 @@ task api:sqlc          # Generate sqlc code
 
 ### Frontend Testing (add alongside refactors/bugfixes)
 
-Current state: 81 tests cover stores, API client, and templates. Zero component or interaction tests. The items below are ordered by impact — each one catches a different class of bug.
+Current state: 94 tests cover stores, API client, templates, and useAutoSave hook. Zero component or interaction tests. The items below are ordered by impact — each one catches a different class of bug.
 
 **P0 — Catch render/type breakage:**
 - [ ] Smoke tests for all 6 section editors (Personal, Summary, Experience, Education, Skills, Languages) — render with mock data, verify key elements appear. Catches broken imports, missing props, and type mismatches after refactors.
 - [ ] Smoke tests for page-level components (Dashboard, Editor) — render with mocked stores, verify basic structure loads.
 
 **P1 — Catch interaction bugs:**
-- [ ] `useAutoSave` hook test — verify debounce timing, dirty-state triggers, and cleanup on unmount. This hook has real async logic that can silently break.
+- [x] ~~`useAutoSave` hook test~~ — 10 tests covering registration/cleanup lifecycle, immediate save, concurrent save prevention, error handling, debounce timing
 - [ ] Editor interaction tests — add/edit/delete entries in ExperienceEditor and SkillsEditor (these have modal forms and the most complex user flows). Use `@testing-library/user-event`.
 - [ ] Export API error path tests — verify abort timeout and network error map to `ApiError` (new code, currently 0% covered).
 

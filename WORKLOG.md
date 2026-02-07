@@ -4,6 +4,137 @@ Chronological record of development activity.
 
 ---
 
+## 2026-02-07 (Session 9)
+
+### Session Focus
+Sprint 1 implementation — fix saving, merge landing into dashboard, write tests
+
+### Completed
+
+**Sprint 1, Task #1 — Fix saving + error feedback** ✅
+- [FEAT] Added `saveNow` state and `setSaveNow` action to `editor-store.ts`
+- [FEAT] Refactored `useAutoSave.ts` — extracted `saveImmediately()` for instant save, registers with store via `setSaveNow`, unregisters on unmount
+- [FEAT] Updated `EditorToolbar.tsx` — back-to-dashboard arrow (→ `/`), error tooltip showing `saveError` with click-to-retry, manual save button when dirty
+
+**Sprint 1, Task #2 — Merge landing into dashboard** ✅
+- [FEAT] Replaced marketing `page.tsx` (root) with full dashboard — DropdownMenu on CV card burger button (Edit/Delete), delete confirmation dialog, edit links to `/editor`
+- [FEAT] `dashboard/page.tsx` now does `redirect('/')` (307)
+- [FIX] `Header.tsx` — nav links changed from `/dashboard` to `/`, fixed `isActive` for root path (exact match for `/`)
+- [FIX] `editor/page.tsx` — "Go to Dashboard" link changed from `/dashboard` to `/`
+- [FEAT] Created `dropdown-menu.tsx` (shadcn/ui component using existing `@radix-ui/react-dropdown-menu`)
+- [FEAT] Added dropdown-menu exports to `ui/index.ts`
+
+**Testing** ✅
+- [TEST] `useAutoSave.test.ts` — 10 new tests: saveNow registration/cleanup lifecycle, immediate save, skip when not dirty, skip when no CV, concurrent save prevention (race condition guard), error handling with markError, retry after failure, non-Error thrown values, debounced auto-save timing
+- [TEST] `editor-store.test.ts` — 3 new tests: setSaveNow stores callback, clears with null, replaces existing
+- [TEST] All 94 tests passing (was 81), TypeScript clean, lint clean
+
+**Verification**
+- [QA] curl: `/` → 200 with dashboard content
+- [QA] curl: `/dashboard` → 307 redirect to `/`
+- [QA] curl: `/editor` → 200
+- [QA] Next.js cache cleared and recompiled clean
+- [ISSUE] Chrome extension disconnected during session — browser visual testing deferred
+
+### Files Changed
+
+**Modified:**
+- `web/src/stores/editor-store.ts` — Added `saveNow`, `setSaveNow`
+- `web/src/hooks/useAutoSave.ts` — Refactored with `saveImmediately()` + store registration
+- `web/src/components/editor/EditorToolbar.tsx` — Back link, error tooltip, save button
+- `web/src/app/page.tsx` — Replaced marketing page with dashboard
+- `web/src/app/dashboard/page.tsx` — Now redirects to `/`
+- `web/src/components/layout/Header.tsx` — Nav links + isActive fix
+- `web/src/app/editor/page.tsx` — Dashboard link fix
+- `web/src/components/ui/index.ts` — Added dropdown-menu exports
+- `web/src/stores/editor-store.test.ts` — Added setSaveNow tests
+
+**Created:**
+- `web/src/components/ui/dropdown-menu.tsx` — shadcn/ui dropdown menu
+- `web/src/hooks/useAutoSave.test.ts` — Hook lifecycle tests
+
+### Next Session
+- **Browser test Sprint 1 visually** (Chrome extension was down — need to verify: dropdown menu on CV card, error tooltip in editor toolbar, back arrow, manual save button, delete confirmation dialog)
+- **Begin Sprint 2** once browser tests pass:
+  - Task #3: Implement 3 CV template renderers (classic, modern, visionary)
+  - Task #4: Make editor layout responsive
+  - Task #5: Double-click to edit sections in preview
+  - Task #6: Fix education description/location display
+  - Task #7: Smooth drag & drop animation
+
+---
+
+## 2026-02-07 (Session 8)
+
+### Session Focus
+Stakeholder review triage, sprint planning, and initial implementation attempt
+
+### Completed
+
+**Stakeholder Review Analysis**
+- [PM] Read and triaged all 15 findings from `STAKEHOLDER_REVIEW.md`
+- [PM] Created prioritized sprint plan with 9 tasks across 3 sprints
+- [PM] Established task dependencies (Sprint 1 → 2 → 3)
+
+**Architecture Analysis (Architect Agent)**
+- [ARCH] Root-caused save bug: `saveError` stored in Zustand but never displayed in `EditorToolbar.tsx`
+- [ARCH] Root-caused edit 404: Dashboard links to `/editor/${cv.id}` but no dynamic route exists
+- [ARCH] Root-caused burger menu: `MoreVertical` button has no dropdown attached (line 100-102 of dashboard)
+- [ARCH] Root-caused education display bug: `description` and `location` fields not rendered in `CVPreview.tsx`
+- [ARCH] Decided template strategy: React components for preview, HTML string generation for Gotenberg export
+- [ARCH] Decided PDF-only export for MVP scope (DOCX later)
+- [ARCH] Designed accent color system: CSS custom properties + `styling.primaryColor` in CV content
+- [ARCH] Analyzed all 3 HTML template designs (classic, modern, visionary) from `data/` directory
+
+**Implementation Attempt**
+- [CHORE] Launched parallel engineer agents for Sprint 1 tasks
+- [ISSUE] Both agents completed analysis but were blocked by write permissions (sub-agents can't prompt for file writes)
+- [DOCS] Captured exact code changes needed from both agents (see Sprint Plan below)
+
+### Sprint Plan
+
+**Sprint 1 — Critical Fixes (must complete first)** ✅ DONE (Session 9)
+1. **Fix saving + error feedback** (Task #1) ✅
+2. **Merge landing page into dashboard** (Task #2) ✅
+
+**Sprint 2 — Visual & UX (depends on Sprint 1)**
+3. **Implement 3 CV template renderers** (Task #3)
+   - Create React components: `ClassicTemplate`, `ModernTemplate`, `VisionaryTemplate`
+   - Based on HTML designs in `data/CV_classic.html`, `data/CV__modern.html`, `data/CV_visionary.html`
+   - Accent color system with CSS custom properties
+   - Color picker in PropertiesPanel
+
+4. **Make editor layout responsive** (Task #4)
+   - Allow sidebars to collapse/resize
+   - Responsive breakpoints for different screen widths
+
+5. **Double-click to edit sections in preview** (Task #5)
+   - Add double-click handlers to preview sections
+   - Select section + open properties panel on double-click
+
+6. **Fix education additional info display** (Task #6)
+   - Add `description` and `location` fields to `EducationPreview` in `CVPreview.tsx`
+
+7. **Smooth drag & drop animation** (Task #7)
+   - Add CSS transitions for section reordering snap
+
+**Sprint 3 — Export & Templates (depends on Sprint 2)**
+8. **Implement Gotenberg PDF/DOCX export** (Task #8)
+   - Generate HTML string from CV content using template renderers
+   - POST to Gotenberg API for conversion
+   - Wire up backend export handler (currently returns 501)
+
+9. **Add template switching for existing CVs** (Task #9)
+   - Template selector in editor
+   - Preserve content when switching templates
+
+### Notes
+- `@radix-ui/react-dropdown-menu` is already in `package.json`
+- Dev environment verified: API :8080, Web :3000, PostgreSQL, Gotenberg :3001
+- Agent sub-processes cannot prompt for file write permissions — apply changes from main process
+
+---
+
 ## 2026-02-05 (Session 7)
 
 ### Session Focus

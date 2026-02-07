@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import {
   Undo2,
   Redo2,
@@ -11,6 +12,8 @@ import {
   Check,
   Loader2,
   AlertCircle,
+  Save,
+  ArrowLeft,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,7 +25,7 @@ import { Separator } from '@/components/ui/separator';
 import { useEditorStore, useUIStore, usePreviewScalePercent } from '@/stores';
 
 export function EditorToolbar() {
-  const { canUndo, canRedo, undo, redo, saveStatus, isDirty } = useEditorStore();
+  const { canUndo, canRedo, undo, redo, saveStatus, saveError, saveNow, isDirty } = useEditorStore();
   const {
     leftSidebarOpen,
     rightSidebarOpen,
@@ -37,6 +40,20 @@ export function EditorToolbar() {
 
   return (
     <div className="h-12 border-b bg-background px-2 flex items-center gap-1">
+      {/* Back to Dashboard */}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+            <Link href="/">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Back to Dashboard</TooltipContent>
+      </Tooltip>
+
+      <Separator orientation="vertical" className="h-6 mx-1" />
+
       {/* Left Panel Toggle */}
       <Tooltip>
         <TooltipTrigger asChild>
@@ -145,15 +162,42 @@ export function EditorToolbar() {
           </>
         )}
         {saveStatus === 'error' && (
-          <>
-            <AlertCircle className="h-4 w-4 text-destructive" />
-            <span className="text-destructive">Error</span>
-          </>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => saveNow?.()}
+                className="flex items-center gap-2 text-destructive hover:text-destructive/80 transition-colors"
+              >
+                <AlertCircle className="h-4 w-4" />
+                <span>Save failed — click to retry</span>
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {saveError || 'Unknown error'}
+            </TooltipContent>
+          </Tooltip>
         )}
         {(saveStatus === 'idle' && isDirty) && (
           <span>Unsaved changes</span>
         )}
       </div>
+
+      {/* Manual Save */}
+      {isDirty && saveStatus !== 'saving' && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => saveNow?.()}
+            >
+              <Save className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Save now (Ctrl+S)</TooltipContent>
+        </Tooltip>
+      )}
 
       <Separator orientation="vertical" className="h-6 mx-1" />
 
