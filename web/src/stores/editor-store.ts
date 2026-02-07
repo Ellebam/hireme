@@ -316,6 +316,9 @@ export const useEditorStore = create<EditorStore>()(
           }
           state.isDirty = true;
         });
+
+        // Push to history AFTER making changes
+        get().pushHistory();
       },
 
       // ========================================================================

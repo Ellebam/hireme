@@ -1,5 +1,6 @@
 'use client';
 
+import type React from 'react';
 import { useCallback } from 'react';
 import { Plus, Trash2, Globe, Linkedin, Github, Twitter } from 'lucide-react';
 import { Button } from '@/components/ui/button';

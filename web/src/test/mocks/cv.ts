@@ -13,8 +13,8 @@ import type {
   EducationContent,
   SkillsContent,
   LanguagesContent,
-  SCHEMA_VERSION,
 } from '@/types/cv';
+import { SCHEMA_VERSION } from '@/types/cv';
 
 // ============================================================================
 // Section Mocks
@@ -124,9 +124,9 @@ export const mockSkillsContent: SkillsContent = {
 
 export const mockLanguagesContent: LanguagesContent = {
   entries: [
-    { language: 'English', proficiency: 'native' },
-    { language: 'German', proficiency: 'fluent' },
-    { language: 'Spanish', proficiency: 'intermediate' },
+    { id: 'lang-1', language: 'English', proficiency: 'native' },
+    { id: 'lang-2', language: 'German', proficiency: 'fluent' },
+    { id: 'lang-3', language: 'Spanish', proficiency: 'intermediate' },
   ],
 };
 
@@ -185,7 +185,7 @@ export const mockSections: CVSection[] = [
 // ============================================================================
 
 export const mockCVContent: CVContent = {
-  schemaVersion: '1.0.0',
+  schemaVersion: SCHEMA_VERSION,
   templateId: 'modern',
   locale: 'en',
   title: 'Software Engineer CV',
@@ -207,7 +207,7 @@ export const mockCVContent: CVContent = {
 export const mockCV: CV = {
   id: 'cv-123',
   title: 'Software Engineer CV',
-  schemaVersion: '1.0.0',
+  schemaVersion: SCHEMA_VERSION,
   content: mockCVContent,
   createdAt: '2024-01-15T10:30:00Z',
   updatedAt: '2024-02-01T14:22:00Z',
@@ -254,7 +254,7 @@ export function createMockSection<T extends CVSection['type']>(
 // ============================================================================
 
 export const minimalCVContent: CVContent = {
-  schemaVersion: '1.0.0',
+  schemaVersion: SCHEMA_VERSION,
   templateId: 'classic',
   sections: [
     {
@@ -270,7 +270,7 @@ export const minimalCVContent: CVContent = {
 export const minimalCV: CV = {
   id: 'min-cv-1',
   title: 'Minimal CV',
-  schemaVersion: '1.0.0',
+  schemaVersion: SCHEMA_VERSION,
   content: minimalCVContent,
   createdAt: '2024-01-01T00:00:00Z',
   updatedAt: '2024-01-01T00:00:00Z',

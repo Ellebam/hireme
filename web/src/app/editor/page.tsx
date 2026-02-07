@@ -22,12 +22,15 @@ export default function EditorPage() {
   useKeyboardShortcuts();
 
   useEffect(() => {
+    let isActive = true;
+
     async function loadOrCreateCV() {
       logger.info('Editor', 'Loading CV...');
 
       try {
         // Try to load existing CV
         const cv = await api.cv.get();
+        if (!isActive) return;
         logger.info('Editor', 'CV loaded from API', {
           id: cv.id,
           title: cv.title,
@@ -35,6 +38,7 @@ export default function EditorPage() {
         });
         setCV(cv);
       } catch (err) {
+        if (!isActive) return;
         if (err instanceof ApiError && err.isNotFound) {
           logger.info('Editor', 'No CV found, creating new one');
           // No CV exists, create one with starter template
@@ -47,9 +51,11 @@ export default function EditorPage() {
               title: template.title || 'My CV',
               content: template,
             });
+            if (!isActive) return;
             logger.info('Editor', 'New CV created', { id: newCV.id });
             setCV(newCV);
           } catch (createErr) {
+            if (!isActive) return;
             logger.error('Editor', 'Failed to create CV', createErr);
             setError('Failed to create CV. Please try again.');
           }
@@ -58,7 +64,9 @@ export default function EditorPage() {
           setError('Failed to load CV. Please try again.');
         }
       } finally {
-        setLoading(false);
+        if (isActive) {
+          setLoading(false);
+        }
       }
     }
 
@@ -66,6 +74,7 @@ export default function EditorPage() {
 
     // Cleanup on unmount
     return () => {
+      isActive = false;
       reset();
     };
   }, [setCV, reset]);

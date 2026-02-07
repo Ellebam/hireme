@@ -14,6 +14,7 @@ import type {
 import { logger } from '@/lib/logger';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+const REQUEST_TIMEOUT_MS = 30000; // 30 seconds
 
 // ============================================================================
 // Error Handling
@@ -81,9 +82,13 @@ class ApiClient {
 
     logger.debug('API', `${method} ${endpoint}`);
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
     try {
       const response = await fetch(url, {
         ...options,
+        signal: controller.signal,
         headers: {
           'Content-Type': 'application/json',
           ...options?.headers,
@@ -133,9 +138,17 @@ class ApiClient {
         throw err;
       }
 
+      // Handle abort/timeout errors
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        logger.error('API', `Request timeout for ${method} ${endpoint}`);
+        throw new ApiError(0, 'Request timed out - please try again');
+      }
+
       // Handle network errors
-      logger.error('API', `Network error for ${method} ${endpoint}`, err);
+      logger.error('API', `Network error for ${method} ${endpoint}`);
       throw new ApiError(0, 'Network error - please check your connection');
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 
@@ -144,7 +157,7 @@ class ApiClient {
   }
 
   async post<T>(endpoint: string, data?: unknown): Promise<T> {
-    logger.debug('API', `POST ${endpoint} payload`, data);
+    logger.debug('API', `POST ${endpoint}`, { hasPayload: data !== undefined });
     return this.request<T>(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
@@ -152,7 +165,7 @@ class ApiClient {
   }
 
   async put<T>(endpoint: string, data: unknown): Promise<T> {
-    logger.debug('API', `PUT ${endpoint} payload`, data);
+    logger.debug('API', `PUT ${endpoint}`, { hasPayload: true });
     return this.request<T>(endpoint, {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -170,11 +183,15 @@ class ApiClient {
     const url = `${this.baseUrl}${endpoint}`;
     logger.debug('API', `UPLOAD ${endpoint}`, { filename: file.name, size: file.size });
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS * 2); // Double timeout for uploads
+
     try {
       const response = await fetch(url, {
         method: 'POST',
         body: formData,
         credentials: 'include',
+        signal: controller.signal,
       });
 
       const body: ApiResponse<T> = await response.json().catch(() => ({}));
@@ -197,8 +214,13 @@ class ApiClient {
       return body as unknown as T;
     } catch (err) {
       if (err instanceof ApiError) throw err;
-      logger.error('API', 'Upload network error', err);
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        throw new ApiError(0, 'Upload timed out - please try again');
+      }
+      logger.error('API', 'Upload network error');
       throw new ApiError(0, 'Upload failed - network error');
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 }
@@ -266,25 +288,41 @@ export const exportApi = {
     const url = `${API_BASE}/api/v1/export/${format}`;
     logger.debug('API', `Export ${format}`, { cvId });
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cvId }),
-      credentials: 'include',
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS * 2);
 
-    if (!response.ok) {
-      const body = await response.json().catch(() => ({}));
-      const error = body.error || body;
-      logger.error('API', `Export failed: ${error.message || 'Unknown error'}`);
-      throw new ApiError(
-        response.status,
-        error.message || 'Export failed',
-        error.code
-      );
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cvId }),
+        credentials: 'include',
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        const error = body.error || body;
+        logger.error('API', `Export failed: ${error.message || 'Unknown error'}`);
+        throw new ApiError(
+          response.status,
+          error.message || 'Export failed',
+          error.code
+        );
+      }
+
+      return response.blob();
+    } catch (err) {
+      if (err instanceof ApiError) throw err;
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        logger.error('API', `Export timeout for ${format}`);
+        throw new ApiError(0, 'Export timed out - please try again');
+      }
+      logger.error('API', 'Export network error');
+      throw new ApiError(0, 'Export failed - network error');
+    } finally {
+      clearTimeout(timeoutId);
     }
-
-    return response.blob();
   },
 
   /** Get download URL for export */

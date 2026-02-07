@@ -186,7 +186,13 @@ func setupRouter(cfg *config.Config, h *handler.Handler) *chi.Mux {
 				strings.HasPrefix(origin, "http://127.0.0.1:")
 		}
 	} else {
-		corsOptions.AllowedOrigins = []string{"https://*.hireme.io"}
+		// In production, use AllowOriginFunc for explicit host validation
+		// (wildcard patterns with AllowCredentials:true violate browser CORS spec)
+		corsOptions.AllowOriginFunc = func(r *http.Request, origin string) bool {
+			return origin == "https://hireme.io" ||
+				origin == "https://www.hireme.io" ||
+				origin == "https://app.hireme.io"
+		}
 	}
 
 	r.Use(cors.Handler(corsOptions))

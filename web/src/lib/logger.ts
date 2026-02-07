@@ -30,9 +30,13 @@ const LOG_LEVELS: Record<LogLevel, number> = {
 function getLogLevel(): LogLevel {
   // Check localStorage first (for browser debugging)
   if (typeof window !== 'undefined') {
-    const stored = localStorage.getItem('LOG_LEVEL');
-    if (stored && stored in LOG_LEVELS) {
-      return stored as LogLevel;
+    try {
+      const stored = localStorage.getItem('LOG_LEVEL');
+      if (stored && stored in LOG_LEVELS) {
+        return stored as LogLevel;
+      }
+    } catch {
+      // localStorage may be unavailable in private/sandboxed contexts
     }
   }
 
@@ -121,7 +125,11 @@ export const logger = {
    */
   setLevel(level: LogLevel): void {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('LOG_LEVEL', level);
+      try {
+        localStorage.setItem('LOG_LEVEL', level);
+      } catch {
+        // localStorage may be unavailable in private/sandboxed contexts
+      }
     }
   },
 };

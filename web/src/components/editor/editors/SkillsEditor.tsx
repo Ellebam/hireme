@@ -177,6 +177,7 @@ function SkillCategoryCard({
           />
         ) : (
           <button
+            type="button"
             onClick={() => setIsEditing(true)}
             className="font-medium text-left hover:text-primary"
           >
@@ -254,6 +255,7 @@ function SkillTag({ skill, onUpdate, onDelete }: SkillTagProps) {
           ))}
         </select>
         <button
+          type="button"
           onClick={onDelete}
           className="text-muted-foreground hover:text-destructive"
         >
@@ -275,6 +277,7 @@ function SkillTag({ skill, onUpdate, onDelete }: SkillTagProps) {
         </span>
       )}
       <button
+        type="button"
         onClick={(e) => {
           e.stopPropagation();
           onDelete();

@@ -9,7 +9,7 @@
 
 export const SCHEMA_VERSION = '1.0.0' as const;
 
-export const TEMPLATE_IDS = ['classic', 'modern', 'minimal'] as const;
+export const TEMPLATE_IDS = ['classic', 'modern', 'minimal', 'blank'] as const;
 export type TemplateId = (typeof TEMPLATE_IDS)[number];
 
 export const LOCALES = ['en', 'de'] as const;
@@ -155,6 +155,7 @@ export interface SkillsContent {
 
 /** Language entry */
 export interface LanguageEntry {
+  id: string;
   language: string;
   proficiency: LanguageProficiency;
   certification?: string;

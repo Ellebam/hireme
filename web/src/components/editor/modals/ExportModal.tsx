@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import type React from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { FileText, FileJson, FileType, Download, Loader2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -50,6 +51,16 @@ export function ExportModal() {
   const [isExporting, setIsExporting] = useState(false);
   const [exportSuccess, setExportSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Clear timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleExport = async () => {
     if (!cv) return;
@@ -74,7 +85,7 @@ export function ExportModal() {
       }
 
       setExportSuccess(true);
-      setTimeout(() => {
+      closeTimeoutRef.current = setTimeout(() => {
         closeExportModal();
         setExportSuccess(false);
       }, 1500);
@@ -118,6 +129,7 @@ export function ExportModal() {
 
             return (
               <button
+                type="button"
                 key={format.id}
                 onClick={() => setSelectedFormat(format.id)}
                 className={cn(

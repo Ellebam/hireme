@@ -141,7 +141,7 @@ function SectionEditor({ section }: { section: CVSection }) {
         <div className="space-y-4">
           <div className="p-4 rounded-lg bg-muted/50 border border-dashed">
             <p className="text-sm text-muted-foreground text-center">
-              Edit {SECTION_LABELS[section.type]} content
+              Edit {SECTION_LABELS[section.type] || section.type} content
             </p>
           </div>
           <div>

@@ -19,9 +19,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Separator } from '@/components/ui/separator';
-import { useEditorStore } from '@/stores';
-import { useUIStore, usePreviewScalePercent } from '@/stores';
-import { cn } from '@/lib/utils';
+import { useEditorStore, useUIStore, usePreviewScalePercent } from '@/stores';
 
 export function EditorToolbar() {
   const { canUndo, canRedo, undo, redo, saveStatus, isDirty } = useEditorStore();

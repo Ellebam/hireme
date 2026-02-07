@@ -165,8 +165,8 @@ export function starterTemplate(): CVContent {
         title: 'Languages',
         content: {
           entries: [
-            { language: 'English', proficiency: 'native' },
-            { language: 'Spanish', proficiency: 'intermediate' },
+            { id: generateId(), language: 'English', proficiency: 'native' },
+            { id: generateId(), language: 'Spanish', proficiency: 'intermediate' },
           ],
         },
       },
