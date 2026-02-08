@@ -12,8 +12,10 @@ import type { CV } from '@/types/api';
 import type {
   CVContent,
   CVSection,
+  CVStyling,
   SectionType,
   SectionContent,
+  TemplateId,
 } from '@/types/cv';
 import { getDefaultContent, SCHEMA_VERSION } from '@/types/cv';
 import { generateId } from '@/lib/utils';
@@ -85,6 +87,10 @@ interface EditorActions {
   markSaved: () => void;
   markError: (error: string) => void;
   setSaveNow: (fn: (() => void) | null) => void;
+
+  // Styling & template
+  updateStyling: (updates: Partial<CVStyling>) => void;
+  updateTemplateId: (templateId: TemplateId) => void;
 
   // Direct content update (for batch operations)
   setContent: (content: CVContent) => void;
@@ -480,6 +486,31 @@ export const useEditorStore = create<EditorStore>()(
         set((state) => {
           state.saveNow = fn;
         });
+      },
+
+      // ========================================================================
+      // Styling & Template
+      // ========================================================================
+
+      updateStyling: (updates) => {
+        set((state) => {
+          if (!state.cvContent) return;
+          state.cvContent.styling = {
+            ...state.cvContent.styling,
+            ...updates,
+          };
+          state.isDirty = true;
+        });
+        get().pushHistory();
+      },
+
+      updateTemplateId: (templateId) => {
+        set((state) => {
+          if (!state.cvContent) return;
+          state.cvContent.templateId = templateId;
+          state.isDirty = true;
+        });
+        get().pushHistory();
       },
 
       // ========================================================================

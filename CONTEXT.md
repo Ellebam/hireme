@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Sprint 1 complete (browser tests still pending) — Sprint 2 next (template renderers, responsive, UX fixes)
+**Status:** Sprint 2 complete (browser tests pending) — Sprint 3 next (Gotenberg export, template switching)
 
 ### What's Working
 
@@ -37,24 +37,24 @@
 - ✅ Delete confirmation dialog on CV card
 - ✅ Back-to-dashboard link in editor toolbar
 - ✅ shadcn/ui dropdown-menu component
-- ✅ 94 passing tests (Vitest)
+- ✅ 101 passing tests (Vitest)
 - ✅ Build verified, full stack integration tested
 
 ### What's Not Working Yet (Remaining from Stakeholder Review)
-- ❌ CV preview is bland — needs 3 template renderers (classic, modern, visionary)
-- ❌ No color picker / accent color system
-- ❌ Editor sidebars not collapsible (unresponsive at small widths)
-- ❌ No double-click to edit sections in preview
-- ❌ Education `description` and `location` not displayed in preview
-- ❌ DnD section reorder snaps instead of animating
-- ❌ No template switching for existing CVs
+- ✅ ~~CV preview is bland~~ — 3 template renderers (classic, modern, visionary) implemented
+- ✅ ~~No color picker~~ — accent color picker + template selector in toolbar
+- ✅ ~~Editor sidebars not collapsible~~ — auto-collapse at breakpoints (768px, 1024px)
+- ✅ ~~No double-click to edit~~ — double-click selects section and opens properties panel
+- ✅ ~~Education description/location not displayed~~ — all templates show location, description, grade
+- ✅ ~~DnD snaps~~ — smooth animation with animateLayoutChanges + fallback transition
+- ❌ No template switching for existing CVs (selector exists, needs backend persistence of templateId)
 - ❌ Export (`POST /api/v1/export/{format}`) — returns 501, needs Gotenberg integration
 - ❌ R2 cloud storage — placeholder only, needs AWS SDK implementation
 
-### Sprint Plan (see WORKLOG.md Session 8/9 for details)
+### Sprint Plan (see WORKLOG.md Session 8/9/10 for details)
 - **Sprint 1:** ~~Fix saving + error feedback, merge landing into dashboard~~ ✅ DONE
-- **Sprint 2 (next):** Template renderers, responsive layout, double-click edit, education fix, DnD animation
-- **Sprint 3:** Gotenberg export, template switching
+- **Sprint 2:** ~~Template renderers, responsive layout, double-click edit, education fix, DnD animation~~ ✅ DONE
+- **Sprint 3 (next):** Gotenberg export, template switching
 
 ---
 
@@ -102,11 +102,16 @@ web/src/
 │   ├── logger.ts          # Configurable logging
 │   └── templates/         # CV templates (starter, blank)
 ├── components/editor/
-│   ├── EditorLayout.tsx   # Main layout
-│   ├── CVPreview.tsx      # Live preview
+│   ├── EditorLayout.tsx   # Main layout (responsive breakpoints)
+│   ├── CVPreview.tsx      # Live preview (template dispatch)
 │   ├── SectionPalette.tsx # Add sections
 │   ├── PropertiesPanel.tsx# Edit section content
 │   └── editors/           # Section-specific editors
+├── components/templates/
+│   ├── ClassicTemplate.tsx# Traditional CV layout
+│   ├── ModernTemplate.tsx # Contemporary with timeline
+│   ├── VisionaryTemplate.tsx # Two-column with sidebar
+│   └── index.ts           # Template exports
 └── hooks/
     ├── useAutoSave.ts     # 2s debounced save
     └── useKeyboardShortcuts.ts
