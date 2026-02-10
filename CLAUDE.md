@@ -4,10 +4,10 @@
 
 | Command | Action |
 |---------|--------|
-| `update worklog` | Update WORKLOG.md with session progress |
-| `checkpoint` | Update worklog + CONTEXT.md + commit |
+| `checkpoint` | Update CONTEXT.md + commit |
 | `@engineer` | Switch to implementation mode |
 | `@architect` | Switch to design/planning mode |
+| `/investigate <task>` | PM-led investigation: trace code, document findings, prepare handoff |
 
 ## Agent System
 
@@ -26,21 +26,25 @@ Agent files in `.claude/agents/` for detailed processes.
 
 | File | Purpose |
 |------|---------|
-| `CONTEXT.md` | Tech stack, architecture, current state |
-| `WORKLOG.md` | Session history, what was done, next steps |
+| `CONTEXT.md` | Tech stack, architecture, task board, current state |
+| `<TASK-ID>-NOTES.md` | Per-task investigation notes (temporary, created by `/investigate`) |
 | `.env` | Environment variables (DATABASE_URL, AUTH_BYPASS_ENABLED) |
 
 ## Workflow
 
 ### Starting a Session
-1. Read last entry in `WORKLOG.md` for context
-2. Check `CONTEXT.md` → "Current State" section
+1. Check `CONTEXT.md` → "Current State" and "Task Board" sections
+2. Pick a task or resume an active one
+
+### Working on a Task
+1. Use `/investigate <task>` to set up branch, notes, and run investigation
+2. Hand off to `@architect` for design decisions, then `@engineer` for implementation
+3. Run `@qa` before opening PR
 
 ### Ending a Session
-Say `checkpoint` or `update worklog` to:
-1. Update `WORKLOG.md` with completed work
-2. Update `CONTEXT.md` current state if needed
-3. Commit with proper tag
+Say `checkpoint` to:
+1. Update `CONTEXT.md` current state and task board
+2. Commit with proper tag
 
 ### Commit Format
 ```

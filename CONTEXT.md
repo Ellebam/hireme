@@ -40,8 +40,8 @@
 - ✅ 101 passing tests (Vitest)
 - ✅ Build verified, full stack integration tested
 
-### Remaining Open Items (from Stakeholder Review)
-- ❌ Template switching for existing CVs — selector exists, needs backend persistence of templateId → T-001
+### Remaining Work
+- ❌ Template switching — backend schema rejects `"visionary"` (see T-001)
 - ❌ Export (`POST /api/v1/export/{format}`) — returns 501, needs Gotenberg integration → T-002, T-003, T-004, T-005
 - ❌ R2 cloud storage — placeholder only, needs AWS SDK implementation → T-013
 
@@ -166,7 +166,7 @@ hireme/
 ├── schemas/                # Shared JSON schemas
 ├── scripts/                # Dev utilities
 ├── CONTEXT.md              # This file
-├── WORKLOG.md              # Session history
+├── WORKLOG.md              # Trimmed — historical logs in git history
 └── CLAUDE.md               # AI assistant instructions
 ```
 
@@ -382,12 +382,7 @@ Backlog → Active (in-progress) → QA Review → Tech Lead Approval → Done
 
 ## Stakeholder Feedback
 
-### Ingesting New Feedback
-- **Inline:** Say `stakeholder feedback: [description]` → PM agent creates/updates tasks
-- **Batch:** Say `process stakeholder review` → PM agent reads `STAKEHOLDER_REVIEW.md`, diffs against Task Board, creates new tasks
-
-### Audit Trail
-Each item in `STAKEHOLDER_REVIEW.md` is annotated with `→ T-NNN` linking it to its task
+New feedback: say `stakeholder feedback: [description]` → PM agent creates/updates tasks in the Task Board.
 
 ---
 
