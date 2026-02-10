@@ -164,7 +164,37 @@ TemplateMinimal = "minimal"   // <-- NO "visionary"
 ## Test Plan
 
 - [x] Unit test: change template → verify dirty state — **ALREADY EXISTS** (editor-store.test.ts:486-509)
-- [ ] Backend schema test: `"visionary"` is accepted by JSON schema validation
-- [ ] Backend service test: save with `"visionary"` → retrieve → verify templateId persists
-- [ ] Backend `ValidateTemplateID()` unit test
+- [x] Backend schema test: `"visionary"` is accepted by JSON schema validation — `TestCVValidator_Validate_AllValidTemplateIds`
+- [x] Backend `ValidateTemplateID()` unit test — updated `TestValidateTemplateID_Valid/Invalid`
+- [x] `"minimal"` rejected by schema + standalone validator — regression guard
+- [ ] Backend service test: save with `"visionary"` → retrieve → verify templateId persists (deferred — needs running DB)
 - [ ] Integration test (optional): full round-trip through API with curl/httptest
+
+### QA-Recommended Additional Tests
+
+| # | Test | Layer | Priority | Description |
+|---|------|-------|----------|-------------|
+| 1 | `"minimal"` rejected after rename | Backend validator | High | Add `"minimal"` to invalid cases in `TestCVValidator_Validate_InvalidTemplateId` and `TestValidateTemplateID_Invalid` — regression protection for the core fix |
+| 2 | All valid template IDs pass schema | Backend validator | High | Table-driven test: iterate `["classic", "modern", "visionary"]` (+ `"blank"` if added), each creates valid CV JSON → expect nil error |
+| 3 | Auto-save payload includes correct templateId | Frontend hook | High | In `useAutoSave.test.ts`: set cvContent with templateId `'visionary'` → trigger save → assert `mockUpdate` was called with content containing `templateId: 'visionary'` |
+| 4 | Handler returns 200/201 for visionary | Backend handler | Medium | In `cv_test.go`: add `TestUpdateCV_WithVisionary` (PUT → 200) and `TestCreateCV_WithVisionary` (POST → 201) using content with `templateId:"visionary"` |
+| 5 | `updateTemplateId` with each valid ID | Frontend store | Medium | In `editor-store.test.ts`: expand describe block at line 486 with table-driven test for `['classic', 'modern', 'visionary']` |
+
+---
+
+## Implementation Summary
+
+**Decisions applied:**
+- Decision 1 → **Option A**: Replace `"minimal"` with `"visionary"` (clean break, no production data)
+- Decision 2 → **Option B**: Don't add `"blank"` to backend (frontend-only concept)
+
+**Files changed (4):**
+
+| File | Change |
+|------|--------|
+| `api/internal/validator/schema/cv-schema.json` | `"minimal"` → `"visionary"` in templateId enum |
+| `api/internal/domain/cv.go` | `TemplateMinimal` → `TemplateVisionary` constant |
+| `api/internal/validator/cv_schema.go` | Updated `ValidateTemplateID()` switch |
+| `api/internal/validator/cv_schema_test.go` | New table-driven tests; `"minimal"` added to invalid cases |
+
+**Tests: all green** — Go backend (all packages), Frontend (101/101)

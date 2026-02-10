@@ -8,6 +8,7 @@
 | `@engineer` | Switch to implementation mode |
 | `@architect` | Switch to design/planning mode |
 | `/investigate <task>` | PM-led investigation: trace code, document findings, prepare handoff |
+| `/qa-review <task>` | QA test-gap review: audit coverage, append test recommendations to notes |
 
 ## Agent System
 
@@ -38,8 +39,9 @@ Agent files in `.claude/agents/` for detailed processes.
 
 ### Working on a Task
 1. Use `/investigate <task>` to set up branch, notes, and run investigation
-2. Hand off to `@architect` for design decisions, then `@engineer` for implementation
-3. Run `@qa` before opening PR
+2. Use `/qa-review <task>` to audit test coverage and add recommendations to notes
+3. Hand off to `@architect` for design decisions, then `@engineer` for implementation
+4. Run `@qa` before opening PR
 
 ### Ending a Session
 Say `checkpoint` to:
