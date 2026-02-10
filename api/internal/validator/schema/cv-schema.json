@@ -12,7 +12,7 @@
     },
     "templateId": {
       "type": "string",
-      "enum": ["classic", "modern", "minimal"],
+      "enum": ["classic", "modern", "visionary"],
       "description": "Base template for rendering"
     },
     "locale": {

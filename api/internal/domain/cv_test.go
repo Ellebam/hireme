@@ -148,7 +148,7 @@ func TestCV_SetContent_WithStyling(t *testing.T) {
 
 	content := &CVContent{
 		SchemaVersion: "1.0.0",
-		TemplateID:    "minimal",
+		TemplateID:    "visionary",
 		Sections:      []CVSection{},
 		Styling: &CVStyling{
 			PrimaryColor: "#2563eb",

@@ -76,7 +76,7 @@ func formatValidationError(err *jsonschema.ValidationError) string {
 // ValidateTemplateID validates that a template ID is valid
 func ValidateTemplateID(templateID string) error {
 	switch templateID {
-	case domain.TemplateClassic, domain.TemplateModern, domain.TemplateMinimal:
+	case domain.TemplateClassic, domain.TemplateModern, domain.TemplateVisionary:
 		return nil
 	default:
 		return domain.NewValidationError("templateId", "invalid template ID")

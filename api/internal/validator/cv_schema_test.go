@@ -144,21 +144,49 @@ func TestCVValidator_Validate_InvalidJSON(t *testing.T) {
 	}
 }
 
+func TestCVValidator_Validate_AllValidTemplateIds(t *testing.T) {
+	validator, err := NewCVValidator()
+	if err != nil {
+		t.Fatalf("failed to create validator: %v", err)
+	}
+
+	validTemplates := []string{"classic", "modern", "visionary"}
+
+	for _, tmpl := range validTemplates {
+		t.Run(tmpl, func(t *testing.T) {
+			cv := `{
+				"schemaVersion": "1.0.0",
+				"templateId": "` + tmpl + `",
+				"sections": []
+			}`
+			err := validator.Validate(json.RawMessage(cv))
+			if err != nil {
+				t.Errorf("expected templateId %q to pass schema validation, got: %v", tmpl, err)
+			}
+		})
+	}
+}
+
 func TestCVValidator_Validate_InvalidTemplateId(t *testing.T) {
 	validator, err := NewCVValidator()
 	if err != nil {
 		t.Fatalf("failed to create validator: %v", err)
 	}
 
-	invalidCV := `{
-		"schemaVersion": "1.0.0",
-		"templateId": "unknown",
-		"sections": []
-	}`
+	invalidTemplates := []string{"unknown", "minimal", "blank", "CLASSIC"}
 
-	err = validator.Validate(json.RawMessage(invalidCV))
-	if err == nil {
-		t.Error("expected validation error for invalid templateId, got nil")
+	for _, tmpl := range invalidTemplates {
+		t.Run(tmpl, func(t *testing.T) {
+			cv := `{
+				"schemaVersion": "1.0.0",
+				"templateId": "` + tmpl + `",
+				"sections": []
+			}`
+			err := validator.Validate(json.RawMessage(cv))
+			if err == nil {
+				t.Errorf("expected templateId %q to fail schema validation, got nil", tmpl)
+			}
+		})
 	}
 }
 
@@ -182,7 +210,7 @@ func TestCVValidator_Validate_InvalidLocale(t *testing.T) {
 }
 
 func TestValidateTemplateID_Valid(t *testing.T) {
-	validTemplates := []string{"classic", "modern", "minimal"}
+	validTemplates := []string{"classic", "modern", "visionary"}
 
 	for _, template := range validTemplates {
 		t.Run(template, func(t *testing.T) {
@@ -195,7 +223,7 @@ func TestValidateTemplateID_Valid(t *testing.T) {
 }
 
 func TestValidateTemplateID_Invalid(t *testing.T) {
-	invalidTemplates := []string{"unknown", "fancy", "", "CLASSIC", "Modern"}
+	invalidTemplates := []string{"unknown", "fancy", "", "CLASSIC", "Modern", "minimal"}
 
 	for _, template := range invalidTemplates {
 		t.Run(template, func(t *testing.T) {
