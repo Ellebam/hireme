@@ -4,6 +4,39 @@ Chronological record of development activity.
 
 ---
 
+## 2026-02-08 (Session 11)
+
+### Session Focus
+Workflow restructure — replace sprint-based planning with task-based system
+
+### Motivation
+Sprint 2 touched 10+ files across templates, responsive layout, DnD, and double-click editing in one PR. This makes reviews harder, increases risk per merge, and prevents focused work. Moving to small, independent tasks with their own branches and focused PRs.
+
+### Completed
+- [DOCS] Restructured CONTEXT.md: replaced Sprint Plan, To-Do, and What's Not Working Yet sections with Task Board (Active/Backlog/Done), Task Details, Task Workflow, and Stakeholder Feedback sections
+- [DOCS] Defined 15 tasks (T-001 through T-015) with sizes, dependencies, and acceptance criteria
+- [DOCS] Annotated STAKEHOLDER_REVIEW.md — linked all 15 items to task IDs or marked as resolved
+- [DOCS] Established task lifecycle: Backlog → Active → QA Review → Tech Lead Approval → Done
+- [DOCS] Defined branch/PR convention: one branch per task, `feat/t-NNN-short-name`, PR title includes task ID
+
+### Task Board Summary
+- **15 tasks** defined total
+- **10 unblocked** (T-001, T-006–T-015) — ready to pick up in any order
+- **5 blocked** (T-002→T-001, T-003→T-002, T-004→T-002, T-005→T-003+T-004)
+- **Export chain:** T-001 → T-002 → T-003/T-004 → T-005
+- **Recommended start:** T-001 (XS, unblocks export chain) or T-006/T-007 (testing confidence)
+
+### Files Changed
+- `CONTEXT.md` — Replaced sprint/to-do sections with task board + workflow
+- `STAKEHOLDER_REVIEW.md` — Annotated items with task IDs
+- `WORKLOG.md` — This session entry
+
+### Next Session
+- Pick first task from backlog (suggested: T-001 or T-006)
+- Create task branch, implement, run QA, open PR
+
+---
+
 ## 2026-02-07 (Session 10)
 
 ### Session Focus

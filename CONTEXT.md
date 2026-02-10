@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Sprint 2 complete (browser tests pending) — Sprint 3 next (Gotenberg export, template switching)
+**Status:** Task-based workflow active — 15 tasks defined, 10 unblocked and ready to pick up
 
 ### What's Working
 
@@ -40,21 +40,10 @@
 - ✅ 101 passing tests (Vitest)
 - ✅ Build verified, full stack integration tested
 
-### What's Not Working Yet (Remaining from Stakeholder Review)
-- ✅ ~~CV preview is bland~~ — 3 template renderers (classic, modern, visionary) implemented
-- ✅ ~~No color picker~~ — accent color picker + template selector in toolbar
-- ✅ ~~Editor sidebars not collapsible~~ — auto-collapse at breakpoints (768px, 1024px)
-- ✅ ~~No double-click to edit~~ — double-click selects section and opens properties panel
-- ✅ ~~Education description/location not displayed~~ — all templates show location, description, grade
-- ✅ ~~DnD snaps~~ — smooth animation with animateLayoutChanges + fallback transition
-- ❌ No template switching for existing CVs (selector exists, needs backend persistence of templateId)
-- ❌ Export (`POST /api/v1/export/{format}`) — returns 501, needs Gotenberg integration
-- ❌ R2 cloud storage — placeholder only, needs AWS SDK implementation
-
-### Sprint Plan (see WORKLOG.md Session 8/9/10 for details)
-- **Sprint 1:** ~~Fix saving + error feedback, merge landing into dashboard~~ ✅ DONE
-- **Sprint 2:** ~~Template renderers, responsive layout, double-click edit, education fix, DnD animation~~ ✅ DONE
-- **Sprint 3 (next):** Gotenberg export, template switching
+### Remaining Open Items (from Stakeholder Review)
+- ❌ Template switching for existing CVs — selector exists, needs backend persistence of templateId → T-001
+- ❌ Export (`POST /api/v1/export/{format}`) — returns 501, needs Gotenberg integration → T-002, T-003, T-004, T-005
+- ❌ R2 cloud storage — placeholder only, needs AWS SDK implementation → T-013
 
 ---
 
@@ -232,46 +221,173 @@ task api:sqlc          # Generate sqlc code
 
 ---
 
-## To-Do
+## Task Board
 
-### High Priority
-- [ ] Gotenberg integration for PDF/DOCX export
-- [ ] Production security hardening (see Security Recommendations)
-- [ ] Branch protection rules for main branch
+### Active
+| ID | Task | Branch | Blocked By | Status |
+|----|------|--------|------------|--------|
+| — | — | — | — | — |
 
-### Medium Priority
-- [ ] Mobile responsive improvements
-- [ ] Additional section types (certifications, projects)
-- [x] ~~Upgrade Next.js to patch security vulnerabilities~~ (pinned to 14.2.35)
-- [x] ~~CI/CD: Add coverage thresholds~~ (configured in vitest.config.ts)
+### Backlog
+| ID | Task | Blocked By | Size |
+|----|------|------------|------|
+| T-001 | Verify template switching persists to backend | — | XS |
+| T-002 | Create HTML generation for CV export | T-001 | S |
+| T-003 | Implement PDF export via Gotenberg | T-002 | S |
+| T-004 | Implement DOCX export via Gotenberg | T-002 | S |
+| T-005 | Wire frontend export modal to real API | T-003, T-004 | S |
+| T-006 | P0 smoke tests — section editors | — | S |
+| T-007 | P0 smoke tests — page components | — | S |
+| T-008 | P1 interaction tests — editors | — | S |
+| T-009 | P1 interaction tests — export error paths | — | XS |
+| T-010 | P2 UX regression tests | — | S |
+| T-011 | Add Certifications section | — | S |
+| T-012 | Add Projects section | — | S |
+| T-013 | R2 cloud storage implementation | — | M |
+| T-014 | OAuth authentication (Google OIDC) | — | M |
+| T-015 | Multiple CV support | — | M |
 
-### Low Priority
-- [ ] R2 cloud storage implementation
-- [ ] OAuth authentication (Google OIDC)
-- [ ] Multiple CV support
+### Done
+| ID | Task | PR |
+|----|------|----|
+| — | — | — |
 
-### Frontend Testing (add alongside refactors/bugfixes)
+---
 
-Current state: 94 tests cover stores, API client, templates, and useAutoSave hook. Zero component or interaction tests. The items below are ordered by impact — each one catches a different class of bug.
+## Task Details
 
-**P0 — Catch render/type breakage:**
-- [ ] Smoke tests for all 6 section editors (Personal, Summary, Experience, Education, Skills, Languages) — render with mock data, verify key elements appear. Catches broken imports, missing props, and type mismatches after refactors.
-- [ ] Smoke tests for page-level components (Dashboard, Editor) — render with mocked stores, verify basic structure loads.
+**T-001: Verify template switching persists to backend** — XS
+- Verify changing template in editor triggers auto-save with new `templateId`
+- Verify backend round-trips the `templateId` correctly in JSONB
+- Fix schema validation if `visionary` isn't in allowed values (was `minimal`)
+- Tests: round-trip test (change template, save, reload, verify)
+- Acceptance: Change template, reload page, template stays
 
-**P1 — Catch interaction bugs:**
-- [x] ~~`useAutoSave` hook test~~ — 10 tests covering registration/cleanup lifecycle, immediate save, concurrent save prevention, error handling, debounce timing
-- [ ] Editor interaction tests — add/edit/delete entries in ExperienceEditor and SkillsEditor (these have modal forms and the most complex user flows). Use `@testing-library/user-event`.
-- [ ] Export API error path tests — verify abort timeout and network error map to `ApiError` (new code, currently 0% covered).
+**T-002: Create HTML generation for CV export** — S
+- Go service that takes CV content + templateId and produces a self-contained HTML string
+- One function per template (classic, modern, visionary) with inline CSS
+- Shared foundation for both PDF and DOCX export
+- Tests: unit tests generating HTML from sample CV data for each template
+- Acceptance: Unit tests pass, HTML renders correctly in browser
 
-**P2 — Catch UX regressions:**
-- [ ] Keyboard shortcut tests — verify Ctrl+Z/Y trigger undo/redo on the store.
-- [ ] Drag-and-drop section reorder test — verify `SectionPalette` reorder callback updates store order.
+**T-003: Implement PDF export via Gotenberg** — S
+- Wire `POST /api/v1/export/pdf` to call Gotenberg's chromium HTML-to-PDF endpoint
+- Use HTML from T-002, POST to `http://gotenberg:3000/forms/chromium/convert/html`
+- Return PDF binary with correct Content-Type
+- Tests: handler test (mock Gotenberg), integration test (real Gotenberg)
+- Acceptance: `curl` export endpoint returns valid PDF
 
-**Testing notes:**
-- Use `@testing-library/react` + `@testing-library/user-event` (already installed)
-- Mock `useEditorStore`/`useUIStore` via Zustand's test pattern (see `src/test/setup.ts`)
-- Component tests go next to their source: `ComponentName.test.tsx`
-- Target: reach 35% statement coverage with P0+P1 items, which makes the threshold meaningful
+**T-004: Implement DOCX export via Gotenberg** — S
+- Wire `POST /api/v1/export/docx` using Gotenberg's LibreOffice endpoint
+- Same HTML input as PDF, different Gotenberg conversion
+- Tests: handler test (mock Gotenberg), integration test (real Gotenberg)
+- Acceptance: `curl` export endpoint returns valid DOCX
+
+**T-005: Wire frontend export modal to real API** — S
+- Connect existing ExportModal buttons to actual API calls
+- Download file to browser (PDF, DOCX); JSON export already works
+- Show loading state and error handling
+- Tests: component test for export flow, API client test for export methods
+- Acceptance: Click "Export PDF" in UI, browser downloads PDF
+
+**T-006: P0 smoke tests — section editors** — S
+- Smoke tests for all 6 section editors (Personal, Summary, Experience, Education, Skills, Languages)
+- Render with mock data, verify key elements appear
+- Acceptance: 6 test files, all passing
+
+**T-007: P0 smoke tests — page components** — S
+- Smoke tests for Dashboard and Editor page components
+- Render with mocked stores, verify basic structure loads
+- Acceptance: 2 test files, all passing
+
+**T-008: P1 interaction tests — editors** — S
+- ExperienceEditor + SkillsEditor interaction tests
+- Add/edit/delete entries via modal forms using `@testing-library/user-event`
+- Acceptance: Tests cover add, edit, delete flows
+
+**T-009: P1 interaction tests — export error paths** — XS
+- Verify abort timeout and network errors map to `ApiError`
+- Acceptance: Error path tests passing
+
+**T-010: P2 UX regression tests** — S
+- Keyboard shortcuts: verify Ctrl+Z/Y trigger undo/redo
+- DnD section reorder: verify store updates
+- Acceptance: Tests for shortcuts and DnD passing
+
+**T-011: Add Certifications section** — S
+- `CertificationsEditor.tsx` (modal form for cert entries)
+- Add to `PropertiesPanel` switch + all 3 templates
+- Schema already defines `certificationsContent`
+- Tests: editor smoke test, interaction test, template render test
+- Acceptance: Can add/edit/delete certifications, visible in preview
+
+**T-012: Add Projects section** — S
+- `ProjectsEditor.tsx` (modal form for project entries)
+- Add to `PropertiesPanel` switch + all 3 templates
+- Schema already defines `projectsContent`
+- Tests: editor smoke test, interaction test, template render test
+- Acceptance: Can add/edit/delete projects, visible in preview
+
+**T-013: R2 cloud storage implementation** — M
+- Implement `R2Storage` methods using AWS SDK
+- Tests: storage interface tests with mock S3 client
+
+**T-014: OAuth authentication (Google OIDC)** — M (needs splitting when picked up)
+- Full auth flow: login, callback, JWT, middleware
+- Tests: middleware tests, auth flow tests
+
+**T-015: Multiple CV support** — M (needs splitting when picked up)
+- Dashboard shows list, editor route `/editor/[id]`, create new CV
+- Tests: routing tests, dashboard list test
+
+### Dependency Graph
+```
+T-001 → T-002 → T-003 → T-005
+                → T-004 → T-005
+
+T-006 through T-012: ALL INDEPENDENT (any order)
+T-013, T-014, T-015: Future backlog, independent
+```
+
+10 out of 15 tasks have zero dependencies and can be picked up in any order.
+
+---
+
+## Task Workflow
+
+Every task follows this lifecycle:
+
+```
+Backlog → Active (in-progress) → QA Review → Tech Lead Approval → Done
+```
+
+### Steps
+1. **Pick & Start** — Pick unblocked task, create branch (`feat/t-NNN-short-name`), move to Active
+2. **Implement + Tests** — Engineer implements; tests are mandatory with every task
+3. **QA Review** — `@qa` agent reviews code quality, test coverage, edge cases
+4. **Tech Lead Approval** — PR reviewed and approved by tech lead
+5. **Close** — `@pm` agent moves task to Done, updates blocked tasks, updates WORKLOG
+
+### Task Size Rules
+- **XS** (< 1 hour): Config changes, verifications, tiny fixes
+- **S** (1-3 hours): Single feature, single editor, test suite
+- **M** (3-6 hours): Feature with backend+frontend; must be split if larger
+
+### Branch & PR Convention
+- Branch: `feat/t-003-pdf-export`, `fix/t-001-template-persist`, `test/t-006-editor-smoke`
+- PR title: `[T-003] Implement PDF export via Gotenberg`
+- Target: < 300 lines changed per PR
+
+---
+
+## Stakeholder Feedback
+
+### Ingesting New Feedback
+- **Inline:** Say `stakeholder feedback: [description]` → PM agent creates/updates tasks
+- **Batch:** Say `process stakeholder review` → PM agent reads `STAKEHOLDER_REVIEW.md`, diffs against Task Board, creates new tasks
+
+### Audit Trail
+Each item in `STAKEHOLDER_REVIEW.md` is annotated with `→ T-NNN` linking it to its task
 
 ---
 
