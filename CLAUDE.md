@@ -12,6 +12,7 @@
 | `/qa-plan <task>` | QA test planning: audit coverage gaps, append test recommendations to notes |
 | `/close-task <task>` | PM-led task close: update board, clean up notes, commit + push |
 | `/local-qa` | Full local QA gate: unit tests, type check, build, E2E browser testing |
+| `/ship` | Idempotent commit + push + PR creation (safe to re-run) |
 
 ## Agent System
 
