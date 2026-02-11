@@ -11,6 +11,7 @@
 | `/plan <task>` | Architect-led planning: research, decisions, implementation plan appended to notes |
 | `/qa-plan <task>` | QA test planning: audit coverage gaps, append test recommendations to notes |
 | `/close-task <task>` | PM-led task close: update board, clean up notes, commit + push |
+| `/local-qa` | Full local QA gate: unit tests, type check, build, E2E browser testing |
 
 ## Agent System
 
@@ -44,8 +45,9 @@ Agent files in `.claude/agents/` for detailed processes.
 2. `/plan <task>` — Architect researches, makes decisions, writes implementation plan
 3. `/qa-plan <task>` — QA audits coverage gaps, appends test recommendations
 4. `@engineer` — Implements code + tests per plan
-5. QA review — tech lead + CodeRabbit review the PR
-6. `/close-task <task>` — PM moves task to Done, cleans up
+5. `/local-qa` — Full local QA gate before commit (tests, types, build, E2E)
+6. QA review — tech lead + CodeRabbit review the PR
+7. `/close-task <task>` — PM moves task to Done, cleans up
 
 ### Ending a Session
 Say `checkpoint` to:
@@ -69,6 +71,11 @@ task db:migrate    # Run migrations
 task db:seed       # Seed dev data (user + CV)
 task api:sqlc      # Regenerate sqlc code
 ```
+
+## Dev Environment Notes
+
+- **`next build` kills `task web:dev`** — Running `npx next build` while the dev server is running will stop it. If you need both, run E2E tests first, then the build, or restart the dev server after.
+- **Template selector in editor** — It's a native `<select>` (combobox). Use `form_input` tool to change it; coordinate clicks may not open native dropdowns.
 
 ## GitHub CLI (gh) Reference
 
