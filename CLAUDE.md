@@ -8,7 +8,8 @@
 | `@engineer` | Switch to implementation mode |
 | `@architect` | Switch to design/planning mode |
 | `/investigate <task>` | PM-led investigation: trace code, document findings, prepare handoff |
-| `/qa-review <task>` | QA test-gap review: audit coverage, append test recommendations to notes |
+| `/plan <task>` | Architect-led planning: research, decisions, implementation plan appended to notes |
+| `/qa-plan <task>` | QA test planning: audit coverage gaps, append test recommendations to notes |
 | `/close-task <task>` | PM-led task close: update board, clean up notes, commit + push |
 
 ## Agent System
@@ -39,10 +40,12 @@ Agent files in `.claude/agents/` for detailed processes.
 2. Pick a task or resume an active one
 
 ### Working on a Task
-1. Use `/investigate <task>` to set up branch, notes, and run investigation
-2. Use `/qa-review <task>` to audit test coverage and add recommendations to notes
-3. Hand off to `@architect` for design decisions, then `@engineer` for implementation
-4. Run `@qa` before opening PR
+1. `/investigate <task>` — PM traces code, documents findings, prepares handoff
+2. `/plan <task>` — Architect researches, makes decisions, writes implementation plan
+3. `/qa-plan <task>` — QA audits coverage gaps, appends test recommendations
+4. `@engineer` — Implements code + tests per plan
+5. QA review — tech lead + CodeRabbit review the PR
+6. `/close-task <task>` — PM moves task to Done, cleans up
 
 ### Ending a Session
 Say `checkpoint` to:
@@ -65,4 +68,23 @@ task web:dev       # Run Next.js
 task db:migrate    # Run migrations
 task db:seed       # Seed dev data (user + CV)
 task api:sqlc      # Regenerate sqlc code
+```
+
+## GitHub CLI (gh) Reference
+
+```bash
+# Dependabot alerts (all, with details)
+gh api repos/{owner}/{repo}/dependabot/alerts --jq '.[] | {number, state, severity: .security_advisory.severity, package: .security_vulnerability.package.name, ecosystem: .security_vulnerability.package.ecosystem, summary: .security_advisory.summary, patched: .security_vulnerability.first_patched_version.identifier}'
+
+# Dependabot alerts (open only)
+gh api repos/{owner}/{repo}/dependabot/alerts?state=open
+
+# Dismiss a Dependabot alert
+gh api -X PATCH repos/{owner}/{repo}/dependabot/alerts/{alert_number} -f state=dismissed -f dismissed_reason=tolerable_risk -f dismissed_comment="reason"
+
+# PR operations
+gh pr create --title "title" --body "body"
+gh pr view <number>
+gh pr checks <number>
+gh api repos/{owner}/{repo}/pulls/{number}/comments
 ```
