@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — 15 tasks defined, 10 unblocked and ready to pick up
+**Status:** Task-based workflow active — T-001 done, 14 tasks remaining, 11 unblocked
 
 ### What's Working
 
@@ -40,8 +40,7 @@
 - ✅ 101 passing tests (Vitest)
 - ✅ Build verified, full stack integration tested
 
-### Remaining Open Items (from Stakeholder Review)
-- ❌ Template switching for existing CVs — selector exists, needs backend persistence of templateId → T-001
+### Remaining Work
 - ❌ Export (`POST /api/v1/export/{format}`) — returns 501, needs Gotenberg integration → T-002, T-003, T-004, T-005
 - ❌ R2 cloud storage — placeholder only, needs AWS SDK implementation → T-013
 
@@ -166,7 +165,7 @@ hireme/
 ├── schemas/                # Shared JSON schemas
 ├── scripts/                # Dev utilities
 ├── CONTEXT.md              # This file
-├── WORKLOG.md              # Session history
+├── WORKLOG.md              # Trimmed — historical logs in git history
 └── CLAUDE.md               # AI assistant instructions
 ```
 
@@ -231,8 +230,7 @@ task api:sqlc          # Generate sqlc code
 ### Backlog
 | ID | Task | Blocked By | Size |
 |----|------|------------|------|
-| T-001 | Verify template switching persists to backend | — | XS |
-| T-002 | Create HTML generation for CV export | T-001 | S |
+| T-002 | Create HTML generation for CV export | — | S |
 | T-003 | Implement PDF export via Gotenberg | T-002 | S |
 | T-004 | Implement DOCX export via Gotenberg | T-002 | S |
 | T-005 | Wire frontend export modal to real API | T-003, T-004 | S |
@@ -250,18 +248,11 @@ task api:sqlc          # Generate sqlc code
 ### Done
 | ID | Task | PR |
 |----|------|----|
-| — | — | — |
+| T-001 | Verify template switching persists to backend | feat/t-001-template-persist |
 
 ---
 
 ## Task Details
-
-**T-001: Verify template switching persists to backend** — XS
-- Verify changing template in editor triggers auto-save with new `templateId`
-- Verify backend round-trips the `templateId` correctly in JSONB
-- Fix schema validation if `visionary` isn't in allowed values (was `minimal`)
-- Tests: round-trip test (change template, save, reload, verify)
-- Acceptance: Change template, reload page, template stays
 
 **T-002: Create HTML generation for CV export** — S
 - Go service that takes CV content + templateId and produces a self-contained HTML string
@@ -342,14 +333,14 @@ task api:sqlc          # Generate sqlc code
 
 ### Dependency Graph
 ```
-T-001 → T-002 → T-003 → T-005
-                → T-004 → T-005
+T-002 → T-003 → T-005
+     → T-004 → T-005
 
 T-006 through T-012: ALL INDEPENDENT (any order)
 T-013, T-014, T-015: Future backlog, independent
 ```
 
-10 out of 15 tasks have zero dependencies and can be picked up in any order.
+11 out of 14 remaining tasks have zero dependencies and can be picked up in any order.
 
 ---
 
@@ -362,11 +353,13 @@ Backlog → Active (in-progress) → QA Review → Tech Lead Approval → Done
 ```
 
 ### Steps
-1. **Pick & Start** — Pick unblocked task, create branch (`feat/t-NNN-short-name`), move to Active
-2. **Implement + Tests** — Engineer implements; tests are mandatory with every task
-3. **QA Review** — `@qa` agent reviews code quality, test coverage, edge cases
-4. **Tech Lead Approval** — PR reviewed and approved by tech lead
-5. **Close** — `@pm` agent moves task to Done, updates blocked tasks, updates WORKLOG
+1. **Pick & Start** — Pick unblocked task, create branch (`feat/t-NNN-short-name`), structure to-dos with `@engineer` agent, move to Active
+2. **Technical planning** - `@architect` agent plans the needed architectural adjustements or design of new components and routines
+3. **QA planning** -  `@qa` agent evaluates if additional tests need to be implemented or existing adjusted
+4. **Implement + Tests** — `@engineer` agent implements; tests are mandatory with every task
+5. **QA Review** — `@qa` agent reviews code quality, test coverage, edge cases
+6. **Tech Lead Approval** — PR reviewed and approved by tech lead
+7. **Close** — `@pm` agent moves task to Done, updates blocked tasks, updates WORKLOG
 
 ### Task Size Rules
 - **XS** (< 1 hour): Config changes, verifications, tiny fixes
@@ -382,12 +375,7 @@ Backlog → Active (in-progress) → QA Review → Tech Lead Approval → Done
 
 ## Stakeholder Feedback
 
-### Ingesting New Feedback
-- **Inline:** Say `stakeholder feedback: [description]` → PM agent creates/updates tasks
-- **Batch:** Say `process stakeholder review` → PM agent reads `STAKEHOLDER_REVIEW.md`, diffs against Task Board, creates new tasks
-
-### Audit Trail
-Each item in `STAKEHOLDER_REVIEW.md` is annotated with `→ T-NNN` linking it to its task
+New feedback: say `stakeholder feedback: [description]` → PM agent creates/updates tasks in the Task Board.
 
 ---
 

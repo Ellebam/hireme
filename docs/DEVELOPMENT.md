@@ -389,12 +389,7 @@ Settings (`.vscode/settings.json`):
 
 ### Agentic AI IDE (Antigravity)
 
-The project includes `CLAUDE.md` files optimized for AI assistance:
-- `/CLAUDE.md` — Project overview and common tasks
-- `/api/CLAUDE.md` — Backend-specific context
-- `/web/CLAUDE.md` — Frontend-specific context
-
-These provide context for AI agents working on the codebase.
+The project includes `CLAUDE.md` for AI agent context, and `CONTEXT.md` for architecture and current state.
 
 ---
 

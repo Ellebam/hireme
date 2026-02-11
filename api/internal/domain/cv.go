@@ -70,7 +70,7 @@ const (
 const (
 	TemplateClassic = "classic"
 	TemplateModern  = "modern"
-	TemplateMinimal = "minimal"
+	TemplateVisionary = "visionary"
 )
 
 // ParseContent parses the CV's raw JSON content into CVContent
