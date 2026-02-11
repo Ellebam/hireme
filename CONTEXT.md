@@ -51,7 +51,7 @@
 | Component | Technology |
 |-----------|------------|
 | Backend | Go 1.22+, Chi router, sqlc |
-| Frontend | Next.js 14, React 18, Tailwind, shadcn/ui, Zustand, dnd-kit |
+| Frontend | Next.js 15, React 19, Tailwind, shadcn/ui, Zustand, dnd-kit |
 | Database | PostgreSQL 16 (JSONB for CV content) |
 | Export | Gotenberg (HTML → PDF/DOCX) |
 | Storage | Local filesystem (dev), Cloudflare R2 (prod) |
@@ -353,13 +353,12 @@ Backlog → Active (in-progress) → QA Review → Tech Lead Approval → Done
 ```
 
 ### Steps
-1. **Pick & Start** — Pick unblocked task, create branch (`feat/t-NNN-short-name`), structure to-dos with `@engineer` agent, move to Active
-2. **Technical planning** - `@architect` agent plans the needed architectural adjustements or design of new components and routines
-3. **QA planning** -  `@qa` agent evaluates if additional tests need to be implemented or existing adjusted
-4. **Implement + Tests** — `@engineer` agent implements; tests are mandatory with every task
-5. **QA Review** — `@qa` agent reviews code quality, test coverage, edge cases
-6. **Tech Lead Approval** — PR reviewed and approved by tech lead
-7. **Close** — `@pm` agent moves task to Done, updates blocked tasks, updates WORKLOG
+1. **Investigate** — `/investigate <task>` — PM traces code, documents findings, prepares handoff in notes file
+2. **Plan** — `/plan <task>` — Architect researches, makes decisions, writes implementation plan in notes file
+3. **QA Plan** — `/qa-plan <task>` — QA audits coverage gaps, appends test recommendations to notes file
+4. **Implement** — `@engineer` implements code + tests per the plan
+5. **QA Review** — Tech lead + CodeRabbit review the PR
+6. **Close** — `/close-task <task>` — PM moves task to Done, cleans up notes
 
 ### Task Size Rules
 - **XS** (< 1 hour): Config changes, verifications, tiny fixes
