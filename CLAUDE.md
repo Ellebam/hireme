@@ -9,6 +9,7 @@
 | `@architect` | Switch to design/planning mode |
 | `/investigate <task>` | PM-led investigation: trace code, document findings, prepare handoff |
 | `/qa-review <task>` | QA test-gap review: audit coverage, append test recommendations to notes |
+| `/close-task <task>` | PM-led task close: update board, clean up notes, commit + push |
 
 ## Agent System
 
