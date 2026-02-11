@@ -142,19 +142,3 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-// ============================================================================
-// Console Suppression (optional)
-// ============================================================================
-
-// Suppress specific console warnings during tests
-const originalError = console.error;
-console.error = (...args: unknown[]) => {
-  // Filter out React act() warnings that are often noise in tests
-  if (
-    typeof args[0] === 'string' &&
-    args[0].includes('Warning: ReactDOM.render is no longer supported')
-  ) {
-    return;
-  }
-  originalError.call(console, ...args);
-};
