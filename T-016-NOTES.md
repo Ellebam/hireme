@@ -42,7 +42,7 @@
 - **Root layout** (`src/app/layout.tsx`): Uses `metadata` + `localFont` — standard, compatible
 
 ### glob Dependency Chain
-```
+```text
 eslint-config-next@14.2.35
   → @next/eslint-plugin-next@14.2.35
     → glob@10.3.10  ← VULNERABLE
@@ -138,7 +138,7 @@ Not changing: ESLint 8.x (Next 15 supports both 8 and 9), all other deps unchang
 |------|--------|--------|
 | `web/package.json` | Bump 6 version ranges | Core upgrade |
 | `web/package-lock.json` | Regenerated | `npm install` |
-| `web/src/test/setup.ts` | Remove stale React 18 console filter (line 153-156) | Dead code — React 19 won't emit this warning |
+| `web/src/test/setup.ts` | Remove stale React 18 console filter | Dead code — React 19 won't emit this warning |
 
 **No changes needed:**
 - `next.config.mjs` — `output: 'standalone'`, `reactStrictMode`, `images.remotePatterns`, `headers()`, `createNextIntlPlugin()` all Next 15 compatible
@@ -206,7 +206,7 @@ No new test files are needed — this is a dependency-only change with no functi
 
 ### QA Notes on setup.ts Cleanup
 
-The architect plan already includes removing the stale console filter at `setup.ts:150-160` (suppresses `ReactDOM.render is no longer supported`). QA confirms:
+The architect plan already includes removing the stale React 18 console filter in `setup.ts` (suppresses `ReactDOM.render is no longer supported`). QA confirms:
 - This warning is React 18-era only; React 19 will not emit it
 - Removing it is correct — dead code removal, not a behavioral change
 - If React 19 introduces new warnings, they should surface in test output (not be silently suppressed)

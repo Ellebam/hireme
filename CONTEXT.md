@@ -51,7 +51,7 @@
 | Component | Technology |
 |-----------|------------|
 | Backend | Go 1.22+, Chi router, sqlc |
-| Frontend | Next.js 14, React 18, Tailwind, shadcn/ui, Zustand, dnd-kit |
+| Frontend | Next.js 15, React 19, Tailwind, shadcn/ui, Zustand, dnd-kit |
 | Database | PostgreSQL 16 (JSONB for CV content) |
 | Export | Gotenberg (HTML → PDF/DOCX) |
 | Storage | Local filesystem (dev), Cloudflare R2 (prod) |

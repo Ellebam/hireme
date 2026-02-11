@@ -48,7 +48,7 @@ For each decision identified in the handoff:
 3. **Acknowledge limitations** — what could go wrong, what's the rollback plan
 
 Use the format:
-```
+```markdown
 **Decision N: [Question]**
 - Option A: [approach] — Pros: ... Cons: ...
 - Option B: [approach] — Pros: ... Cons: ...
