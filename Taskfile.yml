@@ -5,6 +5,7 @@ vars:
   API_DIR: ./api
   WEB_DIR: ./web
   DOCKER_COMPOSE_INFRA: ./docker/docker-compose.infra.yml
+  DEV_PORTS: "3000 3001 3002 3003 8080"
 
 dotenv: [".env.local", ".env"]
 
@@ -339,14 +340,72 @@ tasks:
       - echo "✅ All dev services stopped"
 
   dev:kill-ports:
-    desc: Kill processes on dev ports (3000, 3001, 8080)
+    desc: Kill processes on all dev ports (graceful, then force)
     cmds:
       - |
-        for port in 3000 3001 8080; do
-          pid=$(lsof -ti :$port 2>/dev/null || true)
-          if [ -n "$pid" ]; then
-            echo "Killing process on port $port (PID: $pid)"
-            kill -9 $pid 2>/dev/null || true
+        killed=0
+        for port in {{.DEV_PORTS}}; do
+          pids=$(lsof -nP -ti :$port 2>/dev/null || true)
+          if [ -n "$pids" ]; then
+            echo "Port $port — sending SIGTERM to PIDs: $(echo $pids | tr '\n' ' ')"
+            echo "$pids" | xargs kill 2>/dev/null || true
+            killed=1
+          fi
+        done
+        if [ "$killed" -eq 1 ]; then
+          sleep 2
+          for port in {{.DEV_PORTS}}; do
+            remaining=$(lsof -nP -ti :$port 2>/dev/null || true)
+            if [ -n "$remaining" ]; then
+              echo "Port $port — still alive, sending SIGKILL to PIDs: $(echo $remaining | tr '\n' ' ')"
+              echo "$remaining" | xargs kill -9 2>/dev/null || true
+            fi
+          done
+        fi
+        echo "✅ Dev ports cleared"
+    silent: true
+
+  dev:force-kill-ports:
+    desc: Force kill processes on all dev ports (escalates to sudo if needed)
+    cmds:
+      - |
+        for port in {{.DEV_PORTS}}; do
+          pids=$(lsof -nP -ti :$port 2>/dev/null || true)
+          if [ -n "$pids" ]; then
+            echo "Port $port — force killing PIDs: $(echo $pids | tr '\n' ' ')"
+            echo "$pids" | xargs kill -9 2>/dev/null || true
+          fi
+        done
+        sleep 1
+        stuck=""
+        for port in {{.DEV_PORTS}}; do
+          remaining=$(lsof -nP -ti :$port 2>/dev/null || true)
+          if [ -n "$remaining" ]; then
+            stuck="$stuck $port(PIDs:$(echo $remaining | tr '\n' ','))"
+            echo "Port $port — escalating to sudo for PIDs: $(echo $remaining | tr '\n' ' ')"
+            echo "$remaining" | xargs sudo kill -9 2>/dev/null || true
+          fi
+        done
+        if [ -n "$stuck" ]; then
+          echo "⚠️  Used sudo to kill stuck processes on:$stuck"
+        fi
+        echo "✅ Dev ports force-cleared"
+    silent: true
+
+  dev:status:
+    desc: Show what's running on all dev ports
+    cmds:
+      - |
+        echo "Dev port status ({{.DEV_PORTS}}):"
+        echo "─────────────────────────────────────────"
+        for port in {{.DEV_PORTS}}; do
+          info=$(lsof -nP -i :$port 2>/dev/null | grep LISTEN || true)
+          if [ -n "$info" ]; then
+            cmd=$(echo "$info" | awk '{print $1}')
+            pid=$(echo "$info" | awk '{print $2}')
+            echo "  :$port — $cmd (PID $pid)"
+          else
+            echo "  :$port — free"
           fi
         done
     silent: true

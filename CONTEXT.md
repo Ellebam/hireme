@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — T-001 done, 14 tasks remaining, 11 unblocked
+**Status:** Task-based workflow active — T-001, T-006, T-007 done, 12 tasks remaining, 9 unblocked
 
 ### What's Working
 
@@ -37,7 +37,7 @@
 - ✅ Delete confirmation dialog on CV card
 - ✅ Back-to-dashboard link in editor toolbar
 - ✅ shadcn/ui dropdown-menu component
-- ✅ 101 passing tests (Vitest)
+- ✅ 127 passing tests (Vitest)
 - ✅ Build verified, full stack integration tested
 
 ### Remaining Work
@@ -234,8 +234,6 @@ task api:sqlc          # Generate sqlc code
 | T-003 | Implement PDF export via Gotenberg | T-002 | S |
 | T-004 | Implement DOCX export via Gotenberg | T-002 | S |
 | T-005 | Wire frontend export modal to real API | T-003, T-004 | S |
-| T-006 | P0 smoke tests — section editors | — | S |
-| T-007 | P0 smoke tests — page components | — | S |
 | T-008 | P1 interaction tests — editors | — | S |
 | T-009 | P1 interaction tests — export error paths | — | XS |
 | T-010 | P2 UX regression tests | — | S |
@@ -249,6 +247,8 @@ task api:sqlc          # Generate sqlc code
 | ID | Task | PR |
 |----|------|----|
 | T-001 | Verify template switching persists to backend | feat/t-001-template-persist |
+| T-006 | P0 smoke tests — section editors | test/t-006-007-smoke-tests |
+| T-007 | P0 smoke tests — page components | test/t-006-007-smoke-tests |
 
 ---
 
@@ -280,16 +280,6 @@ task api:sqlc          # Generate sqlc code
 - Show loading state and error handling
 - Tests: component test for export flow, API client test for export methods
 - Acceptance: Click "Export PDF" in UI, browser downloads PDF
-
-**T-006: P0 smoke tests — section editors** — S
-- Smoke tests for all 6 section editors (Personal, Summary, Experience, Education, Skills, Languages)
-- Render with mock data, verify key elements appear
-- Acceptance: 6 test files, all passing
-
-**T-007: P0 smoke tests — page components** — S
-- Smoke tests for Dashboard and Editor page components
-- Render with mocked stores, verify basic structure loads
-- Acceptance: 2 test files, all passing
 
 **T-008: P1 interaction tests — editors** — S
 - ExperienceEditor + SkillsEditor interaction tests
@@ -336,11 +326,11 @@ task api:sqlc          # Generate sqlc code
 T-002 → T-003 → T-005
      → T-004 → T-005
 
-T-006 through T-012: ALL INDEPENDENT (any order)
+T-008 through T-012: ALL INDEPENDENT (any order)
 T-013, T-014, T-015: Future backlog, independent
 ```
 
-11 out of 14 remaining tasks have zero dependencies and can be picked up in any order.
+9 out of 12 remaining tasks have zero dependencies and can be picked up in any order.
 
 ---
 

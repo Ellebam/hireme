@@ -65,12 +65,15 @@ Tags: FEAT, FIX, REFACTOR, DOCS, TEST, CHORE
 ## Common Commands
 
 ```bash
-task infra:up      # Start PostgreSQL + Gotenberg
-task api:dev       # Run Go API (hot reload)
-task web:dev       # Run Next.js
-task db:migrate    # Run migrations
-task db:seed       # Seed dev data (user + CV)
-task api:sqlc      # Regenerate sqlc code
+task infra:up            # Start PostgreSQL + Gotenberg
+task api:dev             # Run Go API (hot reload)
+task web:dev             # Run Next.js
+task db:migrate          # Run migrations
+task db:seed             # Seed dev data (user + CV)
+task api:sqlc            # Regenerate sqlc code
+task dev:status          # Show what's running on dev ports
+task dev:kill-ports      # Graceful stop all dev port processes
+task dev:force-kill-ports  # Force kill (escalates to sudo if needed)
 ```
 
 ## Dev Environment Notes
