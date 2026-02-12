@@ -8,6 +8,19 @@ The user may optionally describe what was changed. If not provided, infer from `
 
 ## Process
 
+### Phase 0: Chrome Extension Preflight
+
+Before anything else, verify the Chrome browser extension is connected — E2E tests depend on it.
+
+1. **Call `tabs_context_mcp`** with `createIfEmpty: true`.
+2. **If it returns an error** (e.g. "No Chrome extension connected"):
+   - **STOP immediately.** Do NOT proceed to any other phase.
+   - Tell the user: "Chrome extension is not connected. E2E browser tests cannot run. Please connect the Claude in Chrome extension and re-run `/local-qa`."
+   - Exit the command.
+3. **If it succeeds** — Log the tab group info and continue to Phase 1.
+
+This gate ensures we never get halfway through QA only to discover E2E tests are impossible.
+
 ### Phase 1: Understand the Changes
 
 1. **Run `git diff --stat`** — Identify all modified files.
@@ -91,6 +104,14 @@ Output a structured review following this format:
 [Positive callouts]
 ```
 
+### Phase 5: Cleanup
+
+If you started dev servers (API/Web) during Phase 3:
+1. **Run `task dev:kill-ports`** — Gracefully stops all processes on dev ports (3000-3003, 8080).
+2. **Verify cleanup** — Run `task dev:status` to confirm all ports are free.
+3. If any ports are still occupied, run `task dev:force-kill-ports` as a last resort.
+4. **Always clean up** — even if earlier phases failed. Orphaned servers block future runs.
+
 ## Rules
 
 - **Run ALL checks.** Don't skip phases even if early results look good.
@@ -98,7 +119,7 @@ Output a structured review following this format:
 - **Dark Reader hydration mismatches are expected** — The browser extension injects `data-darkreader-*` attributes that cause SSR/client mismatch. Always note these as "browser extension, not our code."
 - **Don't modify code.** This command only tests and reports. If you find issues, report them — fixing is for @engineer.
 - **Be honest about failures.** A FAIL verdict is valuable — it prevents broken code from being committed.
-- **Clean up after yourself.** If you started dev servers, note they may need restarting after the build test.
+- **Always clean up.** If you started dev servers, kill them in Phase 5. Never leave orphaned processes.
 
 ## Arguments
 
