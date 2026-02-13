@@ -1,0 +1,27 @@
+{{define "base"}}<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{.Title}}</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+@page { margin: 0; size: A4; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body {
+  font-family: {{.Styling.FontStack}};
+  font-size: {{.Styling.FontSizePx}};
+  line-height: {{.Styling.LineHeightVal}};
+  color: #1f2937;
+  width: 210mm;
+  min-height: 297mm;
+}
+a { color: inherit; text-decoration: underline; }
+ul { list-style: none; }
+</style>
+{{block "styles" .}}{{end}}
+</head>
+<body>
+{{block "content" .}}{{end}}
+</body>
+</html>{{end}}

@@ -6,6 +6,7 @@ vars:
   WEB_DIR: ./web
   DOCKER_COMPOSE_INFRA: ./docker/docker-compose.infra.yml
   DEV_PORTS: "3000 3001 3002 3003 8080"
+  APP_PORTS: "3000 3002 3003 8080"
 
 dotenv: [".env.local", ".env"]
 
@@ -340,11 +341,11 @@ tasks:
       - echo "✅ All dev services stopped"
 
   dev:kill-ports:
-    desc: Kill processes on all dev ports (graceful, then force)
+    desc: Kill processes on app ports (graceful, then force). Skips Docker-managed infra ports.
     cmds:
       - |
         killed=0
-        for port in {{.DEV_PORTS}}; do
+        for port in {{.APP_PORTS}}; do
           pids=$(lsof -nP -ti :$port 2>/dev/null || true)
           if [ -n "$pids" ]; then
             echo "Port $port — sending SIGTERM to PIDs: $(echo $pids | tr '\n' ' ')"
@@ -354,7 +355,7 @@ tasks:
         done
         if [ "$killed" -eq 1 ]; then
           sleep 2
-          for port in {{.DEV_PORTS}}; do
+          for port in {{.APP_PORTS}}; do
             remaining=$(lsof -nP -ti :$port 2>/dev/null || true)
             if [ -n "$remaining" ]; then
               echo "Port $port — still alive, sending SIGKILL to PIDs: $(echo $remaining | tr '\n' ' ')"
@@ -362,14 +363,14 @@ tasks:
             fi
           done
         fi
-        echo "✅ Dev ports cleared"
+        echo "✅ App ports cleared"
     silent: true
 
   dev:force-kill-ports:
-    desc: Force kill processes on all dev ports (escalates to sudo if needed)
+    desc: Force kill processes on app ports (escalates to sudo if needed). Skips Docker-managed infra ports.
     cmds:
       - |
-        for port in {{.DEV_PORTS}}; do
+        for port in {{.APP_PORTS}}; do
           pids=$(lsof -nP -ti :$port 2>/dev/null || true)
           if [ -n "$pids" ]; then
             echo "Port $port — force killing PIDs: $(echo $pids | tr '\n' ' ')"
@@ -378,7 +379,7 @@ tasks:
         done
         sleep 1
         stuck=""
-        for port in {{.DEV_PORTS}}; do
+        for port in {{.APP_PORTS}}; do
           remaining=$(lsof -nP -ti :$port 2>/dev/null || true)
           if [ -n "$remaining" ]; then
             stuck="$stuck $port(PIDs:$(echo $remaining | tr '\n' ','))"
@@ -389,7 +390,7 @@ tasks:
         if [ -n "$stuck" ]; then
           echo "⚠️  Used sudo to kill stuck processes on:$stuck"
         fi
-        echo "✅ Dev ports force-cleared"
+        echo "✅ App ports force-cleared"
     silent: true
 
   dev:status:

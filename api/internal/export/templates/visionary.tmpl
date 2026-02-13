@@ -1,0 +1,184 @@
+{{template "base" .}}
+
+{{define "styles"}}
+<style>
+.visionary-layout { display: flex; min-height: 297mm; }
+.visionary-sidebar { width: 250px; flex-shrink: 0; padding: 32px; color: white; }
+.visionary-sidebar-section { margin-bottom: 24px; }
+.visionary-sidebar-section h3 {
+  font-size: 0.875em; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.05em; opacity: 0.8; margin-bottom: 12px;
+}
+.visionary-sidebar .personal h2 { font-size: 1.5em; font-weight: 700; margin-bottom: 4px; }
+.visionary-sidebar .personal .job-title { font-size: 0.875em; opacity: 0.8; margin-bottom: 16px; }
+.visionary-sidebar .contact-row { display: flex; align-items: flex-start; gap: 8px; font-size: 0.875em; }
+.visionary-sidebar .contact-row + .contact-row { margin-top: 8px; }
+.visionary-sidebar .contact-label { opacity: 0.6; flex-shrink: 0; }
+.visionary-sidebar .contact-value { opacity: 0.9; word-break: break-all; }
+.visionary-sidebar .links { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.2); }
+.visionary-sidebar .links div { font-size: 0.75em; opacity: 0.9; word-break: break-all; }
+.visionary-sidebar .links div + div { margin-top: 4px; }
+.visionary-sidebar .skill-cat + .skill-cat { margin-top: 12px; }
+.visionary-sidebar .skill-cat-name { font-size: 0.75em; font-weight: 500; opacity: 0.7; margin-bottom: 4px; }
+.visionary-sidebar .skill-list { list-style: none; }
+.visionary-sidebar .skill-item {
+  font-size: 0.875em; opacity: 0.9; display: flex; align-items: center; gap: 8px;
+}
+.visionary-sidebar .skill-item + .skill-item { margin-top: 4px; }
+.visionary-sidebar .skill-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.5); flex-shrink: 0; }
+.visionary-sidebar .skill-level { font-size: 0.75em; opacity: 0.5; margin-left: auto; }
+.visionary-sidebar .lang-list { list-style: none; }
+.visionary-sidebar .lang-item { font-size: 0.875em; }
+.visionary-sidebar .lang-item + .lang-item { margin-top: 8px; }
+.visionary-sidebar .lang-name { opacity: 0.9; }
+.visionary-sidebar .lang-prof { margin-left: 8px; font-size: 0.75em; opacity: 0.5; }
+.visionary-sidebar .lang-cert { margin-left: 4px; font-size: 0.75em; opacity: 0.4; }
+.visionary-main { flex: 1; padding: 32px; }
+.visionary-header { margin-bottom: 32px; padding-bottom: 16px; }
+.visionary-header h1 { font-size: 1.875em; font-weight: 700; letter-spacing: -0.025em; }
+.visionary-header .job-title { font-size: 1.125em; margin-top: 4px; }
+.visionary-main-section { margin-bottom: 24px; }
+.visionary-main-section-title {
+  font-size: 0.875em; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.05em; margin-bottom: 12px; padding-bottom: 8px;
+}
+.visionary-exp-entry + .visionary-exp-entry { margin-top: 20px; }
+.visionary-exp-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+.visionary-exp-header h3 { font-size: 0.875em; font-weight: 600; color: #111827; }
+.visionary-exp-header .date { font-size: 0.75em; flex-shrink: 0; margin-left: 16px; }
+.visionary-exp-company { font-size: 0.875em; }
+.visionary-exp-desc { font-size: 0.75em; margin-top: 4px; line-height: 1.625; }
+.visionary-exp-highlights { margin-top: 8px; list-style: none; }
+.visionary-exp-highlights li {
+  font-size: 0.75em; display: flex; align-items: flex-start; gap: 8px;
+}
+.visionary-exp-highlights li + li { margin-top: 4px; }
+.visionary-exp-highlights .bullet {
+  width: 6px; height: 6px; border-radius: 50%; margin-top: 4px; flex-shrink: 0;
+}
+.visionary-edu-entry + .visionary-edu-entry { margin-top: 16px; }
+.visionary-edu-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+.visionary-edu-header h3 { font-size: 0.875em; font-weight: 600; color: #111827; }
+.visionary-edu-header .date { font-size: 0.75em; flex-shrink: 0; margin-left: 16px; }
+.visionary-edu-institution { font-size: 0.875em; }
+.visionary-edu-grade { font-size: 0.75em; margin-top: 4px; }
+.visionary-edu-desc { font-size: 0.75em; margin-top: 4px; line-height: 1.625; }
+</style>
+{{end}}
+
+{{define "content"}}
+<div class="visionary-layout">
+  {{/* Sidebar */}}
+  <div class="visionary-sidebar" style="background-color: {{.Styling.PrimaryColor}}">
+    {{range .SidebarSections}}
+      {{if eq .Type "personal"}}
+        {{with .Personal}}
+        <div class="visionary-sidebar-section personal">
+          {{if .FullName}}<h2>{{.FullName}}</h2>{{end}}
+          {{if .Content.JobTitle}}<p class="job-title">{{.Content.JobTitle}}</p>{{end}}
+          {{if .Content.Email}}<div class="contact-row"><span class="contact-label">Email</span><span class="contact-value">{{.Content.Email}}</span></div>{{end}}
+          {{if .Content.Phone}}<div class="contact-row"><span class="contact-label">Phone</span><span class="contact-value">{{.Content.Phone}}</span></div>{{end}}
+          {{if .Content.Location}}<div class="contact-row"><span class="contact-label">Location</span><span class="contact-value">{{.Content.Location}}</span></div>{{end}}
+          {{if .Content.Links}}
+          <div class="links">
+            {{range .Content.Links}}<div>{{linkLabel .}}</div>{{end}}
+          </div>
+          {{end}}
+        </div>
+        {{end}}
+      {{else if eq .Type "skills"}}
+        <div class="visionary-sidebar-section">
+          <h3>{{.Title}}</h3>
+          {{with .Skills}}{{range .Categories}}
+          <div class="skill-cat">
+            {{if .Name}}<p class="skill-cat-name">{{.Name}}</p>{{end}}
+            <ul class="skill-list">
+              {{range .Skills}}
+              <li class="skill-item">
+                <span class="skill-dot"></span>
+                <span>{{.Name}}</span>
+                {{if .Level}}<span class="skill-level">{{.Level}}</span>{{end}}
+              </li>
+              {{end}}
+            </ul>
+          </div>
+          {{end}}{{end}}
+        </div>
+      {{else if eq .Type "languages"}}
+        <div class="visionary-sidebar-section">
+          <h3>{{.Title}}</h3>
+          {{with .Languages}}
+          <ul class="lang-list">
+            {{range .Entries}}
+            <li class="lang-item">
+              <span class="lang-name">{{.Language}}</span>
+              <span class="lang-prof">{{.Proficiency}}</span>
+              {{if .Certification}}<span class="lang-cert">({{.Certification}})</span>{{end}}
+            </li>
+            {{end}}
+          </ul>
+          {{end}}
+        </div>
+      {{end}}
+    {{end}}
+  </div>
+
+  {{/* Main content */}}
+  <div class="visionary-main">
+    {{/* Header strip */}}
+    {{with .HeaderPersonal}}
+    <div class="visionary-header" style="border-bottom: 2px solid {{$.Styling.PrimaryColor}}">
+      <h1 style="color: {{$.Styling.PrimaryColor}}">{{.FullName}}</h1>
+      {{if .Content.JobTitle}}<p class="job-title" style="color: {{$.Styling.SecondaryColor}}">{{.Content.JobTitle}}</p>{{end}}
+    </div>
+    {{end}}
+
+    {{range .MainSections}}
+      {{if eq .Type "summary"}}
+        <div class="visionary-main-section">
+          <h2 class="visionary-main-section-title" style="color: {{$.Styling.PrimaryColor}}; border-bottom: 2px solid {{$.Styling.PrimaryColor}}">{{.Title}}</h2>
+          {{with .Summary}}<p style="font-size: 0.875em; line-height: 1.625; color: {{$.Styling.SecondaryColor}}">{{.Text}}</p>{{end}}
+        </div>
+      {{else if eq .Type "experience"}}
+        <div class="visionary-main-section">
+          <h2 class="visionary-main-section-title" style="color: {{$.Styling.PrimaryColor}}; border-bottom: 2px solid {{$.Styling.PrimaryColor}}">{{.Title}}</h2>
+          {{with .Experience}}{{range .Entries}}
+          <div class="visionary-exp-entry">
+            <div class="visionary-exp-header">
+              <h3>{{.Position}}</h3>
+              {{with dateRange .StartDate .EndDate .Current}}<span class="date" style="color: {{$.Styling.SecondaryColor}}">{{.}}</span>{{end}}
+            </div>
+            <p class="visionary-exp-company" style="color: {{$.Styling.PrimaryColor}}">{{.Company}}{{if .Location}}<span style="color: {{$.Styling.SecondaryColor}}"> &middot; {{.Location}}</span>{{end}}</p>
+            {{if .Description}}<p class="visionary-exp-desc" style="color: {{$.Styling.SecondaryColor}}">{{.Description}}</p>{{end}}
+            {{if .Highlights}}
+            <ul class="visionary-exp-highlights">
+              {{range .Highlights}}<li style="color: {{$.Styling.SecondaryColor}}"><span class="bullet" style="background-color: {{$.Styling.PrimaryColor}}"></span>{{.}}</li>{{end}}
+            </ul>
+            {{end}}
+          </div>
+          {{end}}{{end}}
+        </div>
+      {{else if eq .Type "education"}}
+        <div class="visionary-main-section">
+          <h2 class="visionary-main-section-title" style="color: {{$.Styling.PrimaryColor}}; border-bottom: 2px solid {{$.Styling.PrimaryColor}}">{{.Title}}</h2>
+          {{with .Education}}{{range .Entries}}
+          <div class="visionary-edu-entry">
+            <div class="visionary-edu-header">
+              <h3>{{.Degree}}{{if .Field}} <span style="font-weight: normal">in {{.Field}}</span>{{end}}</h3>
+              {{with dateRange .StartDate .EndDate .Current}}<span class="date" style="color: {{$.Styling.SecondaryColor}}">{{.}}</span>{{end}}
+            </div>
+            <p class="visionary-edu-institution" style="color: {{$.Styling.PrimaryColor}}">{{.Institution}}{{if .Location}}<span style="color: {{$.Styling.SecondaryColor}}"> &middot; {{.Location}}</span>{{end}}</p>
+            {{if .Grade}}<p class="visionary-edu-grade" style="color: {{$.Styling.SecondaryColor}}">Grade: {{.Grade}}</p>{{end}}
+            {{if .Description}}<p class="visionary-edu-desc" style="color: {{$.Styling.SecondaryColor}}">{{.Description}}</p>{{end}}
+          </div>
+          {{end}}{{end}}
+        </div>
+      {{else}}
+        <div class="visionary-main-section">
+          <h2 class="visionary-main-section-title" style="color: {{$.Styling.PrimaryColor}}; border-bottom: 2px solid {{$.Styling.PrimaryColor}}">{{.Title}}</h2>
+        </div>
+      {{end}}
+    {{end}}
+  </div>
+</div>
+{{end}}

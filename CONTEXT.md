@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — T-001, T-006, T-007 done, 12 tasks remaining, 9 unblocked
+**Status:** Task-based workflow active — T-001, T-002, T-006, T-007 done, 11 tasks remaining, 10 unblocked
 
 ### What's Working
 
@@ -41,7 +41,7 @@
 - ✅ Build verified, full stack integration tested
 
 ### Remaining Work
-- ❌ Export (`POST /api/v1/export/{format}`) — returns 501, needs Gotenberg integration → T-002, T-003, T-004, T-005
+- ❌ Export (`POST /api/v1/export/{format}`) — returns 501, needs Gotenberg integration → T-003, T-004, T-005
 - ❌ R2 cloud storage — placeholder only, needs AWS SDK implementation → T-013
 
 ---
@@ -230,9 +230,8 @@ task api:sqlc          # Generate sqlc code
 ### Backlog
 | ID | Task | Blocked By | Size |
 |----|------|------------|------|
-| T-002 | Create HTML generation for CV export | — | S |
-| T-003 | Implement PDF export via Gotenberg | T-002 | S |
-| T-004 | Implement DOCX export via Gotenberg | T-002 | S |
+| T-003 | Implement PDF export via Gotenberg | — | S |
+| T-004 | Implement DOCX export via Gotenberg | — | S |
 | T-005 | Wire frontend export modal to real API | T-003, T-004 | S |
 | T-008 | P1 interaction tests — editors | — | S |
 | T-009 | P1 interaction tests — export error paths | — | XS |
@@ -249,17 +248,11 @@ task api:sqlc          # Generate sqlc code
 | T-001 | Verify template switching persists to backend | feat/t-001-template-persist |
 | T-006 | P0 smoke tests — section editors | test/t-006-007-smoke-tests |
 | T-007 | P0 smoke tests — page components | test/t-006-007-smoke-tests |
+| T-002 | Create HTML generation for CV export | feat/t-002-html-generation |
 
 ---
 
 ## Task Details
-
-**T-002: Create HTML generation for CV export** — S
-- Go service that takes CV content + templateId and produces a self-contained HTML string
-- One function per template (classic, modern, visionary) with inline CSS
-- Shared foundation for both PDF and DOCX export
-- Tests: unit tests generating HTML from sample CV data for each template
-- Acceptance: Unit tests pass, HTML renders correctly in browser
 
 **T-003: Implement PDF export via Gotenberg** — S
 - Wire `POST /api/v1/export/pdf` to call Gotenberg's chromium HTML-to-PDF endpoint
@@ -323,14 +316,14 @@ task api:sqlc          # Generate sqlc code
 
 ### Dependency Graph
 ```
-T-002 → T-003 → T-005
-     → T-004 → T-005
+T-003 → T-005
+T-004 → T-005
 
 T-008 through T-012: ALL INDEPENDENT (any order)
 T-013, T-014, T-015: Future backlog, independent
 ```
 
-9 out of 12 remaining tasks have zero dependencies and can be picked up in any order.
+10 out of 11 remaining tasks have zero dependencies and can be picked up in any order.
 
 ---
 
