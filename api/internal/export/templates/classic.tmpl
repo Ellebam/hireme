@@ -1,0 +1,128 @@
+{{template "base" .}}
+
+{{define "styles"}}
+<style>
+.classic-page { padding: 48px; }
+.classic-sections { }
+.classic-sections > * + * { margin-top: 24px; }
+.classic-personal { text-align: center; }
+.classic-personal h1 { font-size: 1.5em; font-weight: 700; letter-spacing: -0.025em; margin-bottom: 4px; }
+.classic-personal .job-title { font-size: 1em; margin-bottom: 12px; }
+.classic-personal .contact { font-size: 0.875em; }
+.classic-personal .contact .sep { margin: 0 8px; }
+.classic-personal .links { display: flex; justify-content: center; gap: 16px; margin-top: 8px; font-size: 0.875em; }
+.classic-personal .divider { margin-top: 16px; width: 100%; }
+.classic-section-title {
+  font-size: 0.875em; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; margin-bottom: 12px; padding-bottom: 8px;
+}
+.classic-entry + .classic-entry { margin-top: 16px; }
+.classic-entry-header { display: flex; justify-content: space-between; align-items: baseline; }
+.classic-entry-header .title { font-size: 0.875em; font-weight: 700; }
+.classic-entry-header .subtitle { font-size: 0.875em; }
+.classic-entry-header .date { font-size: 0.75em; white-space: nowrap; margin-left: 16px; }
+.classic-entry .description { font-size: 0.875em; margin-top: 4px; color: #374151; }
+.classic-entry .highlights { margin-top: 4px; list-style: disc inside; }
+.classic-entry .highlights li { font-size: 0.875em; color: #374151; }
+.classic-skills-cat { font-size: 0.875em; }
+.classic-skills-cat + .classic-skills-cat { margin-top: 8px; }
+.classic-skills-cat .cat-name { font-weight: 600; }
+.classic-skills-cat .cat-skills { color: #374151; }
+.classic-languages { font-size: 0.875em; }
+.classic-languages .lang-name { font-weight: 600; }
+.classic-languages .sep { margin: 0 4px; }
+.classic-summary { font-size: 0.875em; line-height: 1.625; color: #374151; }
+</style>
+{{end}}
+
+{{define "content"}}
+<div class="classic-page">
+<div class="classic-sections">
+{{range .Sections}}
+  {{if eq .Type "personal"}}
+    {{with .Personal}}
+    <div class="classic-personal">
+      {{if .FullName}}<h1>{{.FullName}}</h1>{{end}}
+      {{if .Content.JobTitle}}<p class="job-title" style="color: {{$.Styling.SecondaryColor}}">{{.Content.JobTitle}}</p>{{end}}
+      {{if .ContactParts}}
+      <p class="contact" style="color: {{$.Styling.SecondaryColor}}">
+        {{range $i, $p := .ContactParts}}{{if $i}}<span class="sep">&middot;</span>{{end}}{{$p}}{{end}}
+      </p>
+      {{end}}
+      {{if .Content.Links}}
+      <div class="links">
+        {{range .Content.Links}}<a href="{{.URL}}" style="color: {{$.Styling.PrimaryColor}}">{{linkLabel .}}</a>{{end}}
+      </div>
+      {{end}}
+      {{if .FullName}}<div class="divider" style="border-bottom: 2px solid {{$.Styling.PrimaryColor}}"></div>{{end}}
+    </div>
+    {{end}}
+  {{else if eq .Type "summary"}}
+    <div>
+      <h2 class="classic-section-title" style="border-bottom: 1px solid {{$.Styling.PrimaryColor}}; color: {{$.Styling.PrimaryColor}}">{{.Title}}</h2>
+      {{with .Summary}}<p class="classic-summary">{{.Text}}</p>{{end}}
+    </div>
+  {{else if eq .Type "experience"}}
+    <div>
+      <h2 class="classic-section-title" style="border-bottom: 1px solid {{$.Styling.PrimaryColor}}; color: {{$.Styling.PrimaryColor}}">{{.Title}}</h2>
+      {{with .Experience}}{{range .Entries}}
+      <div class="classic-entry">
+        <div class="classic-entry-header">
+          <div>
+            <span class="title">{{.Position}}</span>
+            {{if .Company}}<span class="subtitle"> at {{.Company}}</span>{{end}}
+            {{if .Location}}<span class="subtitle" style="color: {{$.Styling.SecondaryColor}}"> &middot; {{.Location}}</span>{{end}}
+          </div>
+          {{with dateRange .StartDate .EndDate .Current}}<span class="date" style="color: {{$.Styling.SecondaryColor}}">{{.}}</span>{{end}}
+        </div>
+        {{if .Description}}<p class="description">{{.Description}}</p>{{end}}
+        {{if .Highlights}}<ul class="highlights">{{range .Highlights}}<li>{{.}}</li>{{end}}</ul>{{end}}
+      </div>
+      {{end}}{{end}}
+    </div>
+  {{else if eq .Type "education"}}
+    <div>
+      <h2 class="classic-section-title" style="border-bottom: 1px solid {{$.Styling.PrimaryColor}}; color: {{$.Styling.PrimaryColor}}">{{.Title}}</h2>
+      {{with .Education}}{{range .Entries}}
+      <div class="classic-entry">
+        <div class="classic-entry-header">
+          <div>
+            <span class="title">{{degreeField .Degree .Field}}</span>
+            {{if .Institution}}<span class="subtitle"> at {{.Institution}}</span>{{end}}
+            {{if .Location}}<span class="subtitle" style="color: {{$.Styling.SecondaryColor}}"> &middot; {{.Location}}</span>{{end}}
+          </div>
+          {{with dateRange .StartDate .EndDate .Current}}<span class="date" style="color: {{$.Styling.SecondaryColor}}">{{.}}</span>{{end}}
+        </div>
+        {{if .Grade}}<p class="description" style="color: {{$.Styling.SecondaryColor}}">Grade: {{.Grade}}</p>{{end}}
+        {{if .Description}}<p class="description">{{.Description}}</p>{{end}}
+      </div>
+      {{end}}{{end}}
+    </div>
+  {{else if eq .Type "skills"}}
+    <div>
+      <h2 class="classic-section-title" style="border-bottom: 1px solid {{$.Styling.PrimaryColor}}; color: {{$.Styling.PrimaryColor}}">{{.Title}}</h2>
+      {{with .Skills}}{{range .Categories}}
+      <div class="classic-skills-cat">
+        <span class="cat-name">{{.Name}}:</span>
+        <span class="cat-skills">{{skillNames .Skills}}</span>
+      </div>
+      {{end}}{{end}}
+    </div>
+  {{else if eq .Type "languages"}}
+    <div>
+      <h2 class="classic-section-title" style="border-bottom: 1px solid {{$.Styling.PrimaryColor}}; color: {{$.Styling.PrimaryColor}}">{{.Title}}</h2>
+      {{with .Languages}}
+      <div class="classic-languages">
+        {{range $i, $e := .Entries}}{{if $i}}<span class="sep">&middot;</span>{{end}}<span class="lang-name">{{$e.Language}}</span> <span style="color: {{$.Styling.SecondaryColor}}">({{$e.Proficiency}})</span>{{if $e.Certification}} <span style="color: {{$.Styling.SecondaryColor}}">- {{$e.Certification}}</span>{{end}}{{end}}
+      </div>
+      {{end}}
+    </div>
+  {{else}}
+    <div>
+      <h2 class="classic-section-title" style="border-bottom: 1px solid {{$.Styling.PrimaryColor}}; color: {{$.Styling.PrimaryColor}}">{{.Title}}</h2>
+    </div>
+  {{end}}
+{{end}}
+</div>
+</div>
+{{end}}
