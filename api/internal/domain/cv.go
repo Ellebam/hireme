@@ -165,3 +165,21 @@ type Skill struct {
 	Name  string `json:"name"`
 	Level string `json:"level,omitempty"`
 }
+
+// SummaryContent represents the professional summary section
+type SummaryContent struct {
+	Text string `json:"text"`
+}
+
+// LanguagesContent represents the languages section
+type LanguagesContent struct {
+	Entries []LanguageEntry `json:"entries"`
+}
+
+// LanguageEntry represents a single language
+type LanguageEntry struct {
+	ID            string `json:"id,omitempty"`
+	Language      string `json:"language"`
+	Proficiency   string `json:"proficiency"`
+	Certification string `json:"certification,omitempty"`
+}
