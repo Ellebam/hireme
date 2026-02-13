@@ -186,3 +186,200 @@ If we go synchronous, the `ExportResponse` struct in `export.go` becomes unused 
 ### Integration Test (requires Gotenberg running)
 - Start infra → call `POST /api/v1/export/pdf` → verify response is valid PDF (check `%PDF-` magic bytes)
 - Can be tagged `//go:build integration` to skip in CI
+
+---
+
+## Architect Plan
+
+### Decision 1: Synchronous vs Async Export
+
+- **Option A: Synchronous** — Handler renders HTML → calls Gotenberg → streams PDF bytes back in same request. No export_jobs table, no polling. Pros: Simple, matches acceptance criteria exactly, no async infrastructure needed. Cons: Request blocks until Gotenberg finishes (~1-3s).
+- **Option B: Async** — Create export job → background worker → client polls for completion. Pros: Non-blocking, scales better for large PDFs. Cons: Over-engineered for MVP, frontend has no polling logic, requires job queue infrastructure.
+- **Choice:** A (Synchronous) — **Rationale:** The acceptance criteria is a single `curl` returning a PDF. Gotenberg conversion takes 1-3s which is acceptable for a synchronous request. The async job table (`export_jobs`) and its SQLC queries are already scaffolded and can be used later if needed. Frontend export modal in T-005 expects a direct download, not polling.
+
+### Decision 2: Gotenberg Client Design
+
+- **Option A: Stdlib client** — New `GotenbergClient` struct in `internal/export/gotenberg.go` using `net/http` + `mime/multipart`. Define a `PDFConverter` interface for testability. Pros: Zero dependencies, full control, small footprint (~40 lines). Cons: Must construct multipart form manually.
+- **Option B: Third-party library** (`github.com/dcaraxes/gotenberg-go-client/v8`) — Pre-built client. Pros: Handles multipart construction. Cons: New dependency for ~15 lines of saved code, may lag behind Gotenberg releases.
+- **Choice:** A (Stdlib) — **Rationale:** The Gotenberg API is a single multipart POST. The Go stdlib handles this natively. Adding a dependency for something this simple violates YAGNI and the constraint of no new Go dependencies.
+
+### Decision 3: Where to Put Business Logic
+
+- **Option A: ExportService** — New `service/export_service.go` with `ExportPDF(ctx, userID) ([]byte, error)`. Orchestrates: fetch CV → parse content → render HTML → convert to PDF. Depends on interfaces: `repository.CVRepository`, `HTMLRenderer`, `PDFConverter`. Pros: Clean separation, independently testable, follows existing service pattern. Cons: One more file.
+- **Option B: Handler-level** — Handler directly calls renderer + Gotenberg client. Pros: Fewer files. Cons: Handler becomes fat, harder to test (must mock 3 things instead of 1), breaks the Handler → Service → Repository pattern.
+- **Choice:** A (ExportService) — **Rationale:** Follows the established `Handler → Service → Repository` architecture. Handler tests mock one interface (`ExportServiceInterface`). Service tests mock three granular interfaces. This is the same layering used by `CVService`, `UserService`, `AssetService`.
+
+### Files Changing
+
+| # | File | Action | Lines (est) |
+|---|------|--------|-------------|
+| 1 | `api/internal/export/gotenberg.go` | **NEW** — `PDFConverter` interface + `GotenbergClient` struct | ~45 |
+| 2 | `api/internal/export/gotenberg_test.go` | **NEW** — httptest mock: success, error, timeout | ~55 |
+| 3 | `api/internal/service/export_service.go` | **NEW** — `ExportService` + `HTMLRenderer`/`PDFConverter` interfaces | ~50 |
+| 4 | `api/internal/service/export_service_test.go` | **NEW** — 4 test cases (happy, CV not found, render error, convert error) | ~60 |
+| 5 | `api/internal/handler/export.go` | **MODIFY** — Replace 501 stub with sync PDF streaming, feature flag check | ~30 net |
+| 6 | `api/internal/handler/handler.go` | **MODIFY** — Add `exportService` field + `ExportService` in `Dependencies` | ~4 |
+| 7 | `api/internal/handler/export_test.go` | **NEW** — 4 test cases (success, invalid format, feature disabled, service error) | ~50 |
+| 8 | `api/internal/handler/testutil_test.go` | **MODIFY** — Add `ExportServiceInterface` + `MockExportService` + TestHandler field | ~25 |
+| 9 | `api/cmd/server/main.go` | **MODIFY** — Initialize renderer, gotenberg client, export service; wire into handler | ~10 |
+
+**Estimated total:** ~290 lines changed (within 300-line PR target)
+
+### Files NOT Changing
+
+| File | Reason |
+|------|--------|
+| `domain/asset.go` | `ExportJob`, format constants, `IsValidExportFormat` — all reused as-is |
+| `domain/cv.go` | `CV.ParseContent()`, `CVContent` — already complete |
+| `export/renderer.go` | HTML renderer from T-002 — used as-is, no modifications needed |
+| `export/section.go` | Section parsers — used as-is |
+| `repository/repository.go` | `CVRepository` interface already has `GetByUserID` — sufficient |
+| `postgres/export.go` | Not needed — synchronous export doesn't use export_jobs table |
+| `config/config.go` | `ExportConfig.GotenbergURL` and `Features.EnableExportPDF` already defined |
+
+### Detailed Design
+
+#### 1. Gotenberg Client (`export/gotenberg.go`)
+
+```go
+// PDFConverter converts HTML to PDF.
+type PDFConverter interface {
+    ConvertHTMLToPDF(ctx context.Context, html string) ([]byte, error)
+}
+
+// GotenbergClient calls Gotenberg's Chromium HTML-to-PDF endpoint.
+type GotenbergClient struct {
+    url        string        // e.g. "http://localhost:3001"
+    httpClient *http.Client
+}
+
+func NewGotenbergClient(url string) *GotenbergClient
+func (g *GotenbergClient) ConvertHTMLToPDF(ctx context.Context, html string) ([]byte, error)
+```
+
+Implementation notes:
+- POST multipart form to `{url}/forms/chromium/convert/html`
+- File field: `files` with filename `index.html` and content-type `text/html`
+- Check response status: 200 → return body, non-200 → read error body and wrap in `fmt.Errorf`
+- Use 30s timeout via `http.Client.Timeout` (Gotenberg itself has 60s timeout)
+- Return `([]byte, error)` — caller writes to response
+
+#### 2. Export Service (`service/export_service.go`)
+
+```go
+// HTMLRenderer renders CV content to HTML string.
+type HTMLRenderer interface {
+    Render(content domain.CVContent) (string, error)
+}
+
+// ExportService handles document export operations.
+type ExportService struct {
+    cvRepo   repository.CVRepository
+    renderer HTMLRenderer
+    pdf      export.PDFConverter
+}
+
+func NewExportService(cvRepo repository.CVRepository, renderer HTMLRenderer, pdf export.PDFConverter) *ExportService
+func (s *ExportService) ExportPDF(ctx context.Context, userID string) ([]byte, error)
+```
+
+`ExportPDF` flow:
+1. `s.cvRepo.GetByUserID(ctx, userID)` → `*domain.CV` (propagates `ErrNotFound`)
+2. `cv.ParseContent()` → `*domain.CVContent`
+3. `s.renderer.Render(*content)` → HTML string
+4. `s.pdf.ConvertHTMLToPDF(ctx, html)` → PDF bytes
+5. Return `(pdfBytes, nil)`
+
+#### 3. Handler Changes (`handler/export.go`)
+
+`CreateExport` becomes:
+1. Get format from `chi.URLParam(r, "format")`
+2. Validate format with `domain.IsValidExportFormat(format)`
+3. Switch on format:
+   - `"pdf"`: check `h.config.Features.EnableExportPDF` → if disabled, return 501. Get userID → call `h.exportService.ExportPDF(ctx, userID)` → set `Content-Type: application/pdf`, `Content-Disposition: attachment; filename="export.pdf"` → write bytes.
+   - Other formats: return 501 Not Implemented
+4. On error: use `httputil.HandleError(w, err)` for domain errors, `httputil.Error(w, 500, ...)` for others.
+
+`GetExport` stays 501 (deferred to async job feature).
+
+`ExportResponse` struct stays (unused but harmless; may be used by future JSON/YAML export).
+
+#### 4. Handler Wiring (`handler/handler.go`)
+
+Add to `Handler`:
+```go
+exportService *service.ExportService
+```
+
+Add to `Dependencies`:
+```go
+ExportService *service.ExportService
+```
+
+#### 5. Test Handler Additions (`handler/testutil_test.go`)
+
+```go
+type ExportServiceInterface interface {
+    ExportPDF(ctx context.Context, userID string) ([]byte, error)
+}
+
+type MockExportService struct {
+    ExportPDFFunc func(ctx context.Context, userID string) ([]byte, error)
+}
+```
+
+Add `exportService ExportServiceInterface` to `TestHandler` struct.
+Add `CreateExport` method to `TestHandler`.
+Update `NewTestHandler` to accept export service (4th param).
+
+#### 6. Main Wiring (`cmd/server/main.go`)
+
+After existing service initialization:
+```go
+renderer, err := export.NewRenderer()
+gotenbergClient := export.NewGotenbergClient(cfg.Export.GotenbergURL)
+exportSvc := service.NewExportService(cvRepo, renderer, gotenbergClient)
+```
+
+Add `ExportService: exportSvc` to `handler.Dependencies`.
+
+### Risk Assessment
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|-----------|--------|------------|
+| Gotenberg not running → 500 on export | Medium | Low | Error message includes "gotenberg" context; dev env starts it via `task infra:up` |
+| Large CV HTML → Gotenberg timeout | Low | Low | 30s client timeout, 60s Gotenberg timeout; CVs are small documents |
+| Memory spike from large PDF in memory | Low | Low | Typical CV PDF is <500KB; `[]byte` is fine for MVP |
+| Breaking TestHandler constructor signature | Medium | Medium | All existing tests pass `nil` for 4th param; update call sites |
+
+### Consequences
+
+**Becomes easier:**
+- T-004 (DOCX export) — add `ExportDOCX` to ExportService, `ConvertHTMLToDOCX` to a new converter, extend handler switch
+- T-005 (frontend wiring) — backend endpoint is ready, frontend just calls `POST /api/v1/export/pdf`
+- Future async export — ExportService can be wrapped by a job worker without changing the core logic
+
+**Becomes harder:**
+- Nothing. The synchronous approach is strictly simpler than async.
+
+### Engineer Execution Steps
+
+1. **Create `api/internal/export/gotenberg.go`** — `PDFConverter` interface + `GotenbergClient` implementation
+2. **Create `api/internal/export/gotenberg_test.go`** — 3 tests using `httptest.NewServer`
+3. **Create `api/internal/service/export_service.go`** — `HTMLRenderer` interface (consumed here), `ExportService` struct, `ExportPDF` method
+4. **Create `api/internal/service/export_service_test.go`** — 4 test cases with mocks
+5. **Modify `api/internal/handler/handler.go`** — Add `exportService` to Handler + Dependencies
+6. **Modify `api/internal/handler/testutil_test.go`** — Add `ExportServiceInterface`, `MockExportService`, update `TestHandler` + `NewTestHandler`
+7. **Modify `api/internal/handler/export.go`** — Replace 501 stub with synchronous PDF export logic + feature flag check
+8. **Create `api/internal/handler/export_test.go`** — 4 handler test cases
+9. **Modify `api/cmd/server/main.go`** — Wire renderer, gotenberg client, export service into handler dependencies
+10. **Run `go test ./...`** from `api/` — all tests must pass
+11. **Run `go vet ./...`** — no issues
+12. **Run `go build ./cmd/server`** — compiles cleanly
+
+### Verification Gates
+
+- [ ] `cd api && go test ./...` — all pass (unit tests, no Gotenberg needed)
+- [ ] `cd api && go vet ./...` — no issues
+- [ ] `cd api && go build ./cmd/server` — compiles
+- [ ] Manual integration test: `task infra:up && task api:dev`, then `curl -s -o /tmp/test.pdf -w "%{http_code}" -X POST http://localhost:8080/api/v1/export/pdf` returns 200 and `file /tmp/test.pdf` shows "PDF document"
