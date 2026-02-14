@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — T-001, T-002, T-006, T-007 done, 11 tasks remaining, 10 unblocked
+**Status:** Task-based workflow active — T-001, T-002, T-003, T-006, T-007 done, 10 tasks remaining, 10 unblocked
 
 ### What's Working
 
@@ -41,7 +41,7 @@
 - ✅ Build verified, full stack integration tested
 
 ### Remaining Work
-- ❌ Export (`POST /api/v1/export/{format}`) — returns 501, needs Gotenberg integration → T-003, T-004, T-005
+- ❌ Export (`POST /api/v1/export/{format}`) — PDF working (T-003), DOCX pending → T-004, T-005
 - ❌ R2 cloud storage — placeholder only, needs AWS SDK implementation → T-013
 
 ---
@@ -230,9 +230,8 @@ task api:sqlc          # Generate sqlc code
 ### Backlog
 | ID | Task | Blocked By | Size |
 |----|------|------------|------|
-| T-003 | Implement PDF export via Gotenberg | — | S |
 | T-004 | Implement DOCX export via Gotenberg | — | S |
-| T-005 | Wire frontend export modal to real API | T-003, T-004 | S |
+| T-005 | Wire frontend export modal to real API | T-004 | S |
 | T-008 | P1 interaction tests — editors | — | S |
 | T-009 | P1 interaction tests — export error paths | — | XS |
 | T-010 | P2 UX regression tests | — | S |
@@ -249,17 +248,11 @@ task api:sqlc          # Generate sqlc code
 | T-006 | P0 smoke tests — section editors | test/t-006-007-smoke-tests |
 | T-007 | P0 smoke tests — page components | test/t-006-007-smoke-tests |
 | T-002 | Create HTML generation for CV export | feat/t-002-html-generation |
+| T-003 | Implement PDF export via Gotenberg | feat/t-003-pdf-export |
 
 ---
 
 ## Task Details
-
-**T-003: Implement PDF export via Gotenberg** — S
-- Wire `POST /api/v1/export/pdf` to call Gotenberg's chromium HTML-to-PDF endpoint
-- Use HTML from T-002, POST to `http://gotenberg:3000/forms/chromium/convert/html`
-- Return PDF binary with correct Content-Type
-- Tests: handler test (mock Gotenberg), integration test (real Gotenberg)
-- Acceptance: `curl` export endpoint returns valid PDF
 
 **T-004: Implement DOCX export via Gotenberg** — S
 - Wire `POST /api/v1/export/docx` using Gotenberg's LibreOffice endpoint
@@ -316,14 +309,13 @@ task api:sqlc          # Generate sqlc code
 
 ### Dependency Graph
 ```
-T-003 → T-005
 T-004 → T-005
 
 T-008 through T-012: ALL INDEPENDENT (any order)
 T-013, T-014, T-015: Future backlog, independent
 ```
 
-10 out of 11 remaining tasks have zero dependencies and can be picked up in any order.
+9 out of 10 remaining tasks have zero dependencies and can be picked up in any order.
 
 ---
 
