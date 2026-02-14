@@ -51,7 +51,7 @@ func TestConvertHTMLToPDF_Success(t *testing.T) {
 		}
 
 		w.WriteHeader(http.StatusOK)
-		w.Write(expectedPDF)
+		_, _ = w.Write(expectedPDF)
 	}))
 	defer server.Close()
 
@@ -68,7 +68,7 @@ func TestConvertHTMLToPDF_Success(t *testing.T) {
 func TestConvertHTMLToPDF_GotenbergError(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("invalid file format"))
+		_, _ = w.Write([]byte("invalid file format"))
 	}))
 	defer server.Close()
 
@@ -104,7 +104,7 @@ func TestConvertHTMLToPDF_ContextCancellation(t *testing.T) {
 func TestConvertHTMLToPDF_ServerError(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("chromium crashed"))
+		_, _ = w.Write([]byte("chromium crashed"))
 	}))
 	defer server.Close()
 
