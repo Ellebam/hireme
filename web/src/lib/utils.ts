@@ -13,8 +13,8 @@ export function cn(...inputs: ClassValue[]) {
  * Format a date string for display
  */
 export function formatDate(date: string | Date, locale = 'en'): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
-  return d.toLocaleDateString(locale, {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  return dateObj.toLocaleDateString(locale, {
     year: 'numeric',
     month: 'short',
   });
@@ -64,11 +64,11 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
 export function formatBytes(bytes: number, decimals = 2): string {
   if (bytes === 0) return '0 Bytes';
 
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
+  const bytesPerUnit = 1024;
+  const decimalPlaces = decimals < 0 ? 0 : decimals;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
 
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  const unitIndex = Math.floor(Math.log(bytes) / Math.log(bytesPerUnit));
 
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  return parseFloat((bytes / Math.pow(bytesPerUnit, unitIndex)).toFixed(decimalPlaces)) + ' ' + sizes[unitIndex];
 }
