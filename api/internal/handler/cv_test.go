@@ -26,7 +26,7 @@ func TestGetCV_Success(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, mockCVSvc, nil)
+	h := NewTestHandler(nil, mockCVSvc, nil, nil)
 	req := newAuthenticatedRequest("GET", "/cv", userID, nil)
 	rr := httptest.NewRecorder()
 
@@ -70,7 +70,7 @@ func TestGetCV_NotFound(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, mockCVSvc, nil)
+	h := NewTestHandler(nil, mockCVSvc, nil, nil)
 	req := newAuthenticatedRequest("GET", "/cv", userID, nil)
 	rr := httptest.NewRecorder()
 
@@ -110,7 +110,7 @@ func TestCreateCV_Success(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, mockCVSvc, nil)
+	h := NewTestHandler(nil, mockCVSvc, nil, nil)
 
 	body := jsonBody(CreateCVRequest{
 		Title:   title,
@@ -149,7 +149,7 @@ func TestCreateCV_MissingTitle(t *testing.T) {
 	userID := "user-123"
 	content := json.RawMessage(`{"sections":[]}`)
 
-	h := NewTestHandler(nil, &MockCVService{}, nil)
+	h := NewTestHandler(nil, &MockCVService{}, nil, nil)
 
 	body := jsonBody(CreateCVRequest{
 		Title:   "", // Missing title
@@ -182,7 +182,7 @@ func TestCreateCV_MissingTitle(t *testing.T) {
 func TestCreateCV_MissingContent(t *testing.T) {
 	userID := "user-123"
 
-	h := NewTestHandler(nil, &MockCVService{}, nil)
+	h := NewTestHandler(nil, &MockCVService{}, nil, nil)
 
 	// Send JSON without content field (it will be empty/nil)
 	body := strings.NewReader(`{"title": "My CV"}`)
@@ -213,7 +213,7 @@ func TestCreateCV_MissingContent(t *testing.T) {
 func TestCreateCV_InvalidBody(t *testing.T) {
 	userID := "user-123"
 
-	h := NewTestHandler(nil, &MockCVService{}, nil)
+	h := NewTestHandler(nil, &MockCVService{}, nil, nil)
 
 	// Send invalid JSON
 	req := newAuthenticatedRequest("POST", "/cv", userID, jsonBody("not valid json structure"))
@@ -247,7 +247,7 @@ func TestCreateCV_LimitReached(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, mockCVSvc, nil)
+	h := NewTestHandler(nil, mockCVSvc, nil, nil)
 
 	body := jsonBody(CreateCVRequest{
 		Title:   title,
@@ -300,7 +300,7 @@ func TestUpdateCV_Success(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, mockCVSvc, nil)
+	h := NewTestHandler(nil, mockCVSvc, nil, nil)
 
 	body := jsonBody(UpdateCVRequest{
 		Title: &newTitle,
@@ -337,7 +337,7 @@ func TestUpdateCV_Success(t *testing.T) {
 func TestUpdateCV_InvalidID(t *testing.T) {
 	userID := "user-123"
 
-	h := NewTestHandler(nil, &MockCVService{}, nil)
+	h := NewTestHandler(nil, &MockCVService{}, nil, nil)
 
 	body := jsonBody(UpdateCVRequest{})
 	req := newAuthenticatedRequestWithParams("PUT", "/cv/not-a-uuid", userID, body, map[string]string{"id": "not-a-uuid"})
@@ -371,7 +371,7 @@ func TestUpdateCV_NotFound(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, mockCVSvc, nil)
+	h := NewTestHandler(nil, mockCVSvc, nil, nil)
 
 	body := jsonBody(UpdateCVRequest{
 		Title: &newTitle,
@@ -398,7 +398,7 @@ func TestUpdateCV_Forbidden(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, mockCVSvc, nil)
+	h := NewTestHandler(nil, mockCVSvc, nil, nil)
 
 	body := jsonBody(UpdateCVRequest{
 		Title: &newTitle,
@@ -432,7 +432,7 @@ func TestDeleteCV_Success(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, mockCVSvc, nil)
+	h := NewTestHandler(nil, mockCVSvc, nil, nil)
 
 	req := newAuthenticatedRequestWithParams("DELETE", "/cv/"+cvID.String(), userID, nil, map[string]string{"id": cvID.String()})
 	rr := httptest.NewRecorder()
@@ -451,7 +451,7 @@ func TestDeleteCV_Success(t *testing.T) {
 func TestDeleteCV_InvalidID(t *testing.T) {
 	userID := "user-123"
 
-	h := NewTestHandler(nil, &MockCVService{}, nil)
+	h := NewTestHandler(nil, &MockCVService{}, nil, nil)
 
 	req := newAuthenticatedRequestWithParams("DELETE", "/cv/not-a-uuid", userID, nil, map[string]string{"id": "not-a-uuid"})
 	rr := httptest.NewRecorder()
@@ -473,7 +473,7 @@ func TestDeleteCV_NotFound(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, mockCVSvc, nil)
+	h := NewTestHandler(nil, mockCVSvc, nil, nil)
 
 	req := newAuthenticatedRequestWithParams("DELETE", "/cv/"+cvID.String(), userID, nil, map[string]string{"id": cvID.String()})
 	rr := httptest.NewRecorder()

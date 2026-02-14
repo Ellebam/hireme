@@ -22,7 +22,7 @@ func TestGetCurrentUser_Success(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(mockUserSvc, nil, nil)
+	h := NewTestHandler(mockUserSvc, nil, nil, nil)
 	req := newAuthenticatedRequest("GET", "/users/me", userID, nil)
 	rr := httptest.NewRecorder()
 
@@ -81,7 +81,7 @@ func TestGetCurrentUser_NotFound(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(mockUserSvc, nil, nil)
+	h := NewTestHandler(mockUserSvc, nil, nil, nil)
 	req := newAuthenticatedRequest("GET", "/users/me", userID, nil)
 	rr := httptest.NewRecorder()
 
@@ -119,7 +119,7 @@ func TestUpdateCurrentUser_Success(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(mockUserSvc, nil, nil)
+	h := NewTestHandler(mockUserSvc, nil, nil, nil)
 
 	body := jsonBody(UpdateUserRequest{
 		DisplayName: &newDisplayName,
@@ -168,7 +168,7 @@ func TestUpdateCurrentUser_UpdateLocale(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(mockUserSvc, nil, nil)
+	h := NewTestHandler(mockUserSvc, nil, nil, nil)
 
 	body := jsonBody(UpdateUserRequest{
 		Locale: &newLocale,
@@ -201,7 +201,7 @@ func TestUpdateCurrentUser_UpdateLocale(t *testing.T) {
 func TestUpdateCurrentUser_InvalidBody(t *testing.T) {
 	userID := "user-123"
 
-	h := NewTestHandler(&MockUserService{}, nil, nil)
+	h := NewTestHandler(&MockUserService{}, nil, nil, nil)
 
 	// Send invalid JSON
 	req := newAuthenticatedRequest("PATCH", "/users/me", userID, jsonBody("not valid json structure"))
@@ -234,7 +234,7 @@ func TestUpdateCurrentUser_ValidationError(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(mockUserSvc, nil, nil)
+	h := NewTestHandler(mockUserSvc, nil, nil, nil)
 
 	body := jsonBody(UpdateUserRequest{
 		Locale: &invalidLocale,
@@ -273,7 +273,7 @@ func TestUpdateCurrentUser_NotFound(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(mockUserSvc, nil, nil)
+	h := NewTestHandler(mockUserSvc, nil, nil, nil)
 
 	body := jsonBody(UpdateUserRequest{
 		DisplayName: &newDisplayName,

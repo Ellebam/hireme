@@ -7,7 +7,7 @@ import (
 )
 
 func TestHealth(t *testing.T) {
-	h := NewTestHandler(nil, nil, nil)
+	h := NewTestHandler(nil, nil, nil, nil)
 
 	req := httptest.NewRequest("GET", "/health", nil)
 	rr := httptest.NewRecorder()
@@ -42,7 +42,7 @@ func TestHealth(t *testing.T) {
 }
 
 func TestReady_AllHealthy(t *testing.T) {
-	h := NewTestHandler(nil, nil, nil)
+	h := NewTestHandler(nil, nil, nil, nil)
 
 	req := httptest.NewRequest("GET", "/ready", nil)
 	rr := httptest.NewRecorder()
