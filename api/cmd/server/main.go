@@ -17,6 +17,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/ellebam/hireme/api/internal/config"
+	"github.com/ellebam/hireme/api/internal/export"
 	"github.com/ellebam/hireme/api/internal/handler"
 	appMiddleware "github.com/ellebam/hireme/api/internal/middleware"
 	"github.com/ellebam/hireme/api/internal/repository/postgres"
@@ -82,12 +83,26 @@ func main() {
 	cvSvc := service.NewCVService(cvRepo, userRepo, cvValidator)
 	assetSvc := service.NewAssetService(assetRepo, userRepo, store, cfg)
 
+	// Initialize export pipeline
+	renderer, err := export.NewRenderer()
+	if err != nil {
+		slog.Error("failed to create HTML renderer", "error", err)
+		os.Exit(1)
+	}
+	if cfg.Features.EnableExportPDF && cfg.Export.GotenbergURL == "" {
+		slog.Error("PDF export enabled but GotenbergURL not configured")
+		os.Exit(1)
+	}
+	gotenbergClient := export.NewGotenbergClient(cfg.Export.GotenbergURL)
+	exportSvc := service.NewExportService(cvRepo, renderer, gotenbergClient)
+
 	// Initialize handlers
 	h := handler.New(handler.Dependencies{
-		Config:       cfg,
-		UserService:  userSvc,
-		CVService:    cvSvc,
-		AssetService: assetSvc,
+		Config:        cfg,
+		UserService:   userSvc,
+		CVService:     cvSvc,
+		AssetService:  assetSvc,
+		ExportService: exportSvc,
 	})
 
 	// Setup router

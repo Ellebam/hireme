@@ -14,6 +14,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 
+	"github.com/ellebam/hireme/api/internal/config"
 	"github.com/ellebam/hireme/api/internal/domain"
 	"github.com/ellebam/hireme/api/internal/middleware"
 	"github.com/ellebam/hireme/api/pkg/httputil"
@@ -39,6 +40,11 @@ type AssetServiceInterface interface {
 	GetByID(ctx context.Context, id uuid.UUID, userID string) (*domain.Asset, error)
 	GetFileContent(ctx context.Context, asset *domain.Asset) ([]byte, error)
 	Delete(ctx context.Context, id uuid.UUID, userID string) error
+}
+
+// ExportServiceInterface defines the export service methods used by handlers
+type ExportServiceInterface interface {
+	ExportPDF(ctx context.Context, userID string) ([]byte, error)
 }
 
 // MockUserService is a mock implementation of UserServiceInterface
@@ -133,19 +139,35 @@ func (m *MockAssetService) Delete(ctx context.Context, id uuid.UUID, userID stri
 	return nil
 }
 
+// MockExportService is a mock implementation of ExportServiceInterface
+type MockExportService struct {
+	ExportPDFFunc func(ctx context.Context, userID string) ([]byte, error)
+}
+
+func (m *MockExportService) ExportPDF(ctx context.Context, userID string) ([]byte, error) {
+	if m.ExportPDFFunc != nil {
+		return m.ExportPDFFunc(ctx, userID)
+	}
+	return nil, domain.ErrNotFound
+}
+
 // TestHandler is a handler wrapper that uses interfaces for testing
 type TestHandler struct {
-	userService  UserServiceInterface
-	cvService    CVServiceInterface
-	assetService AssetServiceInterface
+	userService   UserServiceInterface
+	cvService     CVServiceInterface
+	assetService  AssetServiceInterface
+	exportService ExportServiceInterface
+	config        *config.Config
 }
 
 // NewTestHandler creates a handler with mock services for testing
-func NewTestHandler(userSvc UserServiceInterface, cvSvc CVServiceInterface, assetSvc AssetServiceInterface) *TestHandler {
+func NewTestHandler(userSvc UserServiceInterface, cvSvc CVServiceInterface, assetSvc AssetServiceInterface, exportSvc ExportServiceInterface) *TestHandler {
 	return &TestHandler{
-		userService:  userSvc,
-		cvService:    cvSvc,
-		assetService: assetSvc,
+		userService:   userSvc,
+		cvService:     cvSvc,
+		assetService:  assetSvc,
+		exportService: exportSvc,
+		config:        &config.Config{Features: config.FeaturesConfig{EnableExportPDF: true, EnableExportDOCX: true}},
 	}
 }
 
@@ -459,6 +481,40 @@ func (h *TestHandler) Ready(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 	httputil.JSON(w, http.StatusOK, response)
+}
+
+// CreateExport handles export requests in tests
+func (h *TestHandler) CreateExport(w http.ResponseWriter, r *http.Request) {
+	format := chi.URLParam(r, "format")
+
+	if !domain.IsValidExportFormat(format) {
+		httputil.Error(w, http.StatusBadRequest, "invalid export format")
+		return
+	}
+
+	switch format {
+	case domain.ExportFormatPDF:
+		if !h.config.Features.EnableExportPDF {
+			httputil.Error(w, http.StatusNotImplemented, "PDF export is not enabled")
+			return
+		}
+
+		ctx := r.Context()
+		userID := middleware.MustGetUserID(ctx)
+
+		pdfBytes, err := h.exportService.ExportPDF(ctx, userID)
+		if err != nil {
+			httputil.HandleError(w, err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/pdf")
+		w.Header().Set("Content-Disposition", `attachment; filename="export.pdf"`)
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(pdfBytes)
+	default:
+		httputil.Error(w, http.StatusNotImplemented, "export format not yet implemented")
+	}
 }
 
 // newAuthenticatedRequest creates an HTTP request with userID set in context

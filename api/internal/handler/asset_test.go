@@ -28,7 +28,7 @@ func TestUploadAsset_Success(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, nil, mockAssetSvc)
+	h := NewTestHandler(nil, nil, mockAssetSvc, nil)
 
 	// Create multipart request with a file
 	fileContent := []byte("fake image content")
@@ -78,7 +78,7 @@ func TestUploadAsset_Success(t *testing.T) {
 func TestUploadAsset_NoFile(t *testing.T) {
 	userID := "user-123"
 
-	h := NewTestHandler(nil, nil, &MockAssetService{})
+	h := NewTestHandler(nil, nil, &MockAssetService{}, nil)
 
 	// Create request without multipart form
 	req := newAuthenticatedRequest("POST", "/assets", userID, nil)
@@ -110,7 +110,7 @@ func TestUploadAsset_TooLarge(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, nil, mockAssetSvc)
+	h := NewTestHandler(nil, nil, mockAssetSvc, nil)
 
 	fileContent := []byte("large file content")
 	req, err := createMultipartRequest("/assets", userID, "file", "large.jpg", fileContent)
@@ -148,7 +148,7 @@ func TestUploadAsset_InvalidType(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, nil, mockAssetSvc)
+	h := NewTestHandler(nil, nil, mockAssetSvc, nil)
 
 	fileContent := []byte("text file content")
 	req, err := createMultipartRequest("/assets", userID, "file", "document.txt", fileContent)
@@ -186,7 +186,7 @@ func TestUploadAsset_StorageLimitReached(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, nil, mockAssetSvc)
+	h := NewTestHandler(nil, nil, mockAssetSvc, nil)
 
 	fileContent := []byte("image content")
 	req, err := createMultipartRequest("/assets", userID, "file", "photo.jpg", fileContent)
@@ -233,7 +233,7 @@ func TestGetAsset_Metadata(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, nil, mockAssetSvc)
+	h := NewTestHandler(nil, nil, mockAssetSvc, nil)
 
 	req := newAuthenticatedRequestWithParams("GET", "/assets/"+assetID.String(), userID, nil, map[string]string{"id": assetID.String()})
 	rr := httptest.NewRecorder()
@@ -285,7 +285,7 @@ func TestGetAsset_FileContent(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, nil, mockAssetSvc)
+	h := NewTestHandler(nil, nil, mockAssetSvc, nil)
 
 	req := newAuthenticatedRequestWithParams("GET", "/assets/"+assetID.String(), userID, nil, map[string]string{"id": assetID.String()})
 	req.Header.Set("Accept", "image/*") // Request file content
@@ -332,7 +332,7 @@ func TestGetAsset_FileContentWithExactMimeType(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, nil, mockAssetSvc)
+	h := NewTestHandler(nil, nil, mockAssetSvc, nil)
 
 	req := newAuthenticatedRequestWithParams("GET", "/assets/"+assetID.String(), userID, nil, map[string]string{"id": assetID.String()})
 	req.Header.Set("Accept", "image/jpeg") // Request file content with exact MIME type
@@ -361,7 +361,7 @@ func TestGetAsset_NotFound(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, nil, mockAssetSvc)
+	h := NewTestHandler(nil, nil, mockAssetSvc, nil)
 
 	req := newAuthenticatedRequestWithParams("GET", "/assets/"+assetID.String(), userID, nil, map[string]string{"id": assetID.String()})
 	rr := httptest.NewRecorder()
@@ -376,7 +376,7 @@ func TestGetAsset_NotFound(t *testing.T) {
 func TestGetAsset_InvalidID(t *testing.T) {
 	userID := "user-123"
 
-	h := NewTestHandler(nil, nil, &MockAssetService{})
+	h := NewTestHandler(nil, nil, &MockAssetService{}, nil)
 
 	req := newAuthenticatedRequestWithParams("GET", "/assets/not-a-uuid", userID, nil, map[string]string{"id": "not-a-uuid"})
 	rr := httptest.NewRecorder()
@@ -398,7 +398,7 @@ func TestGetAsset_Forbidden(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, nil, mockAssetSvc)
+	h := NewTestHandler(nil, nil, mockAssetSvc, nil)
 
 	req := newAuthenticatedRequestWithParams("GET", "/assets/"+assetID.String(), userID, nil, map[string]string{"id": assetID.String()})
 	rr := httptest.NewRecorder()
@@ -428,7 +428,7 @@ func TestDeleteAsset_Success(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, nil, mockAssetSvc)
+	h := NewTestHandler(nil, nil, mockAssetSvc, nil)
 
 	req := newAuthenticatedRequestWithParams("DELETE", "/assets/"+assetID.String(), userID, nil, map[string]string{"id": assetID.String()})
 	rr := httptest.NewRecorder()
@@ -454,7 +454,7 @@ func TestDeleteAsset_NotFound(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, nil, mockAssetSvc)
+	h := NewTestHandler(nil, nil, mockAssetSvc, nil)
 
 	req := newAuthenticatedRequestWithParams("DELETE", "/assets/"+assetID.String(), userID, nil, map[string]string{"id": assetID.String()})
 	rr := httptest.NewRecorder()
@@ -469,7 +469,7 @@ func TestDeleteAsset_NotFound(t *testing.T) {
 func TestDeleteAsset_InvalidID(t *testing.T) {
 	userID := "user-123"
 
-	h := NewTestHandler(nil, nil, &MockAssetService{})
+	h := NewTestHandler(nil, nil, &MockAssetService{}, nil)
 
 	req := newAuthenticatedRequestWithParams("DELETE", "/assets/not-a-uuid", userID, nil, map[string]string{"id": "not-a-uuid"})
 	rr := httptest.NewRecorder()
@@ -491,7 +491,7 @@ func TestDeleteAsset_Forbidden(t *testing.T) {
 		},
 	}
 
-	h := NewTestHandler(nil, nil, mockAssetSvc)
+	h := NewTestHandler(nil, nil, mockAssetSvc, nil)
 
 	req := newAuthenticatedRequestWithParams("DELETE", "/assets/"+assetID.String(), userID, nil, map[string]string{"id": assetID.String()})
 	rr := httptest.NewRecorder()

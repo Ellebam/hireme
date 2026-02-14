@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/ellebam/hireme/api/internal/domain"
+	"github.com/ellebam/hireme/api/internal/middleware"
 	"github.com/ellebam/hireme/api/pkg/httputil"
 )
 
@@ -19,32 +20,41 @@ type ExportResponse struct {
 	CreatedAt string  `json:"createdAt"`
 }
 
-// CreateExport initiates a new export job
+// CreateExport handles synchronous export requests
 func (h *Handler) CreateExport(w http.ResponseWriter, r *http.Request) {
-	// Get format from URL
 	format := chi.URLParam(r, "format")
 
-	// Validate format
 	if !domain.IsValidExportFormat(format) {
 		httputil.Error(w, http.StatusBadRequest, "invalid export format")
 		return
 	}
 
-	// TODO: Implement export job creation
-	// 1. Get user's CV
-	// 2. Create export job record
-	// 3. Queue for processing (or process synchronously for MVP)
-	// 4. Return job status
+	switch format {
+	case domain.ExportFormatPDF:
+		if !h.config.Features.EnableExportPDF {
+			httputil.Error(w, http.StatusNotImplemented, "PDF export is not enabled")
+			return
+		}
 
-	httputil.Error(w, http.StatusNotImplemented, "export not yet implemented")
+		ctx := r.Context()
+		userID := middleware.MustGetUserID(ctx)
+
+		pdfBytes, err := h.exportService.ExportPDF(ctx, userID)
+		if err != nil {
+			httputil.HandleError(w, err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/pdf")
+		w.Header().Set("Content-Disposition", `attachment; filename="export.pdf"`)
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(pdfBytes)
+	default:
+		httputil.Error(w, http.StatusNotImplemented, "export format not yet implemented")
+	}
 }
 
 // GetExport returns the status of an export job
 func (h *Handler) GetExport(w http.ResponseWriter, r *http.Request) {
-	// TODO: Implement export status retrieval
-	// 1. Get export job by ID
-	// 2. Verify user owns the job
-	// 3. Return status and download URL if complete
-
 	httputil.Error(w, http.StatusNotImplemented, "export not yet implemented")
 }
