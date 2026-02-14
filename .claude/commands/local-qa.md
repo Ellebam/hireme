@@ -8,16 +8,16 @@ The user may optionally describe what was changed. If not provided, infer from `
 
 ## Process
 
-### Phase 0: Chrome Extension Preflight
+### Phase 0: Playwright MCP Preflight
 
-Before anything else, verify the Chrome browser extension is connected — E2E tests depend on it.
+Before anything else, verify the Playwright MCP browser tools are available — E2E tests depend on them.
 
-1. **Call `tabs_context_mcp`** with `createIfEmpty: true`.
-2. **If it returns an error** (e.g. "No Chrome extension connected"):
+1. **Call `browser_snapshot`** to test that Playwright MCP is connected.
+2. **If it returns an error** (e.g. tool not found, MCP server not running):
    - **STOP immediately.** Do NOT proceed to any other phase.
-   - Tell the user: "Chrome extension is not connected. E2E browser tests cannot run. Please connect the Claude in Chrome extension and re-run `/local-qa`."
+   - Tell the user: "Playwright MCP is not available. E2E browser tests cannot run. Please ensure `.mcp.json` is configured and restart Claude Code, then re-run `/local-qa`."
    - Exit the command.
-3. **If it succeeds** — Log the tab group info and continue to Phase 1.
+3. **If it succeeds** — Playwright MCP is ready, continue to Phase 1.
 
 This gate ensures we never get halfway through QA only to discover E2E tests are impossible.
 
@@ -46,25 +46,23 @@ Report each check as PASS or FAIL with details.
 
 **Important**: Run the production build (Phase 2) AFTER E2E testing, or restart dev servers afterwards, since `next build` kills the dev server.
 
-**Test sequence using Chrome browser extension** (`mcp__claude-in-chrome__*` tools):
+**Test sequence using Playwright MCP** (`mcp__playwright__browser_*` tools):
 
-1. **Get tab context** — `tabs_context_mcp` to get or create a tab
-2. **Dashboard page** (`http://localhost:3000/`):
+1. **Dashboard page** — `browser_navigate` to `http://localhost:3000/`:
    - Page loads without crash
-   - CV card(s) render with correct data (title, template, section count)
+   - `browser_snapshot` — CV card(s) render with correct data (title, template, section count)
    - Navigation links present (Dashboard, Editor)
-   - Check console for errors (`read_console_messages` with `onlyErrors: true`)
-   - Note: Dark Reader extension hydration mismatches are expected, not our code
-3. **Editor page** (click Edit on a CV card):
+   - `browser_take_screenshot` for visual verification
+2. **Editor page** — Click Edit on a CV card using `browser_click`:
    - Page loads with CV preview showing all sections
-   - Left sidebar shows section list and CV structure
+   - `browser_snapshot` — Left sidebar shows section list and CV structure
    - Toolbar renders (template selector, zoom, undo/redo, export)
    - Click a section in preview — Properties panel opens on the right
-   - Template switching — Change template via `form_input` on the combobox, verify re-render
+   - Template switching — Use `browser_select_option` on the template combobox, verify re-render
    - Auto-save — Check for "Saved" indicator after changes
-   - Check console for errors
-4. **Navigation** — Go back to Dashboard, verify the persisted change is reflected
-5. **API verification** — Confirm data round-trips (changes made in editor appear on dashboard)
+   - `browser_take_screenshot` for visual verification
+3. **Navigation** — `browser_go_back` to Dashboard, verify the persisted change is reflected
+4. **API verification** — Confirm data round-trips (changes made in editor appear on dashboard)
 
 Screenshot each page and report observations.
 
@@ -93,7 +91,6 @@ Output a structured review following this format:
 | Template switching | PASS/FAIL | ... |
 | Data persistence | PASS/FAIL | ... |
 | Navigation | PASS/FAIL | ... |
-| Console errors | PASS/FAIL | ... |
 
 ### Issues
 (blocking) ...

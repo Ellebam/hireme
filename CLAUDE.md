@@ -76,6 +76,10 @@ task dev:kill-ports      # Graceful stop all dev port processes
 task dev:force-kill-ports  # Force kill (escalates to sudo if needed)
 ```
 
+## Tool Restrictions
+
+- **Never use the Obsidian MCP server** (`mcp__obsidian__*` tools). All markdown files in this project (CONTEXT.md, T-*-NOTES.md, etc.) are regular files — use Read, Edit, and Write tools directly.
+
 ## Dev Environment Notes
 
 - **`next build` kills `task web:dev`** — Running `npx next build` while the dev server is running will stop it. If you need both, run E2E tests first, then the build, or restart the dev server after.

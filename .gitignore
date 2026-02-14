@@ -68,6 +68,8 @@ Thumbs.db
 coverage/
 *.lcov
 .nyc_output/
+.qa-screenshots/
+.playwright-mcp/
 
 # ══════════════════════════════════════════════════════════════════════════════
 # MISC
