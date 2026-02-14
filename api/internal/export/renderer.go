@@ -195,8 +195,8 @@ func buildTemplateData(content domain.CVContent) TemplateData {
 		return ordered[i].order < ordered[j].order
 	})
 	allSections := make([]SectionData, len(ordered))
-	for i, o := range ordered {
-		allSections[i] = o.data
+	for i, entry := range ordered {
+		allSections[i] = entry.data
 	}
 
 	// Split for Visionary template
@@ -240,65 +240,65 @@ func parseSectionData(sec domain.CVSection) SectionData {
 
 	switch sec.Type {
 	case domain.SectionTypePersonal:
-		p := ParsePersonal(sec.Content)
-		fullName := strings.TrimSpace(p.FirstName + " " + p.LastName)
+		personal := ParsePersonal(sec.Content)
+		fullName := strings.TrimSpace(personal.FirstName + " " + personal.LastName)
 		var contactParts []string
-		if p.Email != "" {
-			contactParts = append(contactParts, p.Email)
+		if personal.Email != "" {
+			contactParts = append(contactParts, personal.Email)
 		}
-		if p.Phone != "" {
-			contactParts = append(contactParts, p.Phone)
+		if personal.Phone != "" {
+			contactParts = append(contactParts, personal.Phone)
 		}
-		if p.Location != "" {
-			contactParts = append(contactParts, p.Location)
+		if personal.Location != "" {
+			contactParts = append(contactParts, personal.Location)
 		}
 		sd.Personal = &PersonalData{
-			Content:      p,
+			Content:      personal,
 			FullName:     fullName,
 			ContactParts: contactParts,
 		}
 	case domain.SectionTypeSummary:
-		s := ParseSummary(sec.Content)
-		sd.Summary = &s
+		summary := ParseSummary(sec.Content)
+		sd.Summary = &summary
 	case domain.SectionTypeExperience:
-		e := ParseExperience(sec.Content)
-		sd.Experience = &e
+		experience := ParseExperience(sec.Content)
+		sd.Experience = &experience
 	case domain.SectionTypeEducation:
-		e := ParseEducation(sec.Content)
-		sd.Education = &e
+		education := ParseEducation(sec.Content)
+		sd.Education = &education
 	case domain.SectionTypeSkills:
-		s := ParseSkills(sec.Content)
-		sd.Skills = &s
+		skills := ParseSkills(sec.Content)
+		sd.Skills = &skills
 	case domain.SectionTypeLanguages:
-		l := ParseLanguages(sec.Content)
-		sd.Languages = &l
+		languages := ParseLanguages(sec.Content)
+		sd.Languages = &languages
 	}
 
 	return sd
 }
 
-func resolveStyling(s *domain.CVStyling) StylingData {
+func resolveStyling(styling *domain.CVStyling) StylingData {
 	primary := defaultPrimaryColor
 	secondary := defaultSecondaryColor
 	family := defaultFontFamily
 	size := defaultFontSize
-	lh := defaultLineHeight
+	lineHeightKey := defaultLineHeight
 
-	if s != nil {
-		if s.PrimaryColor != "" {
-			primary = s.PrimaryColor
+	if styling != nil {
+		if styling.PrimaryColor != "" {
+			primary = styling.PrimaryColor
 		}
-		if s.SecondaryColor != "" {
-			secondary = s.SecondaryColor
+		if styling.SecondaryColor != "" {
+			secondary = styling.SecondaryColor
 		}
-		if s.FontFamily != "" {
-			family = s.FontFamily
+		if styling.FontFamily != "" {
+			family = styling.FontFamily
 		}
-		if s.FontSize != "" {
-			size = s.FontSize
+		if styling.FontSize != "" {
+			size = styling.FontSize
 		}
-		if s.LineHeight != "" {
-			lh = s.LineHeight
+		if styling.LineHeight != "" {
+			lineHeightKey = styling.LineHeight
 		}
 	}
 
@@ -312,7 +312,7 @@ func resolveStyling(s *domain.CVStyling) StylingData {
 		fontSize = fontSizes[defaultFontSize]
 	}
 
-	lineHeight := lineHeights[lh]
+	lineHeight := lineHeights[lineHeightKey]
 	if lineHeight == "" {
 		lineHeight = lineHeights[defaultLineHeight]
 	}
@@ -374,8 +374,8 @@ func degreeField(degree, field string) string {
 
 func skillNames(skills []domain.Skill) string {
 	names := make([]string, len(skills))
-	for i, s := range skills {
-		names[i] = s.Name
+	for i, skill := range skills {
+		names[i] = skill.Name
 	}
 	return strings.Join(names, ", ")
 }

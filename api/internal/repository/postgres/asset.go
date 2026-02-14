@@ -82,12 +82,12 @@ func (r *AssetRepository) Create(ctx context.Context, asset *domain.Asset) error
 	// Convert dimensions
 	var width, height *int32
 	if asset.Width != nil {
-		w := int32(*asset.Width)
-		width = &w
+		widthVal := int32(*asset.Width)
+		width = &widthVal
 	}
 	if asset.Height != nil {
-		h := int32(*asset.Height)
-		height = &h
+		heightVal := int32(*asset.Height)
+		height = &heightVal
 	}
 
 	created, err := r.q.CreateAsset(ctx, queries.CreateAssetParams{
@@ -131,12 +131,12 @@ func assetToDomain(a queries.Asset) *domain.Asset {
 	}
 
 	if a.Width != nil {
-		w := int(*a.Width)
-		asset.Width = &w
+		width := int(*a.Width)
+		asset.Width = &width
 	}
 	if a.Height != nil {
-		h := int(*a.Height)
-		asset.Height = &h
+		height := int(*a.Height)
+		asset.Height = &height
 	}
 	if a.Metadata != nil {
 		asset.Metadata = json.RawMessage(a.Metadata)
