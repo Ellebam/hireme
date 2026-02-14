@@ -353,6 +353,16 @@ New feedback: say `stakeholder feedback: [description]` → PM agent creates/upd
 
 ---
 
+## Coding Guidelines
+
+### Variable Naming
+- Use descriptive variable names — no single-letter or cryptic abbreviations
+- Good: `personal`, `styling`, `downloadLink`, `bytesPerUnit`, `lineHeightKey`, `widthVal`
+- Bad: `p`, `s`, `a`, `k`, `lh`, `w`
+- Loop indices (`i`, `j`) are acceptable when the context is obvious
+
+---
+
 ## Key Patterns
 
 ### Auth Bypass (Development)
