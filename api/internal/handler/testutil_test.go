@@ -511,7 +511,7 @@ func (h *TestHandler) CreateExport(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/pdf")
 		w.Header().Set("Content-Disposition", `attachment; filename="export.pdf"`)
 		w.WriteHeader(http.StatusOK)
-		w.Write(pdfBytes)
+		_, _ = w.Write(pdfBytes)
 	default:
 		httputil.Error(w, http.StatusNotImplemented, "export format not yet implemented")
 	}

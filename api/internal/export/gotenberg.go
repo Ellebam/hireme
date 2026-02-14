@@ -63,7 +63,7 @@ func (g *GotenbergClient) ConvertHTMLToPDF(ctx context.Context, html string) ([]
 	if err != nil {
 		return nil, fmt.Errorf("calling gotenberg: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {

@@ -89,6 +89,10 @@ func main() {
 		slog.Error("failed to create HTML renderer", "error", err)
 		os.Exit(1)
 	}
+	if cfg.Features.EnableExportPDF && cfg.Export.GotenbergURL == "" {
+		slog.Error("PDF export enabled but GotenbergURL not configured")
+		os.Exit(1)
+	}
 	gotenbergClient := export.NewGotenbergClient(cfg.Export.GotenbergURL)
 	exportSvc := service.NewExportService(cvRepo, renderer, gotenbergClient)
 
