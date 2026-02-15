@@ -17,6 +17,7 @@ uploads/
 # GO
 # ══════════════════════════════════════════════════════════════════════════════
 api/bin/
+api/server
 api/tmp/
 api/coverage.out
 api/coverage.html
