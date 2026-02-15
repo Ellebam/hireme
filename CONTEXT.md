@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — T-001, T-002, T-003, T-004, T-006, T-007 done, 9 tasks remaining, 9 unblocked
+**Status:** Task-based workflow active — T-001–T-007 done, 8 tasks remaining, 8 unblocked
 
 ### What's Working
 
@@ -41,7 +41,7 @@
 - ✅ Build verified, full stack integration tested
 
 ### Remaining Work
-- ❌ Export (`POST /api/v1/export/{format}`) — PDF working (T-003), DOCX working (T-004), frontend wiring pending → T-005
+- ✅ Export: PDF (T-003), DOCX (T-004), frontend wiring (T-005) — all working
 - ❌ R2 cloud storage — placeholder only, needs AWS SDK implementation → T-013
 
 ---
@@ -185,6 +185,7 @@ DELETE /api/v1/cv/{id}          → Delete CV
 POST /api/v1/assets             → Upload asset (image)
 GET  /api/v1/assets/{id}        → Get asset metadata
 DELETE /api/v1/assets/{id}      → Delete asset
+POST /api/v1/export/{format}    → Export CV (pdf, docx)
 ```
 
 ---
@@ -230,7 +231,6 @@ task api:sqlc          # Generate sqlc code
 ### Backlog
 | ID | Task | Blocked By | Size |
 |----|------|------------|------|
-| T-005 | Wire frontend export modal to real API | — | S |
 | T-008 | P1 interaction tests — editors | — | S |
 | T-009 | P1 interaction tests — export error paths | — | XS |
 | T-010 | P2 UX regression tests | — | S |
@@ -249,17 +249,11 @@ task api:sqlc          # Generate sqlc code
 | T-002 | Create HTML generation for CV export | feat/t-002-html-generation |
 | T-003 | Implement PDF export via Gotenberg | feat/t-003-pdf-export |
 | T-004 | Implement DOCX export via godocx | feat/t-004-docx-export |
+| T-005 | Wire frontend export modal to real API | (shipped in MVP) |
 
 ---
 
 ## Task Details
-
-**T-005: Wire frontend export modal to real API** — S
-- Connect existing ExportModal buttons to actual API calls
-- Download file to browser (PDF, DOCX); JSON export already works
-- Show loading state and error handling
-- Tests: component test for export flow, API client test for export methods
-- Acceptance: Click "Export PDF" in UI, browser downloads PDF
 
 **T-008: P1 interaction tests — editors** — S
 - ExperienceEditor + SkillsEditor interaction tests
@@ -303,11 +297,11 @@ task api:sqlc          # Generate sqlc code
 
 ### Dependency Graph
 ```
-T-005 through T-012: ALL INDEPENDENT (any order)
+T-008 through T-012: ALL INDEPENDENT (any order)
 T-013, T-014, T-015: Future backlog, independent
 ```
 
-All 9 remaining tasks have zero dependencies and can be picked up in any order.
+All 8 remaining tasks have zero dependencies and can be picked up in any order.
 
 ---
 
