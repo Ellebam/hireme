@@ -35,9 +35,15 @@ func readDocumentXML(t *testing.T, docxBytes []byte) string {
 			if err != nil {
 				t.Fatalf("opening document.xml: %v", err)
 			}
-			defer rc.Close()
+			defer func() {
+				if err := rc.Close(); err != nil {
+					t.Fatalf("closing document.xml: %v", err)
+				}
+			}()
 			var buf bytes.Buffer
-			buf.ReadFrom(rc)
+			if _, err := buf.ReadFrom(rc); err != nil {
+				t.Fatalf("reading document.xml: %v", err)
+			}
 			return buf.String()
 		}
 	}
