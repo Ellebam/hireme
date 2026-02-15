@@ -9,10 +9,10 @@
 # Bugs
 - it seems we still have bugs saving a cv after we made changes to it. We suspect the switch of the templates makes the saving get broken in the backend
 - the frontend is still not responsive enough, we should do way more testing and adjusting in terms of viewports and also different clients. We want to have mobile users have also a good time editing cvs.
--  Much Clipping issues in regards to half screen windows, looks really off
+-  Much clipping issues in regards to half-screen windows, looks really off
 
 # Findings
 - currently each clicked section will have a button displayed that says "click to edit". The button is still there even when you are already in the opened sidebar or modal to edit. It should either be removed when you are in the edit pane or not displayed at all
-- when clicking any section you often are not directly able to edit them. We should build our components in a way, that when you click them in a subcompontents (e.g. textfield in section) you should be able to edit it directly without an extra click (maybe keyboard focus directly in the edit field needed)
+- when clicking any section you often are not directly able to edit them. We should build our components in a way, that when you click them in a subcomponents (e.g. textfield in section) you should be able to edit it directly without an extra click (maybe keyboard focus directly in the edit field needed)
 - the frontend looks really bland and boring. We need to do a full design overhaul and generate our visual direction for the app
-- the general export of cvs in docx works but the styling is missmatched and does not look like the actual cv  design. We need to update it to match. This task should be tackled after we have finalized the stylings of the cv templates
+- the general export of CVs in DOCX works but the styling is mismatched and does not look like the actual CV design. We need to update it to match. This task should be tackled after we have finalized the stylings of the CV templates
