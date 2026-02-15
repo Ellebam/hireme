@@ -49,6 +49,25 @@ func (h *Handler) CreateExport(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Disposition", `attachment; filename="export.pdf"`)
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write(pdfBytes)
+	case domain.ExportFormatDOCX:
+		if !h.config.Features.EnableExportDOCX {
+			httputil.Error(w, http.StatusNotImplemented, "DOCX export is not enabled")
+			return
+		}
+
+		ctx := r.Context()
+		userID := middleware.MustGetUserID(ctx)
+
+		docxBytes, err := h.exportService.ExportDOCX(ctx, userID)
+		if err != nil {
+			httputil.HandleError(w, err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+		w.Header().Set("Content-Disposition", `attachment; filename="export.docx"`)
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(docxBytes)
 	default:
 		httputil.Error(w, http.StatusNotImplemented, "export format not yet implemented")
 	}

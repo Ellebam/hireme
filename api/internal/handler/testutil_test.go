@@ -45,6 +45,7 @@ type AssetServiceInterface interface {
 // ExportServiceInterface defines the export service methods used by handlers
 type ExportServiceInterface interface {
 	ExportPDF(ctx context.Context, userID string) ([]byte, error)
+	ExportDOCX(ctx context.Context, userID string) ([]byte, error)
 }
 
 // MockUserService is a mock implementation of UserServiceInterface
@@ -141,12 +142,20 @@ func (m *MockAssetService) Delete(ctx context.Context, id uuid.UUID, userID stri
 
 // MockExportService is a mock implementation of ExportServiceInterface
 type MockExportService struct {
-	ExportPDFFunc func(ctx context.Context, userID string) ([]byte, error)
+	ExportPDFFunc  func(ctx context.Context, userID string) ([]byte, error)
+	ExportDOCXFunc func(ctx context.Context, userID string) ([]byte, error)
 }
 
 func (m *MockExportService) ExportPDF(ctx context.Context, userID string) ([]byte, error) {
 	if m.ExportPDFFunc != nil {
 		return m.ExportPDFFunc(ctx, userID)
+	}
+	return nil, domain.ErrNotFound
+}
+
+func (m *MockExportService) ExportDOCX(ctx context.Context, userID string) ([]byte, error) {
+	if m.ExportDOCXFunc != nil {
+		return m.ExportDOCXFunc(ctx, userID)
 	}
 	return nil, domain.ErrNotFound
 }
@@ -512,6 +521,25 @@ func (h *TestHandler) CreateExport(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Disposition", `attachment; filename="export.pdf"`)
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write(pdfBytes)
+	case domain.ExportFormatDOCX:
+		if !h.config.Features.EnableExportDOCX {
+			httputil.Error(w, http.StatusNotImplemented, "DOCX export is not enabled")
+			return
+		}
+
+		ctx := r.Context()
+		userID := middleware.MustGetUserID(ctx)
+
+		docxBytes, err := h.exportService.ExportDOCX(ctx, userID)
+		if err != nil {
+			httputil.HandleError(w, err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+		w.Header().Set("Content-Disposition", `attachment; filename="export.docx"`)
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(docxBytes)
 	default:
 		httputil.Error(w, http.StatusNotImplemented, "export format not yet implemented")
 	}

@@ -108,8 +108,11 @@ export function ExportModal() {
     downloadLink.download = filename;
     document.body.appendChild(downloadLink);
     downloadLink.click();
-    document.body.removeChild(downloadLink);
-    URL.revokeObjectURL(url);
+    // Delay cleanup so the browser can start the download before the blob URL is revoked
+    setTimeout(() => {
+      document.body.removeChild(downloadLink);
+      URL.revokeObjectURL(url);
+    }, 150);
   };
 
   return (

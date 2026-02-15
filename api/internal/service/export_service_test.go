@@ -75,7 +75,7 @@ func TestExportPDF_Success(t *testing.T) {
 		},
 	}
 
-	svc := NewExportService(repo, renderer, pdf)
+	svc := NewExportService(repo, renderer, pdf, nil)
 	result, err := svc.ExportPDF(context.Background(), "user-1")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -94,7 +94,7 @@ func TestExportPDF_CVNotFound(t *testing.T) {
 	renderer := &mockRenderer{RenderFunc: func(domain.CVContent) (string, error) { return "", nil }}
 	pdf := &mockPDFConverter{ConvertFunc: func(context.Context, string) ([]byte, error) { return nil, nil }}
 
-	svc := NewExportService(repo, renderer, pdf)
+	svc := NewExportService(repo, renderer, pdf, nil)
 	_, err := svc.ExportPDF(context.Background(), "user-1")
 	if err == nil {
 		t.Fatal("expected error, got nil")
@@ -117,7 +117,7 @@ func TestExportPDF_RenderError(t *testing.T) {
 	}
 	pdf := &mockPDFConverter{ConvertFunc: func(context.Context, string) ([]byte, error) { return nil, nil }}
 
-	svc := NewExportService(repo, renderer, pdf)
+	svc := NewExportService(repo, renderer, pdf, nil)
 	_, err := svc.ExportPDF(context.Background(), "user-1")
 	if err == nil {
 		t.Fatal("expected error, got nil")
@@ -142,7 +142,7 @@ func TestExportPDF_ConvertError(t *testing.T) {
 		},
 	}
 
-	svc := NewExportService(repo, renderer, pdf)
+	svc := NewExportService(repo, renderer, pdf, nil)
 	_, err := svc.ExportPDF(context.Background(), "user-1")
 	if err == nil {
 		t.Fatal("expected error, got nil")
@@ -161,7 +161,7 @@ func TestExportPDF_ParseContentError(t *testing.T) {
 	renderer := &mockRenderer{RenderFunc: func(domain.CVContent) (string, error) { return "", nil }}
 	pdf := &mockPDFConverter{ConvertFunc: func(context.Context, string) ([]byte, error) { return nil, nil }}
 
-	svc := NewExportService(repo, renderer, pdf)
+	svc := NewExportService(repo, renderer, pdf, nil)
 	_, err := svc.ExportPDF(context.Background(), "user-1")
 	if err == nil {
 		t.Fatal("expected error from invalid JSON, got nil")
@@ -183,12 +183,143 @@ func TestExportPDF_EmptyHTML(t *testing.T) {
 		},
 	}
 
-	svc := NewExportService(repo, renderer, pdf)
+	svc := NewExportService(repo, renderer, pdf, nil)
 	result, err := svc.ExportPDF(context.Background(), "user-1")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	if string(result) != "%PDF-empty" {
 		t.Errorf("expected PDF bytes, got %q", result)
+	}
+}
+
+// mockDOCXGenerator implements export.DOCXGenerator for testing
+type mockDOCXGenerator struct {
+	GenerateFunc func(content domain.CVContent) ([]byte, error)
+}
+
+func (m *mockDOCXGenerator) Generate(content domain.CVContent) ([]byte, error) {
+	return m.GenerateFunc(content)
+}
+
+func TestExportDOCX_Success(t *testing.T) {
+	expectedDOCX := []byte("PK fake docx")
+
+	repo := &mockCVRepo{
+		GetByUserIDFunc: func(ctx context.Context, userID string) (*domain.CV, error) {
+			return &domain.CV{ID: uuid.New(), UserID: userID, Content: exportTestCVContent()}, nil
+		},
+	}
+	renderer := &mockRenderer{
+		RenderFunc: func(domain.CVContent) (string, error) {
+			t.Fatal("renderer should not be called for DOCX")
+			return "", nil
+		},
+	}
+	docx := &mockDOCXGenerator{
+		GenerateFunc: func(content domain.CVContent) ([]byte, error) {
+			if content.SchemaVersion != "1.0.0" {
+				t.Errorf("expected schemaVersion 1.0.0, got %q", content.SchemaVersion)
+			}
+			if content.TemplateID != "classic" {
+				t.Errorf("expected templateId classic, got %q", content.TemplateID)
+			}
+			return expectedDOCX, nil
+		},
+	}
+
+	svc := NewExportService(repo, renderer, nil, docx)
+	result, err := svc.ExportDOCX(context.Background(), "user-1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if string(result) != string(expectedDOCX) {
+		t.Errorf("expected %q, got %q", expectedDOCX, result)
+	}
+}
+
+func TestExportDOCX_CVNotFound(t *testing.T) {
+	repo := &mockCVRepo{
+		GetByUserIDFunc: func(ctx context.Context, userID string) (*domain.CV, error) {
+			return nil, domain.ErrNotFound
+		},
+	}
+	renderer := &mockRenderer{RenderFunc: func(domain.CVContent) (string, error) { return "", nil }}
+	docx := &mockDOCXGenerator{GenerateFunc: func(domain.CVContent) ([]byte, error) { return nil, nil }}
+
+	svc := NewExportService(repo, renderer, nil, docx)
+	_, err := svc.ExportDOCX(context.Background(), "user-1")
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+	if !errors.Is(err, domain.ErrNotFound) {
+		t.Errorf("expected ErrNotFound, got %v", err)
+	}
+}
+
+func TestExportDOCX_GenerateError(t *testing.T) {
+	repo := &mockCVRepo{
+		GetByUserIDFunc: func(ctx context.Context, userID string) (*domain.CV, error) {
+			return &domain.CV{ID: uuid.New(), Content: exportTestCVContent()}, nil
+		},
+	}
+	renderer := &mockRenderer{RenderFunc: func(domain.CVContent) (string, error) { return "", nil }}
+	docx := &mockDOCXGenerator{
+		GenerateFunc: func(domain.CVContent) ([]byte, error) {
+			return nil, errors.New("docx generation failed")
+		},
+	}
+
+	svc := NewExportService(repo, renderer, nil, docx)
+	_, err := svc.ExportDOCX(context.Background(), "user-1")
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+	if got := err.Error(); got != "generating DOCX: docx generation failed" {
+		t.Errorf("unexpected error: %s", got)
+	}
+}
+
+func TestExportDOCX_ParseContentError(t *testing.T) {
+	repo := &mockCVRepo{
+		GetByUserIDFunc: func(ctx context.Context, userID string) (*domain.CV, error) {
+			return &domain.CV{ID: uuid.New(), Content: json.RawMessage("not json")}, nil
+		},
+	}
+	renderer := &mockRenderer{RenderFunc: func(domain.CVContent) (string, error) { return "", nil }}
+	docx := &mockDOCXGenerator{GenerateFunc: func(domain.CVContent) ([]byte, error) { return nil, nil }}
+
+	svc := NewExportService(repo, renderer, nil, docx)
+	_, err := svc.ExportDOCX(context.Background(), "user-1")
+	if err == nil {
+		t.Fatal("expected error from invalid JSON, got nil")
+	}
+}
+
+func TestExportDOCX_EmptySections(t *testing.T) {
+	repo := &mockCVRepo{
+		GetByUserIDFunc: func(ctx context.Context, userID string) (*domain.CV, error) {
+			return &domain.CV{ID: uuid.New(), Content: exportTestCVContent()}, nil
+		},
+	}
+	renderer := &mockRenderer{
+		RenderFunc: func(domain.CVContent) (string, error) {
+			t.Fatal("renderer should not be called for DOCX")
+			return "", nil
+		},
+	}
+	docx := &mockDOCXGenerator{
+		GenerateFunc: func(content domain.CVContent) ([]byte, error) {
+			return []byte("PK-empty"), nil
+		},
+	}
+
+	svc := NewExportService(repo, renderer, nil, docx)
+	result, err := svc.ExportDOCX(context.Background(), "user-1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if string(result) != "PK-empty" {
+		t.Errorf("expected DOCX bytes, got %q", result)
 	}
 }

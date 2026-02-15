@@ -16,7 +16,7 @@ type PDFConverter interface {
 	ConvertHTMLToPDF(ctx context.Context, html string) ([]byte, error)
 }
 
-// GotenbergClient calls Gotenberg's Chromium HTML-to-PDF endpoint.
+// GotenbergClient calls Gotenberg's conversion endpoints.
 type GotenbergClient struct {
 	url        string
 	httpClient *http.Client
@@ -34,6 +34,11 @@ func NewGotenbergClient(url string) *GotenbergClient {
 
 // ConvertHTMLToPDF sends HTML to Gotenberg and returns PDF bytes.
 func (g *GotenbergClient) ConvertHTMLToPDF(ctx context.Context, html string) ([]byte, error) {
+	return g.convertHTML(ctx, html, "/forms/chromium/convert/html")
+}
+
+// convertHTML sends HTML to a Gotenberg endpoint and returns the converted bytes.
+func (g *GotenbergClient) convertHTML(ctx context.Context, html string, endpoint string) ([]byte, error) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 
@@ -53,7 +58,7 @@ func (g *GotenbergClient) ConvertHTMLToPDF(ctx context.Context, html string) ([]
 		return nil, fmt.Errorf("closing multipart writer: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, g.url+"/forms/chromium/convert/html", body)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, g.url+endpoint, body)
 	if err != nil {
 		return nil, fmt.Errorf("creating request: %w", err)
 	}

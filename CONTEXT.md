@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — T-001, T-002, T-003, T-006, T-007 done, 10 tasks remaining, 10 unblocked
+**Status:** Task-based workflow active — T-001, T-002, T-003, T-004, T-006, T-007 done, 9 tasks remaining, 9 unblocked
 
 ### What's Working
 
@@ -41,7 +41,7 @@
 - ✅ Build verified, full stack integration tested
 
 ### Remaining Work
-- ❌ Export (`POST /api/v1/export/{format}`) — PDF working (T-003), DOCX pending → T-004, T-005
+- ❌ Export (`POST /api/v1/export/{format}`) — PDF working (T-003), DOCX working (T-004), frontend wiring pending → T-005
 - ❌ R2 cloud storage — placeholder only, needs AWS SDK implementation → T-013
 
 ---
@@ -53,7 +53,7 @@
 | Backend | Go 1.22+, Chi router, sqlc |
 | Frontend | Next.js 15, React 19, Tailwind, shadcn/ui, Zustand, dnd-kit |
 | Database | PostgreSQL 16 (JSONB for CV content) |
-| Export | Gotenberg (HTML → PDF/DOCX) |
+| Export | Gotenberg (HTML → PDF), godocx (CV data → DOCX) |
 | Storage | Local filesystem (dev), Cloudflare R2 (prod) |
 | Testing | Vitest (frontend), Go testing (backend - planned) |
 
@@ -230,8 +230,7 @@ task api:sqlc          # Generate sqlc code
 ### Backlog
 | ID | Task | Blocked By | Size |
 |----|------|------------|------|
-| T-004 | Implement DOCX export via Gotenberg | — | S |
-| T-005 | Wire frontend export modal to real API | T-004 | S |
+| T-005 | Wire frontend export modal to real API | — | S |
 | T-008 | P1 interaction tests — editors | — | S |
 | T-009 | P1 interaction tests — export error paths | — | XS |
 | T-010 | P2 UX regression tests | — | S |
@@ -249,16 +248,11 @@ task api:sqlc          # Generate sqlc code
 | T-007 | P0 smoke tests — page components | test/t-006-007-smoke-tests |
 | T-002 | Create HTML generation for CV export | feat/t-002-html-generation |
 | T-003 | Implement PDF export via Gotenberg | feat/t-003-pdf-export |
+| T-004 | Implement DOCX export via godocx | feat/t-004-docx-export |
 
 ---
 
 ## Task Details
-
-**T-004: Implement DOCX export via Gotenberg** — S
-- Wire `POST /api/v1/export/docx` using Gotenberg's LibreOffice endpoint
-- Same HTML input as PDF, different Gotenberg conversion
-- Tests: handler test (mock Gotenberg), integration test (real Gotenberg)
-- Acceptance: `curl` export endpoint returns valid DOCX
 
 **T-005: Wire frontend export modal to real API** — S
 - Connect existing ExportModal buttons to actual API calls
@@ -309,13 +303,11 @@ task api:sqlc          # Generate sqlc code
 
 ### Dependency Graph
 ```
-T-004 → T-005
-
-T-008 through T-012: ALL INDEPENDENT (any order)
+T-005 through T-012: ALL INDEPENDENT (any order)
 T-013, T-014, T-015: Future backlog, independent
 ```
 
-9 out of 10 remaining tasks have zero dependencies and can be picked up in any order.
+All 9 remaining tasks have zero dependencies and can be picked up in any order.
 
 ---
 

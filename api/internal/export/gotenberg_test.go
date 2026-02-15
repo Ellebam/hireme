@@ -119,3 +119,4 @@ func TestConvertHTMLToPDF_ServerError(t *testing.T) {
 		t.Errorf("expected error %q, got %q", expected, err.Error())
 	}
 }
+
