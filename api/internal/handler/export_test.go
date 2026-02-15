@@ -96,8 +96,45 @@ func TestCreateExport_PDF_ServiceError(t *testing.T) {
 	}
 }
 
-func TestCreateExport_DOCX_NotImplemented(t *testing.T) {
-	h := NewTestHandler(nil, nil, nil, nil)
+func TestCreateExport_DOCX_Success(t *testing.T) {
+	expectedDOCX := []byte("PK fake docx content")
+	userID := "user-123"
+
+	mockExportSvc := &MockExportService{
+		ExportDOCXFunc: func(ctx context.Context, uid string) ([]byte, error) {
+			if uid != userID {
+				t.Errorf("expected userID %q, got %q", userID, uid)
+			}
+			return expectedDOCX, nil
+		},
+	}
+
+	h := NewTestHandler(nil, nil, nil, mockExportSvc)
+
+	req := newAuthenticatedRequestWithParams("POST", "/export/docx", userID, nil, map[string]string{"format": "docx"})
+	rr := httptest.NewRecorder()
+
+	h.CreateExport(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", rr.Code)
+	}
+	if ct := rr.Header().Get("Content-Type"); ct != "application/vnd.openxmlformats-officedocument.wordprocessingml.document" {
+		t.Errorf("expected DOCX Content-Type, got %q", ct)
+	}
+	if cd := rr.Header().Get("Content-Disposition"); cd != `attachment; filename="export.docx"` {
+		t.Errorf("expected Content-Disposition with export.docx, got %q", cd)
+	}
+	if rr.Body.String() != string(expectedDOCX) {
+		t.Errorf("expected body %q, got %q", expectedDOCX, rr.Body.String())
+	}
+}
+
+func TestCreateExport_DOCX_FeatureDisabled(t *testing.T) {
+	h := NewTestHandler(nil, nil, nil, &MockExportService{})
+	h.config = &config.Config{
+		Features: config.FeaturesConfig{EnableExportDOCX: false},
+	}
 
 	req := newAuthenticatedRequestWithParams("POST", "/export/docx", "user-1", nil, map[string]string{"format": "docx"})
 	rr := httptest.NewRecorder()
@@ -106,5 +143,24 @@ func TestCreateExport_DOCX_NotImplemented(t *testing.T) {
 
 	if rr.Code != http.StatusNotImplemented {
 		t.Errorf("expected 501, got %d", rr.Code)
+	}
+}
+
+func TestCreateExport_DOCX_ServiceError(t *testing.T) {
+	mockExportSvc := &MockExportService{
+		ExportDOCXFunc: func(ctx context.Context, userID string) ([]byte, error) {
+			return nil, domain.ErrNotFound
+		},
+	}
+
+	h := NewTestHandler(nil, nil, nil, mockExportSvc)
+
+	req := newAuthenticatedRequestWithParams("POST", "/export/docx", "user-1", nil, map[string]string{"format": "docx"})
+	rr := httptest.NewRecorder()
+
+	h.CreateExport(rr, req)
+
+	if rr.Code != http.StatusNotFound {
+		t.Errorf("expected 404, got %d", rr.Code)
 	}
 }

@@ -94,7 +94,8 @@ func main() {
 		os.Exit(1)
 	}
 	gotenbergClient := export.NewGotenbergClient(cfg.Export.GotenbergURL)
-	exportSvc := service.NewExportService(cvRepo, renderer, gotenbergClient)
+	docxGenerator := export.NewGodocxGenerator()
+	exportSvc := service.NewExportService(cvRepo, renderer, gotenbergClient, docxGenerator)
 
 	// Initialize handlers
 	h := handler.New(handler.Dependencies{
