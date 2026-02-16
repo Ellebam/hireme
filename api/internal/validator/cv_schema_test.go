@@ -243,6 +243,131 @@ func TestValidateTemplateID_Invalid(t *testing.T) {
 	}
 }
 
+func TestCVValidator_Validate_EmptyEntriesSection(t *testing.T) {
+	validator, err := NewCVValidator()
+	if err != nil {
+		t.Fatalf("failed to create validator: %v", err)
+	}
+
+	// A certifications section with empty entries should validate
+	// (this was previously broken due to oneOf collision)
+	cv := `{
+		"schemaVersion": "1.0.0",
+		"templateId": "classic",
+		"sections": [
+			{
+				"id": "550e8400-e29b-41d4-a716-446655440001",
+				"type": "certifications",
+				"order": 0,
+				"content": { "entries": [] }
+			}
+		]
+	}`
+
+	err = validator.Validate(json.RawMessage(cv))
+	if err != nil {
+		t.Errorf("expected empty certifications entries to pass validation, got: %v", err)
+	}
+}
+
+func TestCVValidator_Validate_MultipleEmptyEntriesSections(t *testing.T) {
+	validator, err := NewCVValidator()
+	if err != nil {
+		t.Fatalf("failed to create validator: %v", err)
+	}
+
+	// Multiple entry-based sections all with empty entries
+	cv := `{
+		"schemaVersion": "1.0.0",
+		"templateId": "classic",
+		"sections": [
+			{
+				"id": "550e8400-e29b-41d4-a716-446655440001",
+				"type": "certifications",
+				"order": 0,
+				"content": { "entries": [] }
+			},
+			{
+				"id": "550e8400-e29b-41d4-a716-446655440002",
+				"type": "projects",
+				"order": 1,
+				"content": { "entries": [] }
+			},
+			{
+				"id": "550e8400-e29b-41d4-a716-446655440003",
+				"type": "awards",
+				"order": 2,
+				"content": { "entries": [] }
+			}
+		]
+	}`
+
+	err = validator.Validate(json.RawMessage(cv))
+	if err != nil {
+		t.Errorf("expected multiple empty-entries sections to pass validation, got: %v", err)
+	}
+}
+
+func TestCVValidator_Validate_PopulatedCertificationsSection(t *testing.T) {
+	validator, err := NewCVValidator()
+	if err != nil {
+		t.Fatalf("failed to create validator: %v", err)
+	}
+
+	cv := `{
+		"schemaVersion": "1.0.0",
+		"templateId": "classic",
+		"sections": [
+			{
+				"id": "550e8400-e29b-41d4-a716-446655440001",
+				"type": "certifications",
+				"order": 0,
+				"content": {
+					"entries": [
+						{
+							"id": "550e8400-e29b-41d4-a716-446655440010",
+							"name": "AWS Solutions Architect",
+							"issuer": "Amazon Web Services",
+							"date": "2023-06"
+						}
+					]
+				}
+			}
+		]
+	}`
+
+	err = validator.Validate(json.RawMessage(cv))
+	if err != nil {
+		t.Errorf("expected populated certifications to pass validation, got: %v", err)
+	}
+}
+
+func TestCVValidator_Validate_WrongContentForSectionType(t *testing.T) {
+	validator, err := NewCVValidator()
+	if err != nil {
+		t.Fatalf("failed to create validator: %v", err)
+	}
+
+	// Certifications section with summary content (has "text" instead of "entries")
+	cv := `{
+		"schemaVersion": "1.0.0",
+		"templateId": "classic",
+		"sections": [
+			{
+				"id": "550e8400-e29b-41d4-a716-446655440001",
+				"type": "certifications",
+				"order": 0,
+				"content": { "text": "This is summary content, not certifications" }
+			}
+		]
+	}`
+
+	err = validator.Validate(json.RawMessage(cv))
+	if err == nil {
+		t.Error("expected validation error for wrong content type in certifications section, got nil")
+	}
+}
+
 func TestValidateLocale_Valid(t *testing.T) {
 	validLocales := []string{"en", "de"}
 

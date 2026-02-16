@@ -12,7 +12,7 @@
     },
     "templateId": {
       "type": "string",
-      "enum": ["classic", "modern", "minimal"],
+      "enum": ["classic", "modern", "visionary"],
       "description": "Base template for rendering"
     },
     "locale": {
@@ -83,25 +83,62 @@
           "description": "Custom section title (optional, uses type label if not set)"
         },
         "content": {
-          "oneOf": [
-            { "$ref": "#/$defs/personalContent" },
-            { "$ref": "#/$defs/summaryContent" },
-            { "$ref": "#/$defs/experienceContent" },
-            { "$ref": "#/$defs/educationContent" },
-            { "$ref": "#/$defs/skillsContent" },
-            { "$ref": "#/$defs/languagesContent" },
-            { "$ref": "#/$defs/certificationsContent" },
-            { "$ref": "#/$defs/projectsContent" },
-            { "$ref": "#/$defs/awardsContent" },
-            { "$ref": "#/$defs/publicationsContent" },
-            { "$ref": "#/$defs/referencesContent" },
-            { "$ref": "#/$defs/customContent" }
-          ],
-          "description": "Section-specific content"
+          "type": "object",
+          "description": "Section-specific content (validated by type-conditional allOf below)"
         }
       },
       "required": ["id", "type", "order", "content"],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "personal" } }, "required": ["type"] },
+          "then": { "properties": { "content": { "$ref": "#/$defs/personalContent" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "summary" } }, "required": ["type"] },
+          "then": { "properties": { "content": { "$ref": "#/$defs/summaryContent" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "experience" } }, "required": ["type"] },
+          "then": { "properties": { "content": { "$ref": "#/$defs/experienceContent" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "education" } }, "required": ["type"] },
+          "then": { "properties": { "content": { "$ref": "#/$defs/educationContent" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "skills" } }, "required": ["type"] },
+          "then": { "properties": { "content": { "$ref": "#/$defs/skillsContent" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "languages" } }, "required": ["type"] },
+          "then": { "properties": { "content": { "$ref": "#/$defs/languagesContent" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "certifications" } }, "required": ["type"] },
+          "then": { "properties": { "content": { "$ref": "#/$defs/certificationsContent" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "projects" } }, "required": ["type"] },
+          "then": { "properties": { "content": { "$ref": "#/$defs/projectsContent" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "awards" } }, "required": ["type"] },
+          "then": { "properties": { "content": { "$ref": "#/$defs/awardsContent" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "publications" } }, "required": ["type"] },
+          "then": { "properties": { "content": { "$ref": "#/$defs/publicationsContent" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "references" } }, "required": ["type"] },
+          "then": { "properties": { "content": { "$ref": "#/$defs/referencesContent" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "custom" } }, "required": ["type"] },
+          "then": { "properties": { "content": { "$ref": "#/$defs/customContent" } } }
+        }
+      ]
     },
 
     "personalContent": {
