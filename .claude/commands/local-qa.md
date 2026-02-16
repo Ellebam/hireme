@@ -109,6 +109,32 @@ If you started dev servers (API/Web) during Phase 3:
 3. If any ports are still occupied, run `task dev:force-kill-ports` as a last resort.
 4. **Always clean up** — even if earlier phases failed. Orphaned servers block future runs.
 
+### Phase 6: Write Findings to Task Notes
+
+If the verdict is **FAIL** or **PASS WITH NOTES** (i.e. there are blocking, non-blocking, or noteworthy findings), append the findings to the task notes file.
+
+1. **Identify the notes file** — Derive from the current branch name or the `$TASK_DESCRIPTION` argument:
+   - Branch `feat/t-011-012-*` → `T-011-012-NOTES.md`
+   - Branch `feat/t-005-*` → `T-005-NOTES.md`
+   - If `$TASK_DESCRIPTION` contains a task ID like `t-011`, use that
+   - If no notes file exists or can be derived, **skip this phase** (don't create one)
+2. **Append a "Local QA Review" section** to the end of the notes file with:
+   - Date header: `## Local QA Review (YYYY-MM-DD)`
+   - Verdict
+   - Static checks table
+   - E2E browser tests table
+   - **"Findings Requiring Attention"** subsection — only include items that are **blocking** or **non-blocking but new** (introduced by this change). For each finding:
+     - Severity tag: `(blocking)` or `(non-blocking)`
+     - Clear title
+     - What was observed (error messages, behavior)
+     - Root cause analysis (what file/system is responsible)
+     - Impact (what breaks or degrades)
+     - Do NOT assign an agent or prescribe a fix — just document the finding
+   - Pre-existing issues listed separately (brief, one-line each)
+3. **If the verdict is PASS** with no findings — skip this phase entirely. A clean pass doesn't need to be recorded in notes.
+
+This ensures findings are captured for the next engineer/session without requiring manual follow-up.
+
 ## Rules
 
 - **Run ALL checks.** Don't skip phases even if early results look good.
@@ -117,6 +143,7 @@ If you started dev servers (API/Web) during Phase 3:
 - **Don't modify code.** This command only tests and reports. If you find issues, report them — fixing is for @engineer.
 - **Be honest about failures.** A FAIL verdict is valuable — it prevents broken code from being committed.
 - **Always clean up.** If you started dev servers, kill them in Phase 5. Never leave orphaned processes.
+- **Always write findings.** If there are issues worth noting, append them to the task notes (Phase 6). Don't leave findings only in chat history.
 
 ## Arguments
 

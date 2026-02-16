@@ -317,9 +317,12 @@ Backlog → Active (in-progress) → QA Review → Tech Lead Approval → Done
 1. **Investigate** — `/investigate <task>` — PM traces code, documents findings, prepares handoff in notes file
 2. **Plan** — `/plan <task>` — Architect researches, makes decisions, writes implementation plan in notes file
 3. **QA Plan** — `/qa-plan <task>` — QA audits coverage gaps, appends test recommendations to notes file
-4. **Implement** — `@engineer` implements code + tests per the plan
-5. **QA Review** — Tech lead + CodeRabbit review the PR
-6. **Close** — `/close-task <task>` — PM moves task to Done, cleans up notes
+4. **Implement** — `/implement <task>` — Engineer implements code + tests per plan, runs verification gates
+5. **Local QA** — `/local-qa` — Full local QA gate (unit tests, type check, build, E2E browser testing)
+6. **If QA finds issues** — `/plan <task>` (re-plan mode) → `/implement <task>` (re-implementation mode)
+7. **Ship** — `/ship` — Commit, push, open PR
+8. **QA Review** — Tech lead + CodeRabbit review the PR
+9. **Close** — `/close-task <task>` — PM moves task to Done, cleans up notes
 
 ### Task Size Rules
 - **XS** (< 1 hour): Config changes, verifications, tiny fixes
