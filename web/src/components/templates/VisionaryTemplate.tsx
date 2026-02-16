@@ -10,6 +10,8 @@ import type {
   EducationContent,
   SkillsContent,
   LanguagesContent,
+  CertificationsContent,
+  ProjectsContent,
 } from '@/types/cv';
 import { SECTION_LABELS } from '@/types/cv';
 
@@ -167,8 +169,24 @@ export function VisionaryTemplate({
                   secondaryColor={secondaryColor}
                 />
               )}
+              {section.type === 'certifications' && (
+                <MainCertifications
+                  content={section.content as CertificationsContent}
+                  title={section.title || SECTION_LABELS[section.type]}
+                  primaryColor={primaryColor}
+                  secondaryColor={secondaryColor}
+                />
+              )}
+              {section.type === 'projects' && (
+                <MainProjects
+                  content={section.content as ProjectsContent}
+                  title={section.title || SECTION_LABELS[section.type]}
+                  primaryColor={primaryColor}
+                  secondaryColor={secondaryColor}
+                />
+              )}
               {/* Fallback for any other section type in main */}
-              {!['summary', 'experience', 'education'].includes(section.type) && (
+              {!['summary', 'experience', 'education', 'certifications', 'projects'].includes(section.type) && (
                 <MainGeneric
                   title={section.title || SECTION_LABELS[section.type] || 'Section'}
                   primaryColor={primaryColor}
@@ -494,6 +512,153 @@ function MainEducation({
                 >
                   {entry.description}
                 </p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function MainCertifications({
+  content,
+  title,
+  primaryColor,
+  secondaryColor,
+}: {
+  content: CertificationsContent;
+  title: string;
+  primaryColor: string;
+  secondaryColor: string;
+}) {
+  return (
+    <div className="mb-6">
+      <MainSectionTitle title={title} primaryColor={primaryColor} />
+      <div className="space-y-4">
+        {content.entries.map((entry) => (
+          <div key={entry.id}>
+            <div className="flex justify-between items-start mb-1">
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900">
+                  {entry.name}
+                </h3>
+                <p className="text-sm" style={{ color: primaryColor }}>
+                  {entry.issuer}
+                  {entry.credentialId && (
+                    <span style={{ color: secondaryColor }}>
+                      {' '}
+                      &middot; ID: {entry.credentialId}
+                    </span>
+                  )}
+                </p>
+              </div>
+              {entry.date && (
+                <span
+                  className="text-xs flex-shrink-0 ml-4"
+                  style={{ color: secondaryColor }}
+                >
+                  {formatDate(entry.date)}
+                  {entry.expiryDate ? ` - ${formatDate(entry.expiryDate)}` : ''}
+                </span>
+              )}
+            </div>
+            {entry.url && (
+              <a
+                href={entry.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs underline hover:no-underline"
+                style={{ color: primaryColor }}
+              >
+                Verify credential
+              </a>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MainProjects({
+  content,
+  title,
+  primaryColor,
+  secondaryColor,
+}: {
+  content: ProjectsContent;
+  title: string;
+  primaryColor: string;
+  secondaryColor: string;
+}) {
+  return (
+    <div className="mb-6">
+      <MainSectionTitle title={title} primaryColor={primaryColor} />
+      <div className="space-y-5">
+        {content.entries.map((entry) => {
+          const startDate = entry.startDate ? formatDate(entry.startDate) : '';
+          const endDate = entry.endDate
+            ? formatDate(entry.endDate)
+            : entry.startDate
+              ? 'Present'
+              : '';
+          const dateRange = [startDate, endDate].filter(Boolean).join(' - ');
+
+          return (
+            <div key={entry.id}>
+              <div className="flex justify-between items-start mb-1">
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900">
+                    {entry.name}
+                  </h3>
+                  <p className="text-sm" style={{ color: primaryColor }}>
+                    {entry.role}
+                    {entry.url && (
+                      <a
+                        href={entry.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline hover:no-underline ml-2"
+                        style={{ color: secondaryColor }}
+                      >
+                        Link
+                      </a>
+                    )}
+                  </p>
+                </div>
+                {dateRange && (
+                  <span
+                    className="text-xs flex-shrink-0 ml-4"
+                    style={{ color: secondaryColor }}
+                  >
+                    {dateRange}
+                  </span>
+                )}
+              </div>
+              {entry.description && (
+                <p
+                  className="text-xs mt-1 leading-relaxed"
+                  style={{ color: secondaryColor }}
+                >
+                  {entry.description}
+                </p>
+              )}
+              {entry.technologies && entry.technologies.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {entry.technologies.map((tech, i) => (
+                    <span
+                      key={i}
+                      className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                      style={{
+                        backgroundColor: primaryColor + '15',
+                        color: primaryColor,
+                      }}
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
               )}
             </div>
           );

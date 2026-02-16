@@ -76,7 +76,7 @@ describe('DashboardPage', () => {
     });
 
     expect(screen.getByText('modern')).toBeInTheDocument();
-    expect(screen.getByText('6 sections')).toBeInTheDocument();
+    expect(screen.getByText('8 sections')).toBeInTheDocument();
   });
 
   it('shows empty state when API returns 404', async () => {

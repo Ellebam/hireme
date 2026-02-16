@@ -13,6 +13,8 @@ import type {
   EducationContent,
   SkillsContent,
   LanguagesContent,
+  CertificationsContent,
+  ProjectsContent,
 } from '@/types/cv';
 import { SCHEMA_VERSION } from '@/types/cv';
 
@@ -130,6 +132,49 @@ export const mockLanguagesContent: LanguagesContent = {
   ],
 };
 
+export const mockCertificationsContent: CertificationsContent = {
+  entries: [
+    {
+      id: 'cert-1',
+      name: 'AWS Solutions Architect',
+      issuer: 'Amazon Web Services',
+      date: '2023-06',
+      expiryDate: '2026-06',
+      credentialId: 'AWS-SAA-123456',
+      url: 'https://aws.amazon.com/verify',
+    },
+    {
+      id: 'cert-2',
+      name: 'Google Cloud Professional',
+      issuer: 'Google',
+      date: '2022-03',
+    },
+  ],
+};
+
+export const mockProjectsContent: ProjectsContent = {
+  entries: [
+    {
+      id: 'proj-1',
+      name: 'Open Source CLI Tool',
+      role: 'Lead Developer',
+      description: 'A command-line tool for automating deployment workflows.',
+      url: 'https://github.com/example/cli-tool',
+      technologies: ['Go', 'Docker', 'GitHub Actions'],
+      startDate: '2022-01',
+      endDate: null,
+    },
+    {
+      id: 'proj-2',
+      name: 'E-Commerce Platform',
+      description: 'Full-stack e-commerce platform with real-time inventory.',
+      technologies: ['React', 'Node.js', 'PostgreSQL'],
+      startDate: '2021-03',
+      endDate: '2021-12',
+    },
+  ],
+};
+
 // ============================================================================
 // Section Mocks
 // ============================================================================
@@ -177,6 +222,20 @@ export const mockSections: CVSection[] = [
     order: 5,
     visible: true,
     content: mockLanguagesContent,
+  },
+  {
+    id: 'sec-certifications',
+    type: 'certifications',
+    order: 6,
+    visible: true,
+    content: mockCertificationsContent,
+  },
+  {
+    id: 'sec-projects',
+    type: 'projects',
+    order: 7,
+    visible: true,
+    content: mockProjectsContent,
   },
 ];
 

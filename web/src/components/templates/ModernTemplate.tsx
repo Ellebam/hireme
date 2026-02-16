@@ -11,6 +11,8 @@ import type {
   SkillsContent,
   LanguagesContent,
   LanguageProficiency,
+  CertificationsContent,
+  ProjectsContent,
 } from '@/types/cv';
 import { SECTION_LABELS } from '@/types/cv';
 
@@ -373,6 +375,149 @@ export function ModernTemplate({
     );
   }
 
+  function renderCertifications(section: CVSection) {
+    const content = section.content as CertificationsContent;
+    const entries = content.entries || [];
+
+    return renderSectionWrapper(
+      section,
+      <div>
+        {renderSectionTitle(section)}
+        <div className="space-y-3">
+          {entries.map((entry) => (
+            <div key={entry.id}>
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h3 className="font-semibold text-sm">{entry.name}</h3>
+                {entry.date && (
+                  <span className="text-xs" style={{ color: secondaryColor }}>
+                    {formatDate(entry.date)}
+                    {entry.expiryDate ? ` - ${formatDate(entry.expiryDate)}` : ''}
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                <span className="text-sm" style={{ color: primaryColor }}>
+                  {entry.issuer}
+                </span>
+                {entry.credentialId && (
+                  <span className="text-xs" style={{ color: secondaryColor }}>
+                    | ID: {entry.credentialId}
+                  </span>
+                )}
+              </div>
+              {entry.url && (
+                <a
+                  href={entry.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs underline hover:no-underline mt-0.5 inline-block"
+                  style={{ color: primaryColor }}
+                >
+                  Verify credential
+                </a>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  function renderProjects(section: CVSection) {
+    const content = section.content as ProjectsContent;
+    const entries = content.entries || [];
+
+    return renderSectionWrapper(
+      section,
+      <div>
+        {renderSectionTitle(section)}
+        <div className="relative pl-6">
+          {/* Timeline line */}
+          <div
+            className="absolute left-[7px] top-2 bottom-0 w-0.5"
+            style={{ backgroundColor: primaryColor + '30' }}
+          />
+          {entries.map((entry) => {
+            const startFormatted = entry.startDate
+              ? formatDate(entry.startDate)
+              : '';
+            const endFormatted = entry.endDate
+              ? formatDate(entry.endDate)
+              : entry.startDate
+                ? 'Present'
+                : '';
+            const dateRange = [startFormatted, endFormatted]
+              .filter(Boolean)
+              .join(' - ');
+
+            return (
+              <div key={entry.id} className="relative mb-4">
+                {/* Dot */}
+                <div
+                  className="absolute -left-6 top-1.5 w-3 h-3 rounded-full border-2 bg-white"
+                  style={{ borderColor: primaryColor }}
+                />
+                {/* Content */}
+                <div>
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <h3 className="font-semibold text-sm">{entry.name}</h3>
+                    {dateRange && (
+                      <span className="text-xs" style={{ color: secondaryColor }}>
+                        {dateRange}
+                      </span>
+                    )}
+                  </div>
+                  {entry.role && (
+                    <div className="mt-0.5">
+                      <span className="text-sm" style={{ color: primaryColor }}>
+                        {entry.role}
+                      </span>
+                    </div>
+                  )}
+                  {entry.description && (
+                    <p
+                      className="text-sm mt-1 leading-relaxed"
+                      style={{ color: secondaryColor }}
+                    >
+                      {entry.description}
+                    </p>
+                  )}
+                  {entry.technologies && entry.technologies.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-1.5">
+                      {entry.technologies.map((tech, i) => (
+                        <span
+                          key={i}
+                          className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                          style={{
+                            backgroundColor: primaryColor + '15',
+                            color: primaryColor,
+                          }}
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {entry.url && (
+                    <a
+                      href={entry.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs underline hover:no-underline mt-1 inline-block"
+                      style={{ color: primaryColor }}
+                    >
+                      {entry.url}
+                    </a>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
   function renderFallback(section: CVSection) {
     return renderSectionWrapper(
       section,
@@ -399,6 +544,10 @@ export function ModernTemplate({
         return renderSkills(section);
       case 'languages':
         return renderLanguages(section);
+      case 'certifications':
+        return renderCertifications(section);
+      case 'projects':
+        return renderProjects(section);
       default:
         return renderFallback(section);
     }
