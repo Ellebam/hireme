@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — T-001–T-012 done, 3 tasks remaining, 3 unblocked
+**Status:** Task-based workflow active — T-001–T-012 + T-016 done, 16 tasks in backlog (9 unblocked, 3 blocked, 4 need splitting when picked up)
 
 ### What's Working
 
@@ -37,7 +37,7 @@
 - ✅ Delete confirmation dialog on CV card
 - ✅ Back-to-dashboard link in editor toolbar
 - ✅ shadcn/ui dropdown-menu component
-- ✅ 167 passing tests (Vitest)
+- ✅ 170 passing tests (Vitest)
 - ✅ Build verified, full stack integration tested
 
 ### Remaining Work
@@ -228,32 +228,136 @@ task api:sqlc          # Generate sqlc code
 |----|------|--------|------------|--------|
 | — | — | — | — | — |
 
-### Backlog
+### Backlog — P0 (Bugs)
 | ID | Task | Blocked By | Size |
 |----|------|------------|------|
+| T-017 | Responsive layout + clipping fixes | — | S–M |
+
+### Backlog — P1 (UX Fixes)
+| ID | Task | Blocked By | Size |
+|----|------|------------|------|
+| T-018 | Section click UX — remove redundant button, auto-open editor | — | XS |
+| T-019 | Replace date pickers with month/year picker component | — | S |
+| T-020 | Tag input for technologies field (extract from SkillTag) | — | XS–S |
+| T-023 | README overhaul — content + design | — | XS |
+
+### Backlog — P2 (Features)
+| ID | Task | Blocked By | Size |
+|----|------|------------|------|
+| T-021 | Export markdown + bundle download (PDF+DOCX+JSON+MD zip) | — | S |
+| T-022 | JSON round-trip import | — | S |
+| T-024 | Design direction — define visual identity, palette, typography | — | S |
+| T-025 | Implement design overhaul | T-024 | M |
+| T-026 | DOCX export styling overhaul — match actual CV templates | T-025 | M |
+| T-027 | Markdown import (parse exported markdown back into CV) | T-021 | S–M |
+| T-028 | CV import from uploaded DOCX/PDF — app-based extraction | — | M |
+| T-029 | Consultant profile CV type — new section structure + template | — | M+ |
 | T-013 | R2 cloud storage implementation | — | M |
 | T-014 | OAuth authentication (Google OIDC) | — | M |
 | T-015 | Multiple CV support | — | M |
 
-### Done
+### Done (T-001 – T-012)
 | ID | Task | PR |
 |----|------|----|
 | T-001 | Verify template switching persists to backend | feat/t-001-template-persist |
-| T-006 | P0 smoke tests — section editors | test/t-006-007-smoke-tests |
-| T-007 | P0 smoke tests — page components | test/t-006-007-smoke-tests |
 | T-002 | Create HTML generation for CV export | feat/t-002-html-generation |
 | T-003 | Implement PDF export via Gotenberg | feat/t-003-pdf-export |
 | T-004 | Implement DOCX export via godocx | feat/t-004-docx-export |
 | T-005 | Wire frontend export modal to real API | (shipped in MVP) |
-| T-011 | Add Certifications section | feat/t-011-012-certifications-projects |
-| T-012 | Add Projects section | feat/t-011-012-certifications-projects |
+| T-006 | P0 smoke tests — section editors | test/t-006-007-smoke-tests |
+| T-007 | P0 smoke tests — page components | test/t-006-007-smoke-tests |
 | T-008 | P1 interaction tests — editors | test/t-008-010-interaction-ux-tests |
 | T-009 | P1 interaction tests — export error paths | test/t-008-010-interaction-ux-tests |
 | T-010 | P2 UX regression tests | test/t-008-010-interaction-ux-tests |
+| T-011 | Add Certifications section | feat/t-011-012-certifications-projects |
+| T-012 | Add Projects section | feat/t-011-012-certifications-projects |
+| T-016 | Fix save bug after template switch | fix/t-016-save-after-template-switch |
 
 ---
 
 ## Task Details
+
+### P0 — Bugs
+
+**T-017: Responsive layout + clipping fixes** — S–M
+- A4 preview uses fixed 794px width + CSS transform scale — clips at narrow viewports
+- Half-screen windows cause layout overflow (transform origin issue)
+- Fix: auto-fit preview scale to available width, revisit sidebar collapse breakpoints
+- Files: `EditorLayout.tsx`, `CVPreview.tsx`, `ui-store.ts`
+
+### P1 — UX Fixes
+
+**T-018: Section click UX** — XS
+- "Click to edit" button renders even when properties panel is already open — hide it
+- Single click on section should open properties panel (currently requires double-click)
+- Fix: change `handleSectionClick` in `CVPreview.tsx` to also call `setRightSidebarOpen(true)`
+- Files: `CVPreview.tsx`, template components, `ui-store.ts`
+
+**T-019: Replace date pickers** — S
+- Current `<input type="month">` is ugly and inconsistent across browsers
+- Build custom `MonthYearPicker` component (Radix Popover + two selects, no new library)
+- Replace in: `ExperienceEditor.tsx`, `EducationEditor.tsx`, `ProjectsEditor.tsx`
+
+**T-020: Tag input for technologies** — XS–S
+- Technologies field in `ProjectsEditor.tsx` uses `<Textarea>` (one-per-line)
+- Data model already supports `string[]` — only the input UX needs changing
+- `SkillsEditor.tsx` already has `SkillTag` component (lines 228-291) — extract into reusable `TagInput`
+- Files: `ProjectsEditor.tsx`, `SkillsEditor.tsx` (extract), new `TagInput` component
+
+**T-023: README overhaul** — XS
+- Documentation only, no code changes
+- Update content to reflect current state, improve design
+- Inspiration: https://github.com/openclaw/openclaw/blob/main/README.md
+
+### P2 — Features
+
+**T-021: Export markdown + bundle download** — S
+- Markdown export: client-side `cvContentToMarkdown()` serializer, same pattern as JSON export
+- Bundle: `jszip` to package PDF + DOCX + JSON + MD into one zip download
+- All export calls already exist; bundle calls them in parallel via `Promise.all`
+- Files: `ExportModal.tsx`, new `markdown-serializer.ts`, new `bundle-export.ts`
+- Note: adds `jszip` runtime dependency
+
+**T-022: JSON round-trip import** — S
+- File input → read JSON → validate against CV schema → hydrate editor via `setContent()`
+- Backend validation already exists (`validator.CVValidator`)
+- Files: new import UI (dashboard or editor toolbar), `editor-store.ts`
+
+**T-024: Design direction** — S
+- Collaborative task: define visual identity, color palette, typography, component style
+- Output: design tokens, reference screenshots/mockups, Tailwind theme config decisions
+- No code changes — purely design exploration and decision-making
+
+**T-025: Implement design overhaul** — M (blocked by T-024)
+- Apply design decisions from T-024 across the app
+- Update Tailwind config (CSS variables for shadcn), component spacing, typography, colors
+- Files: `tailwind.config.ts`, shadcn theme, all template components, dashboard, editor chrome
+- Requires careful regression testing — shadcn CSS variable changes ripple everywhere
+
+**T-026: DOCX export styling overhaul** — M (blocked by T-025)
+- Make DOCX output match the finalized CV template designs
+- Backend Go work: map design decisions to `godocx` paragraph/run styles
+- Note: `godocx` may not support multi-column layouts (Visionary template) — scope to best-effort
+- Files: `api/internal/export/docx.go`
+
+**T-027: Markdown import** — S–M (blocked by T-021)
+- Parse previously exported markdown back into `CVContent` structure
+- Must handle user modifications to the exported markdown
+- Needs custom markdown-to-domain-model parser — fragile, design carefully
+- Files: new `markdown-parser.ts`, import UI
+
+**T-028: CV import from uploaded DOCX/PDF** — M (needs splitting when picked up)
+- Upload DOCX/PDF → extract structured CV data → create new CV
+- App-based extraction: Go libraries for DOCX parsing, PDF text extraction
+- Backend: new `POST /api/v1/cv/import` endpoint + document parser service
+- No LLM — deterministic parsing with Go libraries (e.g. `unidoc` for PDF, `docx` for DOCX)
+- Mapping from raw extracted sections → `CVContent` JSON
+
+**T-029: Consultant profile CV type** — M+ (needs splitting when picked up)
+- Entirely new CV class: skills-first, projects-first, certifications-first structure
+- Requires: `cvType` discriminant in `CVContent`, different validation rules, new section palette behavior, new template(s)
+- Schema migration strategy needed for existing CVs
+- Split into sub-tasks when picked up: schema design, backend validation, frontend palette, template(s)
 
 **T-013: R2 cloud storage implementation** — M
 - Implement `R2Storage` methods using AWS SDK
@@ -269,10 +373,39 @@ task api:sqlc          # Generate sqlc code
 
 ### Dependency Graph
 ```
-T-013, T-014, T-015: ALL INDEPENDENT (any order)
+INDEPENDENT (can start anytime):
+  T-017, T-018, T-019, T-020, T-023
+  T-021, T-022, T-028
+  T-013, T-014, T-015
+
+DEPENDENCY CHAINS:
+  T-024 (design direction) → T-025 (implement design) → T-026 (DOCX styling)
+  T-021 (markdown export) → T-027 (markdown import)
+
+T-029 (consultant profile): independent but needs splitting when picked up
 ```
 
-All 3 remaining tasks have zero dependencies and can be picked up in any order.
+### Recommended Sequencing
+**Phase 1 — Bugs + quick UX wins:**
+1. **T-017** (responsive) — P0, broken for split-screen users
+2. **T-018** (edit UX) — XS, fast win
+3. **T-019** (date pickers) — visible on every CV
+4. **T-020** (tag input) — fast, pattern already exists
+
+**Phase 2 — Features + polish:**
+6. **T-024** (design direction) — collaborative, unlocks T-025/T-026
+7. **T-021** (markdown + bundle) — new capability, unlocks T-027
+8. **T-022** (JSON import) — completes export/import story
+9. **T-023** (README) — housekeeping
+
+**Phase 3 — Design implementation + blocked tasks:**
+10. **T-025** (design overhaul) → **T-026** (DOCX styling)
+11. **T-027** (markdown import)
+12. **T-028** (CV upload/extract)
+
+**Phase 4 — Infrastructure + architecture:**
+13. **T-013/T-014/T-015** — R2, OAuth, multi-CV
+14. **T-029** (consultant profile) — split into sub-tasks first
 
 ---
 

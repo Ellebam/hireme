@@ -173,8 +173,8 @@ INSERT INTO cvs (
                 "visible": true,
                 "content": {
                     "entries": [
-                        {"language": "German", "proficiency": "native"},
-                        {"language": "English", "proficiency": "fluent"}
+                        {"id": "lang-001", "language": "German", "proficiency": "native"},
+                        {"id": "lang-002", "language": "English", "proficiency": "fluent"}
                     ]
                 }
             }

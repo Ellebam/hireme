@@ -9,7 +9,7 @@
 
 export const SCHEMA_VERSION = '1.0.0' as const;
 
-export const TEMPLATE_IDS = ['classic', 'modern', 'visionary', 'blank'] as const;
+export const TEMPLATE_IDS = ['classic', 'modern', 'visionary'] as const;
 export type TemplateId = (typeof TEMPLATE_IDS)[number];
 
 export const LOCALES = ['en', 'de'] as const;

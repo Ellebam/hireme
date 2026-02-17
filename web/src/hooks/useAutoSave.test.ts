@@ -257,6 +257,42 @@ describe('useAutoSave', () => {
   });
 
   // ==========================================================================
+  // Save payload after template switch
+  // ==========================================================================
+
+  describe('save payload after template switch', () => {
+    it('should send correct content with new templateId and preserved language ids', async () => {
+      useEditorStore.getState().setCV(mockCV);
+      mockUpdate.mockResolvedValueOnce(mockCV);
+
+      renderHook(() => useAutoSave());
+
+      // Switch template and mark dirty
+      act(() => {
+        useEditorStore.getState().updateTemplateId('visionary');
+      });
+
+      await act(async () => {
+        useEditorStore.getState().saveNow!();
+      });
+
+      expect(mockUpdate).toHaveBeenCalledTimes(1);
+      const [, payload] = mockUpdate.mock.calls[0];
+      expect(payload.content.templateId).toBe('visionary');
+
+      // Verify language entries still have id fields
+      const languagesSection = payload.content.sections.find(
+        (s: { type: string }) => s.type === 'languages'
+      );
+      expect(languagesSection).toBeDefined();
+      const entries = (languagesSection.content as { entries: { id: string }[] }).entries;
+      for (const entry of entries) {
+        expect(entry.id).toBeTruthy();
+      }
+    });
+  });
+
+  // ==========================================================================
   // Debounced auto-save
   // ==========================================================================
 

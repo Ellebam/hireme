@@ -527,5 +527,26 @@ describe('EditorStore', () => {
 
       expect(useEditorStore.getState().history.length).toBe(historyLenBefore + 1);
     });
+
+    it('should preserve all section content including language entry ids', () => {
+      useEditorStore.getState().setCV(mockCV);
+
+      const languagesBefore = useEditorStore.getState().cvContent?.sections.find(
+        (s) => s.type === 'languages'
+      );
+      const entriesBefore = (languagesBefore?.content as { entries: { id: string }[] }).entries;
+
+      useEditorStore.getState().updateTemplateId('classic');
+
+      const languagesAfter = useEditorStore.getState().cvContent?.sections.find(
+        (s) => s.type === 'languages'
+      );
+      const entriesAfter = (languagesAfter?.content as { entries: { id: string }[] }).entries;
+
+      expect(entriesAfter).toHaveLength(entriesBefore.length);
+      entriesBefore.forEach((entry, index) => {
+        expect(entriesAfter[index].id).toBe(entry.id);
+      });
+    });
   });
 });
