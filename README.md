@@ -1,6 +1,6 @@
 <div align="center">
   <table><tr>
-    <td><img src="https://raw.githubusercontent.com/Ellebam/hireme/main/docs/hireme1.png" alt="HireMe Logo" width="120" /></td>
+    <td><img src="docs/hireme1.png" alt="HireMe Logo" width="120" /></td>
     <td><h1>HireMe</h1></td>
   </tr></table>
   <strong>Open-source, schema-driven CV builder for professionals.</strong><br />
@@ -35,7 +35,7 @@
 | CI/CD | GitHub Actions — lint, test, typecheck, build |
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Ellebam/hireme/main/docs/hireme2.png" alt="HireMe Hero" width="480" />
+  <img src="docs/hireme2.png" alt="HireMe Hero" width="480" />
 </p>
 
 ## Quick Start
