@@ -10,6 +10,8 @@ import type {
   EducationContent,
   SkillsContent,
   LanguagesContent,
+  CertificationsContent,
+  ProjectsContent,
 } from '@/types/cv';
 import { SECTION_LABELS } from '@/types/cv';
 
@@ -379,6 +381,139 @@ export function ClassicTemplate({
     );
   }
 
+  function renderCertifications(section: CVSection) {
+    const content = section.content as CertificationsContent;
+
+    return renderSectionWrapper(
+      section,
+      <div>
+        {renderSectionTitle(section)}
+        {content.entries.length === 0 ? (
+          <p className="text-sm italic" style={{ color: secondaryColor }}>
+            Add your certifications...
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {content.entries.map((entry) => (
+              <div key={entry.id}>
+                <div className="flex justify-between items-baseline">
+                  <div>
+                    <span className="text-sm font-bold">{entry.name}</span>
+                    {entry.issuer && (
+                      <span className="text-sm"> at {entry.issuer}</span>
+                    )}
+                  </div>
+                  {entry.date && (
+                    <span
+                      className="text-xs whitespace-nowrap ml-4"
+                      style={{ color: secondaryColor }}
+                    >
+                      {formatDate(entry.date)}
+                      {entry.expiryDate ? ` - ${formatDate(entry.expiryDate)}` : ''}
+                    </span>
+                  )}
+                </div>
+                {entry.credentialId && (
+                  <p className="text-sm mt-0.5" style={{ color: secondaryColor }}>
+                    ID: {entry.credentialId}
+                  </p>
+                )}
+                {entry.url && (
+                  <a
+                    href={entry.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm underline hover:no-underline mt-0.5 inline-block"
+                    style={{ color: primaryColor }}
+                  >
+                    Verify
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  function renderProjects(section: CVSection) {
+    const content = section.content as ProjectsContent;
+
+    return renderSectionWrapper(
+      section,
+      <div>
+        {renderSectionTitle(section)}
+        {content.entries.length === 0 ? (
+          <p className="text-sm italic" style={{ color: secondaryColor }}>
+            Add your projects...
+          </p>
+        ) : (
+          <div className="space-y-4">
+            {content.entries.map((entry) => {
+              const startFormatted = entry.startDate
+                ? formatDate(entry.startDate)
+                : '';
+              const endFormatted = entry.endDate
+                ? formatDate(entry.endDate)
+                : entry.startDate
+                  ? 'Present'
+                  : '';
+              const dateRange = [startFormatted, endFormatted]
+                .filter(Boolean)
+                .join(' - ');
+
+              return (
+                <div key={entry.id}>
+                  <div className="flex justify-between items-baseline">
+                    <div>
+                      <span className="text-sm font-bold">{entry.name}</span>
+                      {entry.role && (
+                        <span className="text-sm" style={{ color: secondaryColor }}>
+                          {' '}
+                          &middot; {entry.role}
+                        </span>
+                      )}
+                    </div>
+                    {dateRange && (
+                      <span
+                        className="text-xs whitespace-nowrap ml-4"
+                        style={{ color: secondaryColor }}
+                      >
+                        {dateRange}
+                      </span>
+                    )}
+                  </div>
+                  {entry.description && (
+                    <p className="text-sm mt-1" style={{ color: '#374151' }}>
+                      {entry.description}
+                    </p>
+                  )}
+                  {entry.technologies && entry.technologies.length > 0 && (
+                    <p className="text-sm mt-1" style={{ color: secondaryColor }}>
+                      {entry.technologies.join(', ')}
+                    </p>
+                  )}
+                  {entry.url && (
+                    <a
+                      href={entry.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm underline hover:no-underline mt-0.5 inline-block"
+                      style={{ color: primaryColor }}
+                    >
+                      {entry.url}
+                    </a>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   function renderGenericSection(section: CVSection) {
     return renderSectionWrapper(
       section,
@@ -405,6 +540,10 @@ export function ClassicTemplate({
         return renderSkills(section);
       case 'languages':
         return renderLanguages(section);
+      case 'certifications':
+        return renderCertifications(section);
+      case 'projects':
+        return renderProjects(section);
       default:
         return renderGenericSection(section);
     }

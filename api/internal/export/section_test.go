@@ -156,3 +156,91 @@ func TestParseLanguages_Malformed(t *testing.T) {
 		t.Errorf("expected zero entries, got %d", len(c.Entries))
 	}
 }
+
+func TestParseCertifications_Valid(t *testing.T) {
+	expiry := "2026-12"
+	raw := json.RawMessage(`{
+		"entries": [{
+			"id": "cert-1",
+			"name": "AWS Solutions Architect",
+			"issuer": "AWS",
+			"date": "2023-06",
+			"expiryDate": "2026-12",
+			"credentialId": "ABC-123",
+			"url": "https://verify.aws/ABC-123"
+		}]
+	}`)
+	c := ParseCertifications(raw)
+	if len(c.Entries) != 1 {
+		t.Fatalf("Entries: got %d, want 1", len(c.Entries))
+	}
+	e := c.Entries[0]
+	if e.Name != "AWS Solutions Architect" {
+		t.Errorf("Name: got %q", e.Name)
+	}
+	if e.Issuer != "AWS" {
+		t.Errorf("Issuer: got %q", e.Issuer)
+	}
+	if e.Date != "2023-06" {
+		t.Errorf("Date: got %q", e.Date)
+	}
+	if e.ExpiryDate == nil || *e.ExpiryDate != expiry {
+		t.Errorf("ExpiryDate: got %v, want %q", e.ExpiryDate, expiry)
+	}
+	if e.CredentialID != "ABC-123" {
+		t.Errorf("CredentialID: got %q", e.CredentialID)
+	}
+	if e.URL != "https://verify.aws/ABC-123" {
+		t.Errorf("URL: got %q", e.URL)
+	}
+}
+
+func TestParseCertifications_Malformed(t *testing.T) {
+	c := ParseCertifications(json.RawMessage(`{broken`))
+	if len(c.Entries) != 0 {
+		t.Errorf("expected zero entries, got %d", len(c.Entries))
+	}
+}
+
+func TestParseProjects_Valid(t *testing.T) {
+	endDate := "2024-01"
+	raw := json.RawMessage(`{
+		"entries": [{
+			"id": "proj-1",
+			"name": "HireMe",
+			"role": "Lead Developer",
+			"description": "CV builder",
+			"url": "https://github.com/example/hireme",
+			"technologies": ["Go", "Next.js"],
+			"startDate": "2023-01",
+			"endDate": "2024-01"
+		}]
+	}`)
+	c := ParseProjects(raw)
+	if len(c.Entries) != 1 {
+		t.Fatalf("Entries: got %d, want 1", len(c.Entries))
+	}
+	e := c.Entries[0]
+	if e.Name != "HireMe" {
+		t.Errorf("Name: got %q", e.Name)
+	}
+	if e.Role != "Lead Developer" {
+		t.Errorf("Role: got %q", e.Role)
+	}
+	if e.Description != "CV builder" {
+		t.Errorf("Description: got %q", e.Description)
+	}
+	if len(e.Technologies) != 2 || e.Technologies[0] != "Go" {
+		t.Errorf("Technologies: got %v", e.Technologies)
+	}
+	if e.EndDate == nil || *e.EndDate != endDate {
+		t.Errorf("EndDate: got %v, want %q", e.EndDate, endDate)
+	}
+}
+
+func TestParseProjects_Malformed(t *testing.T) {
+	c := ParseProjects(json.RawMessage(`{broken`))
+	if len(c.Entries) != 0 {
+		t.Errorf("expected zero entries, got %d", len(c.Entries))
+	}
+}

@@ -58,6 +58,8 @@ const mvpSectionTypes: SectionType[] = [
   'education',
   'skills',
   'languages',
+  'certifications',
+  'projects',
 ];
 
 export function SectionPalette() {

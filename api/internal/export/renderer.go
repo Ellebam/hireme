@@ -91,14 +91,16 @@ type TemplateData struct {
 
 // SectionData wraps a parsed section with typed content.
 type SectionData struct {
-	Type       string
-	Title      string
-	Personal   *PersonalData
-	Summary    *domain.SummaryContent
-	Experience *domain.ExperienceContent
-	Education  *domain.EducationContent
-	Skills     *domain.SkillsContent
-	Languages  *domain.LanguagesContent
+	Type           string
+	Title          string
+	Personal       *PersonalData
+	Summary        *domain.SummaryContent
+	Experience     *domain.ExperienceContent
+	Education      *domain.EducationContent
+	Skills         *domain.SkillsContent
+	Languages      *domain.LanguagesContent
+	Certifications *domain.CertificationsContent
+	Projects       *domain.ProjectsContent
 }
 
 // PersonalData wraps personal content with pre-computed fields.
@@ -127,6 +129,8 @@ func NewRenderer() (*Renderer, error) {
 	funcMap := template.FuncMap{
 		"dateRange":       formatDateRange,
 		"formatDate":      formatDate,
+		"certDateRange":   certDateRange,
+		"techList":        techList,
 		"degreeField":     degreeField,
 		"skillNames":      skillNames,
 		"linkLabel":       linkLabel,
@@ -272,6 +276,12 @@ func parseSectionData(sec domain.CVSection) SectionData {
 	case domain.SectionTypeLanguages:
 		languages := ParseLanguages(sec.Content)
 		sd.Languages = &languages
+	case domain.SectionTypeCertifications:
+		certifications := ParseCertifications(sec.Content)
+		sd.Certifications = &certifications
+	case domain.SectionTypeProjects:
+		projects := ParseProjects(sec.Content)
+		sd.Projects = &projects
 	}
 
 	return sd
@@ -401,4 +411,16 @@ func proficiencyBars(proficiency, primaryColor string) []template.CSS {
 		}
 	}
 	return bars
+}
+
+func certDateRange(date string, expiryDate *string) string {
+	start := formatDate(date)
+	if expiryDate != nil && *expiryDate != "" {
+		return start + " - " + formatDate(*expiryDate)
+	}
+	return start
+}
+
+func techList(technologies []string) string {
+	return strings.Join(technologies, ", ")
 }

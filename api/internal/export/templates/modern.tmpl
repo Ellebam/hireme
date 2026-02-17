@@ -155,6 +155,45 @@
       </div>
       {{end}}{{end}}
     </div>
+  {{else if eq .Type "certifications"}}
+    <div>
+      <h2 class="modern-section-title" style="border-left: 3px solid {{$.Styling.PrimaryColor}}">{{.Title}}</h2>
+      {{with .Certifications}}{{range .Entries}}
+      <div style="margin-bottom: 12px;">
+        <div class="modern-entry-header">
+          <h3 style="font-weight: 600; font-size: 0.875em;">{{.Name}}</h3>
+          {{if .Date}}<span class="date" style="font-size: 0.75em; color: {{$.Styling.SecondaryColor}}">{{certDateRange .Date .ExpiryDate}}</span>{{end}}
+        </div>
+        {{if .Issuer}}<p style="font-size: 0.875em; color: {{$.Styling.PrimaryColor}}; margin-top: 2px;">{{.Issuer}}</p>{{end}}
+        {{if .CredentialID}}<p style="font-size: 0.75em; color: {{$.Styling.SecondaryColor}}; margin-top: 2px;">ID: {{.CredentialID}}</p>{{end}}
+        {{if .URL}}<a href="{{.URL}}" style="font-size: 0.75em; color: {{$.Styling.PrimaryColor}}; text-decoration: underline;">Verify</a>{{end}}
+      </div>
+      {{end}}{{end}}
+    </div>
+  {{else if eq .Type "projects"}}
+    <div>
+      <h2 class="modern-section-title" style="border-left: 3px solid {{$.Styling.PrimaryColor}}">{{.Title}}</h2>
+      <div class="modern-timeline">
+        <div class="modern-timeline-line" style="background-color: {{$.Styling.PrimaryColor}}30"></div>
+        {{with .Projects}}{{range .Entries}}
+        <div class="modern-timeline-entry modern-entry">
+          <div class="modern-timeline-dot" style="border-color: {{$.Styling.PrimaryColor}}"></div>
+          <div class="modern-entry-header">
+            <h3>{{.Name}}</h3>
+            {{with dateRange .StartDate .EndDate false}}<span class="date" style="color: {{$.Styling.SecondaryColor}}">{{.}}</span>{{end}}
+          </div>
+          {{if .Role}}<p style="font-size: 0.875em; color: {{$.Styling.PrimaryColor}}; margin-top: 2px;">{{.Role}}</p>{{end}}
+          {{if .Description}}<p class="description" style="color: {{$.Styling.SecondaryColor}}">{{.Description}}</p>{{end}}
+          {{if .Technologies}}
+          <div class="modern-skills-pills" style="margin-top: 6px;">
+            {{range .Technologies}}<span class="modern-skill-pill" style="background-color: {{$.Styling.PrimaryColor}}15; color: {{$.Styling.PrimaryColor}}">{{.}}</span>{{end}}
+          </div>
+          {{end}}
+          {{if .URL}}<a href="{{.URL}}" style="font-size: 0.75em; color: {{$.Styling.PrimaryColor}}; text-decoration: underline; display: inline-block; margin-top: 4px;">View project</a>{{end}}
+        </div>
+        {{end}}{{end}}
+      </div>
+    </div>
   {{else}}
     <div>
       <h2 class="modern-section-title" style="border-left: 3px solid {{$.Styling.PrimaryColor}}">{{.Title}}</h2>

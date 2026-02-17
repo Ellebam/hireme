@@ -10,6 +10,7 @@
 | `/investigate <task>` | PM-led investigation: trace code, document findings, prepare handoff |
 | `/plan <task>` | Architect-led planning: research, decisions, implementation plan appended to notes |
 | `/qa-plan <task>` | QA test planning: audit coverage gaps, append test recommendations to notes |
+| `/implement <task>` | Engineer implementation: execute plan (or re-plan) from notes, code + tests + verify |
 | `/close-task <task>` | PM-led task close: update board, clean up notes, commit + push |
 | `/local-qa` | Full local QA gate: unit tests, type check, build, E2E browser testing |
 | `/ship` | Idempotent commit + push + PR creation (safe to re-run) |
@@ -45,10 +46,12 @@ Agent files in `.claude/agents/` for detailed processes.
 1. `/investigate <task>` — PM traces code, documents findings, prepares handoff
 2. `/plan <task>` — Architect researches, makes decisions, writes implementation plan
 3. `/qa-plan <task>` — QA audits coverage gaps, appends test recommendations
-4. `@engineer` — Implements code + tests per plan
+4. `/implement <task>` — Engineer implements code + tests per plan, runs verification
 5. `/local-qa` — Full local QA gate before commit (tests, types, build, E2E)
-6. QA review — tech lead + CodeRabbit review the PR
-7. `/close-task <task>` — PM moves task to Done, cleans up
+6. If QA finds issues: `/plan <task>` (re-plan mode) → `/implement <task>` (re-implementation mode)
+7. `/ship` — Commit, push, open PR
+8. QA review — tech lead + CodeRabbit review the PR
+9. `/close-task <task>` — PM moves task to Done, cleans up
 
 ### Ending a Session
 Say `checkpoint` to:

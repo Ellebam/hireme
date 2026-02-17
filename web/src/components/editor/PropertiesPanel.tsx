@@ -82,7 +82,7 @@ export function PropertiesPanel() {
   );
 }
 
-import type { CVSection, PersonalContent, SummaryContent, ExperienceContent, EducationContent, SkillsContent, LanguagesContent } from '@/types/cv';
+import type { CVSection, PersonalContent, SummaryContent, ExperienceContent, EducationContent, SkillsContent, LanguagesContent, CertificationsContent, ProjectsContent } from '@/types/cv';
 import {
   PersonalEditor,
   SummaryEditor,
@@ -90,6 +90,8 @@ import {
   EducationEditor,
   SkillsEditor,
   LanguagesEditor,
+  CertificationsEditor,
+  ProjectsEditor,
 } from './editors';
 
 function SectionEditor({ section }: { section: CVSection }) {
@@ -134,6 +136,20 @@ function SectionEditor({ section }: { section: CVSection }) {
         <LanguagesEditor
           sectionId={section.id}
           content={section.content as LanguagesContent}
+        />
+      );
+    case 'certifications':
+      return (
+        <CertificationsEditor
+          sectionId={section.id}
+          content={section.content as CertificationsContent}
+        />
+      );
+    case 'projects':
+      return (
+        <ProjectsEditor
+          sectionId={section.id}
+          content={section.content as ProjectsContent}
         />
       );
     default:

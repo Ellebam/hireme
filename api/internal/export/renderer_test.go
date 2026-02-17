@@ -87,6 +87,29 @@ func testCVContent(templateID string) domain.CVContent {
 					]
 				}`),
 			},
+			{
+				ID: "sec-certifications-001", Type: "certifications", Order: 6, Visible: true,
+				Content: mustMarshal(domain.CertificationsContent{
+					Entries: []domain.CertificationEntry{
+						{
+							ID: "cert-001", Name: "AWS Solutions Architect", Issuer: "Amazon Web Services",
+							Date: "2023-06", CredentialID: "SAA-C03-12345",
+						},
+					},
+				}),
+			},
+			{
+				ID: "sec-projects-001", Type: "projects", Order: 7, Visible: true,
+				Content: mustMarshal(domain.ProjectsContent{
+					Entries: []domain.ProjectEntry{
+						{
+							ID: "proj-001", Name: "Open Source CLI Tool", Role: "Creator",
+							Description: "A developer productivity tool", StartDate: "2022-03",
+							Technologies: []string{"Go", "Cobra"},
+						},
+					},
+				}),
+			},
 		},
 		Styling: &domain.CVStyling{
 			PrimaryColor: "#2563eb",
@@ -225,6 +248,15 @@ func TestRender_Classic_FullCV(t *testing.T) {
 	assertContains(t, html, "German")
 	assertContains(t, html, "English")
 	assertContains(t, html, "#2563eb") // dynamic color
+	// Certifications
+	assertContains(t, html, "AWS Solutions Architect")
+	assertContains(t, html, "Amazon Web Services")
+	assertContains(t, html, "SAA-C03-12345")
+	// Projects
+	assertContains(t, html, "Open Source CLI Tool")
+	assertContains(t, html, "Creator")
+	assertContains(t, html, "A developer productivity tool")
+	assertContains(t, html, "Go, Cobra")
 	// Classic-specific: bottom-border section titles
 	assertContains(t, html, "classic-section-title")
 }
@@ -243,6 +275,9 @@ func TestRender_Modern_FullCV(t *testing.T) {
 	assertContains(t, html, "TechCorp GmbH")
 	assertContains(t, html, "Go")
 	assertContains(t, html, "German")
+	// Certifications & Projects
+	assertContains(t, html, "AWS Solutions Architect")
+	assertContains(t, html, "Open Source CLI Tool")
 	// Modern-specific: timeline, skill pills, language bars
 	assertContains(t, html, "modern-timeline")
 	assertContains(t, html, "modern-skill-pill")
@@ -261,6 +296,9 @@ func TestRender_Visionary_FullCV(t *testing.T) {
 	assertContains(t, html, "Max Developer")
 	assertContains(t, html, "Senior Software Engineer")
 	assertContains(t, html, "TechCorp GmbH")
+	// Certifications & Projects (in main area)
+	assertContains(t, html, "AWS Solutions Architect")
+	assertContains(t, html, "Open Source CLI Tool")
 	// Visionary-specific: sidebar + main layout
 	assertContains(t, html, "visionary-sidebar")
 	assertContains(t, html, "visionary-main")
@@ -448,7 +486,7 @@ func TestRender_SectionOrdering(t *testing.T) {
 
 func TestRender_CrossTemplateConsistency(t *testing.T) {
 	r, _ := NewRenderer()
-	dataPoints := []string{"Max Developer", "TechCorp GmbH", "Go", "German", "Technical University of Munich"}
+	dataPoints := []string{"Max Developer", "TechCorp GmbH", "Go", "German", "Technical University of Munich", "AWS Solutions Architect", "Open Source CLI Tool"}
 	for _, tmplID := range []string{"classic", "modern", "visionary"} {
 		t.Run(tmplID, func(t *testing.T) {
 			content := testCVContent(tmplID)

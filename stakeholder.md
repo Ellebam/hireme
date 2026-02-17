@@ -16,3 +16,5 @@
 - when clicking any section you often are not directly able to edit them. We should build our components in a way, that when you click them in a subcomponents (e.g. textfield in section) you should be able to edit it directly without an extra click (maybe keyboard focus directly in the edit field needed)
 - the frontend looks really bland and boring. We need to do a full design overhaul and generate our visual direction for the app
 - the general export of CVs in DOCX works but the styling is mismatched and does not look like the actual CV design. We need to update it to match. This task should be tackled after we have finalized the stylings of the CV templates
+- the date pickers are very uggly and also not good for the user experience, we should use some that are better
+- a free text field for technologies is not what one should use. If we say we have one entry per line we should build something that tokenizes the entries from the get go. 
