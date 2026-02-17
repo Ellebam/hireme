@@ -6,7 +6,7 @@ import { describe, it, expect } from 'vitest';
 import { starterTemplate } from './starter';
 import { blankTemplate } from './blank';
 import { getTemplate, AVAILABLE_TEMPLATES } from './registry';
-import { SCHEMA_VERSION } from '@/types/cv';
+import { SCHEMA_VERSION, TEMPLATE_IDS } from '@/types/cv';
 
 describe('starterTemplate', () => {
   it('returns valid CV content structure', () => {
@@ -66,8 +66,14 @@ describe('blankTemplate', () => {
     const template = blankTemplate();
 
     expect(template.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(template.templateId).toBe('blank');
+    expect(template.templateId).toBe('classic');
     expect(template.sections).toBeInstanceOf(Array);
+  });
+
+  it('uses a valid visual templateId', () => {
+    const template = blankTemplate();
+
+    expect((TEMPLATE_IDS as readonly string[]).includes(template.templateId)).toBe(true);
   });
 
   it('includes all required section types', () => {

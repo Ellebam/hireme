@@ -342,6 +342,240 @@ func TestCVValidator_Validate_PopulatedCertificationsSection(t *testing.T) {
 	}
 }
 
+func TestCVValidator_Validate_PopulatedLanguagesSection(t *testing.T) {
+	validator, err := NewCVValidator()
+	if err != nil {
+		t.Fatalf("failed to create validator: %v", err)
+	}
+
+	cv := `{
+		"schemaVersion": "1.0.0",
+		"templateId": "classic",
+		"sections": [
+			{
+				"id": "550e8400-e29b-41d4-a716-446655440001",
+				"type": "languages",
+				"order": 0,
+				"content": {
+					"entries": [
+						{
+							"id": "550e8400-e29b-41d4-a716-446655440020",
+							"language": "German",
+							"proficiency": "native"
+						},
+						{
+							"id": "550e8400-e29b-41d4-a716-446655440021",
+							"language": "English",
+							"proficiency": "fluent",
+							"certification": "TOEFL 120"
+						}
+					]
+				}
+			}
+		]
+	}`
+
+	err = validator.Validate(json.RawMessage(cv))
+	if err != nil {
+		t.Errorf("expected populated languages to pass validation, got: %v", err)
+	}
+}
+
+func TestCVValidator_Validate_LanguageEntryWithoutId(t *testing.T) {
+	validator, err := NewCVValidator()
+	if err != nil {
+		t.Fatalf("failed to create validator: %v", err)
+	}
+
+	cv := `{
+		"schemaVersion": "1.0.0",
+		"templateId": "classic",
+		"sections": [
+			{
+				"id": "550e8400-e29b-41d4-a716-446655440001",
+				"type": "languages",
+				"order": 0,
+				"content": {
+					"entries": [
+						{
+							"language": "German",
+							"proficiency": "native"
+						}
+					]
+				}
+			}
+		]
+	}`
+
+	err = validator.Validate(json.RawMessage(cv))
+	if err == nil {
+		t.Error("expected validation error for language entry without id, got nil")
+	}
+}
+
+func TestCVValidator_Validate_LanguageEntryExtraProperty(t *testing.T) {
+	validator, err := NewCVValidator()
+	if err != nil {
+		t.Fatalf("failed to create validator: %v", err)
+	}
+
+	cv := `{
+		"schemaVersion": "1.0.0",
+		"templateId": "classic",
+		"sections": [
+			{
+				"id": "550e8400-e29b-41d4-a716-446655440001",
+				"type": "languages",
+				"order": 0,
+				"content": {
+					"entries": [
+						{
+							"id": "550e8400-e29b-41d4-a716-446655440020",
+							"language": "German",
+							"proficiency": "native",
+							"extra": "should-fail"
+						}
+					]
+				}
+			}
+		]
+	}`
+
+	err = validator.Validate(json.RawMessage(cv))
+	if err == nil {
+		t.Error("expected validation error for language entry with extra property, got nil")
+	}
+}
+
+func TestCVValidator_Validate_FullRealisticCV(t *testing.T) {
+	validator, err := NewCVValidator()
+	if err != nil {
+		t.Fatalf("failed to create validator: %v", err)
+	}
+
+	cv := `{
+		"schemaVersion": "1.0.0",
+		"templateId": "modern",
+		"locale": "en",
+		"sections": [
+			{
+				"id": "550e8400-e29b-41d4-a716-446655440001",
+				"type": "personal",
+				"order": 0,
+				"content": {
+					"firstName": "John",
+					"lastName": "Doe",
+					"jobTitle": "Software Engineer",
+					"email": "john@example.com"
+				}
+			},
+			{
+				"id": "550e8400-e29b-41d4-a716-446655440002",
+				"type": "summary",
+				"order": 1,
+				"content": {
+					"text": "Experienced engineer."
+				}
+			},
+			{
+				"id": "550e8400-e29b-41d4-a716-446655440003",
+				"type": "experience",
+				"order": 2,
+				"content": {
+					"entries": [
+						{
+							"id": "550e8400-e29b-41d4-a716-446655440010",
+							"company": "TechCorp",
+							"position": "Senior Engineer",
+							"startDate": "2020-01"
+						}
+					]
+				}
+			},
+			{
+				"id": "550e8400-e29b-41d4-a716-446655440004",
+				"type": "education",
+				"order": 3,
+				"content": {
+					"entries": [
+						{
+							"id": "550e8400-e29b-41d4-a716-446655440011",
+							"institution": "MIT",
+							"degree": "M.Sc."
+						}
+					]
+				}
+			},
+			{
+				"id": "550e8400-e29b-41d4-a716-446655440005",
+				"type": "skills",
+				"order": 4,
+				"content": {
+					"categories": [
+						{
+							"id": "550e8400-e29b-41d4-a716-446655440012",
+							"name": "Languages",
+							"skills": [{"name": "Go", "level": "expert"}]
+						}
+					]
+				}
+			},
+			{
+				"id": "550e8400-e29b-41d4-a716-446655440006",
+				"type": "languages",
+				"order": 5,
+				"content": {
+					"entries": [
+						{
+							"id": "550e8400-e29b-41d4-a716-446655440013",
+							"language": "English",
+							"proficiency": "native"
+						}
+					]
+				}
+			},
+			{
+				"id": "550e8400-e29b-41d4-a716-446655440007",
+				"type": "certifications",
+				"order": 6,
+				"content": {
+					"entries": [
+						{
+							"id": "550e8400-e29b-41d4-a716-446655440014",
+							"name": "AWS SA",
+							"issuer": "Amazon"
+						}
+					]
+				}
+			},
+			{
+				"id": "550e8400-e29b-41d4-a716-446655440008",
+				"type": "projects",
+				"order": 7,
+				"content": {
+					"entries": [
+						{
+							"id": "550e8400-e29b-41d4-a716-446655440015",
+							"name": "CLI Tool",
+							"description": "A command-line tool."
+						}
+					]
+				}
+			}
+		],
+		"styling": {
+			"primaryColor": "#2563eb",
+			"fontFamily": "inter",
+			"fontSize": "medium"
+		}
+	}`
+
+	err = validator.Validate(json.RawMessage(cv))
+	if err != nil {
+		t.Errorf("expected full realistic CV to pass validation, got: %v", err)
+	}
+}
+
 func TestCVValidator_Validate_WrongContentForSectionType(t *testing.T) {
 	validator, err := NewCVValidator()
 	if err != nil {
