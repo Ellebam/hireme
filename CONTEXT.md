@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — T-001–T-012 done, stakeholder feedback triaged into T-016–T-029, 17 tasks in backlog (10 unblocked, 3 blocked, 4 need splitting when picked up)
+**Status:** Task-based workflow active — T-001–T-012 + T-016 done, 16 tasks in backlog (9 unblocked, 3 blocked, 4 need splitting when picked up)
 
 ### What's Working
 
@@ -37,7 +37,7 @@
 - ✅ Delete confirmation dialog on CV card
 - ✅ Back-to-dashboard link in editor toolbar
 - ✅ shadcn/ui dropdown-menu component
-- ✅ 167 passing tests (Vitest)
+- ✅ 170 passing tests (Vitest)
 - ✅ Build verified, full stack integration tested
 
 ### Remaining Work
@@ -231,7 +231,6 @@ task api:sqlc          # Generate sqlc code
 ### Backlog — P0 (Bugs)
 | ID | Task | Blocked By | Size |
 |----|------|------------|------|
-| T-016 | Fix save bug after template switch | — | XS–S |
 | T-017 | Responsive layout + clipping fixes | — | S–M |
 
 ### Backlog — P1 (UX Fixes)
@@ -272,18 +271,13 @@ task api:sqlc          # Generate sqlc code
 | T-010 | P2 UX regression tests | test/t-008-010-interaction-ux-tests |
 | T-011 | Add Certifications section | feat/t-011-012-certifications-projects |
 | T-012 | Add Projects section | feat/t-011-012-certifications-projects |
+| T-016 | Fix save bug after template switch | fix/t-016-save-after-template-switch |
 
 ---
 
 ## Task Details
 
 ### P0 — Bugs
-
-**T-016: Fix save bug after template switch** — XS–S
-- Saves appear to break after switching templates; suspected backend validation issue
-- Needs `/investigate` first — root cause unknown
-- Check: does `PUT /api/v1/cv/{id}` reject content after `templateId` changes?
-- Check: does `useAutoSave` fire correctly after `updateTemplateId` sets `isDirty`?
 
 **T-017: Responsive layout + clipping fixes** — S–M
 - A4 preview uses fixed 794px width + CSS transform scale — clips at narrow viewports
@@ -380,7 +374,7 @@ task api:sqlc          # Generate sqlc code
 ### Dependency Graph
 ```
 INDEPENDENT (can start anytime):
-  T-016, T-017, T-018, T-019, T-020, T-023
+  T-017, T-018, T-019, T-020, T-023
   T-021, T-022, T-028
   T-013, T-014, T-015
 
@@ -393,11 +387,10 @@ T-029 (consultant profile): independent but needs splitting when picked up
 
 ### Recommended Sequencing
 **Phase 1 — Bugs + quick UX wins:**
-1. **T-016** (save bug) — P0, investigate first, data integrity risk
-2. **T-017** (responsive) — P0, broken for split-screen users
-3. **T-018** (edit UX) — XS, fast win
-4. **T-019** (date pickers) — visible on every CV
-5. **T-020** (tag input) — fast, pattern already exists
+1. **T-017** (responsive) — P0, broken for split-screen users
+2. **T-018** (edit UX) — XS, fast win
+3. **T-019** (date pickers) — visible on every CV
+4. **T-020** (tag input) — fast, pattern already exists
 
 **Phase 2 — Features + polish:**
 6. **T-024** (design direction) — collaborative, unlocks T-025/T-026
