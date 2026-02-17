@@ -18,3 +18,4 @@
 - the general export of CVs in DOCX works but the styling is mismatched and does not look like the actual CV design. We need to update it to match. This task should be tackled after we have finalized the stylings of the CV templates
 - the date pickers are very uggly and also not good for the user experience, we should use some that are better
 - a free text field for technologies is not what one should use. If we say we have one entry per line we should build something that tokenizes the entries from the get go. 
+- our documentation for the repository is very outdated and also super bland. We really need to update our readme in terms of content and also design. lets use the following readme as inspiration: https://github.com/openclaw/openclaw/blob/main/README.md
