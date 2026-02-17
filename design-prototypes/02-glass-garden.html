@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HireMe — Glass Garden Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --lavender: #c4b5fd;
+    --lavender-deep: #7c3aed;
+    --sage: #86efac;
+    --sage-deep: #22c55e;
+    --peach: #fdba74;
+    --peach-deep: #f97316;
+    --rose: #fda4af;
+    --rose-deep: #f43f5e;
+    --sky: #7dd3fc;
+    --sky-deep: #0ea5e9;
+
+    --bg: #faf8ff;
+    --bg-glass: rgba(255, 255, 255, 0.55);
+    --bg-glass-strong: rgba(255, 255, 255, 0.75);
+    --text: #1e1b4b;
+    --text-secondary: #6b7280;
+    --text-muted: #9ca3af;
+    --border-glass: rgba(255, 255, 255, 0.4);
+    --shadow-glass: 0 8px 32px rgba(124, 58, 237, 0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ===== Animated Background ===== */
+  .bg-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.5;
+    animation: blobFloat 20s ease-in-out infinite;
+  }
+  .blob-1 {
+    width: 500px; height: 500px;
+    background: linear-gradient(135deg, var(--lavender), #ddd6fe);
+    top: -100px; left: -100px;
+    animation-delay: 0s;
+  }
+  .blob-2 {
+    width: 400px; height: 400px;
+    background: linear-gradient(135deg, var(--sage), #bbf7d0);
+    top: 200px; right: -80px;
+    animation-delay: -7s;
+    animation-duration: 25s;
+  }
+  .blob-3 {
+    width: 350px; height: 350px;
+    background: linear-gradient(135deg, var(--peach), #fed7aa);
+    bottom: -50px; left: 30%;
+    animation-delay: -14s;
+    animation-duration: 22s;
+  }
+  .blob-4 {
+    width: 300px; height: 300px;
+    background: linear-gradient(135deg, var(--rose), #fecdd3);
+    top: 50%; left: 10%;
+    animation-delay: -3s;
+    animation-duration: 28s;
+  }
+  .blob-5 {
+    width: 250px; height: 250px;
+    background: linear-gradient(135deg, var(--sky), #bae6fd);
+    bottom: 20%; right: 15%;
+    animation-delay: -10s;
+    animation-duration: 18s;
+  }
+  @keyframes blobFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(50px, -30px) scale(1.1); }
+    50% { transform: translate(-20px, 40px) scale(0.95); }
+    75% { transform: translate(30px, 20px) scale(1.05); }
+  }
+
+  /* ===== Content Layer ===== */
+  .content { position: relative; z-index: 1; }
+
+  /* ===== Glass Panel ===== */
+  .glass {
+    background: var(--bg-glass);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--border-glass);
+    box-shadow: var(--shadow-glass);
+  }
+  .glass-strong {
+    background: var(--bg-glass-strong);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 8px 40px rgba(124, 58, 237, 0.06);
+  }
+
+  /* ===== Navigation ===== */
+  .nav {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 32px);
+    max-width: 1200px;
+    height: 60px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    z-index: 100;
+    animation: navIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes navIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .nav-logo-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--lavender-deep), var(--rose-deep));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+  }
+  .nav-logo-text {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    background: linear-gradient(135deg, var(--lavender-deep), var(--rose-deep));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .nav-links {
+    display: flex;
+    gap: 2px;
+    margin-left: 40px;
+    background: rgba(124, 58, 237, 0.06);
+    border-radius: 12px;
+    padding: 4px;
+  }
+  .nav-link {
+    padding: 8px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  .nav-link:hover { color: var(--text); }
+  .nav-link.active {
+    background: white;
+    color: var(--lavender-deep);
+    box-shadow: 0 2px 12px rgba(124, 58, 237, 0.1);
+  }
+  .nav-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .nav-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--sage), var(--sky));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  .nav-avatar:hover { transform: scale(1.1); }
+
+  /* ===== Buttons ===== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border-radius: 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--lavender-deep), #9333ea);
+    color: white;
+    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.25);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(124, 58, 237, 0.35);
+  }
+  .btn-soft {
+    background: rgba(124, 58, 237, 0.08);
+    color: var(--lavender-deep);
+  }
+  .btn-soft:hover {
+    background: rgba(124, 58, 237, 0.14);
+  }
+  .btn-white {
+    background: white;
+    color: var(--text);
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .btn-white:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    transform: translateY(-1px);
+  }
+
+  /* ===== Pages ===== */
+  .page {
+    display: none;
+    padding-top: 100px;
+    min-height: 100vh;
+    animation: pageIn 0.5s ease;
+  }
+  .page.active { display: block; }
+  @keyframes pageIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== Dashboard ===== */
+  .dash-hero {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+    text-align: center;
+  }
+  .dash-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--lavender-deep);
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.15s forwards;
+  }
+  .dash-badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--sage);
+    animation: dotPulse 2s ease infinite;
+  }
+  @keyframes dotPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+  .dash-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 52px;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: 16px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.25s forwards;
+  }
+  .dash-title-gradient {
+    background: linear-gradient(135deg, var(--lavender-deep), var(--rose-deep), var(--peach-deep));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .dash-subtitle {
+    font-size: 17px;
+    color: var(--text-secondary);
+    max-width: 460px;
+    margin: 0 auto 32px;
+    line-height: 1.7;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.4s forwards;
+  }
+  .dash-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.5s forwards;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== CV Grid ===== */
+  .cv-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+  .cv-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .cv-section-label {
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+  }
+  .cv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+
+  /* ===== CV Cards ===== */
+  .cv-card {
+    border-radius: 20px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    animation: cardUp 0.5s ease forwards;
+  }
+  .cv-card:nth-child(1) { animation-delay: 0.1s; }
+  .cv-card:nth-child(2) { animation-delay: 0.2s; }
+  .cv-card:nth-child(3) { animation-delay: 0.3s; }
+  .cv-card:nth-child(4) { animation-delay: 0.4s; }
+  @keyframes cardUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .cv-card:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 20px 60px rgba(124, 58, 237, 0.12);
+  }
+  .cv-card-accent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    border-radius: 20px 20px 0 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .cv-card:hover .cv-card-accent { opacity: 1; }
+
+  .cv-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .cv-card-emoji {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+  .cv-card-menu {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 18px;
+  }
+  .cv-card-menu:hover {
+    background: rgba(124, 58, 237, 0.06);
+    color: var(--text);
+  }
+  .cv-card-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+  .cv-card-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+  .cv-card-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(0,0,0,0.04);
+  }
+  .cv-card-badge {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 100px;
+  }
+  .badge-lavender { background: rgba(124, 58, 237, 0.08); color: var(--lavender-deep); }
+  .badge-sage { background: rgba(34, 197, 94, 0.08); color: var(--sage-deep); }
+  .badge-peach { background: rgba(249, 115, 22, 0.08); color: var(--peach-deep); }
+  .cv-card-time {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-left: auto;
+  }
+
+  /* ===== Create Card ===== */
+  .cv-card-create {
+    border: 2px dashed rgba(124, 58, 237, 0.15);
+    border-radius: 20px;
+    padding: 24px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px;
+    transition: all 0.3s ease;
+    background: transparent;
+    opacity: 0;
+    animation: cardUp 0.5s ease 0.5s forwards;
+  }
+  .cv-card-create:hover {
+    border-color: var(--lavender-deep);
+    background: rgba(124, 58, 237, 0.03);
+    transform: translateY(-4px);
+  }
+  .create-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(244, 63, 94, 0.1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    transition: transform 0.3s ease;
+    font-size: 24px;
+    color: var(--lavender-deep);
+  }
+  .cv-card-create:hover .create-icon { transform: scale(1.1) rotate(90deg); }
+  .create-text {
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  /* ===== Editor ===== */
+  .editor-toolbar {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 8px;
+    border-radius: 16px;
+    margin: 0 16px;
+  }
+  .tb-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 18px;
+  }
+  .tb-btn:hover { background: rgba(124, 58, 237, 0.08); color: var(--lavender-deep); }
+  .tb-btn.active { background: rgba(124, 58, 237, 0.1); color: var(--lavender-deep); }
+  .tb-sep {
+    width: 1px;
+    height: 24px;
+    background: rgba(0,0,0,0.06);
+    margin: 0 6px;
+  }
+  .tb-zoom {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    padding: 0 4px;
+  }
+  .save-pill {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 100px;
+    background: rgba(34, 197, 94, 0.08);
+    color: var(--sage-deep);
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .save-pill-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--sage-deep);
+  }
+
+  .editor-body {
+    display: flex;
+    height: calc(100vh - 172px);
+    padding: 0 16px 16px;
+    gap: 16px;
+  }
+  .editor-left {
+    width: 260px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .panel-head {
+    padding: 20px;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+  .panel-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .panel-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .section-list {
+    padding: 10px;
+    flex: 1;
+    overflow-y: auto;
+  }
+  .sec-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 4px;
+  }
+  .sec-item:hover { background: rgba(124, 58, 237, 0.05); }
+  .sec-item.active { background: rgba(124, 58, 237, 0.08); }
+  .sec-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .sec-icon-lavender { background: rgba(124, 58, 237, 0.08); }
+  .sec-icon-sage { background: rgba(34, 197, 94, 0.08); }
+  .sec-icon-peach { background: rgba(249, 115, 22, 0.08); }
+  .sec-icon-rose { background: rgba(244, 63, 94, 0.08); }
+  .sec-icon-sky { background: rgba(14, 165, 233, 0.08); }
+  .sec-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+  .sec-item.active .sec-label { color: var(--lavender-deep); font-weight: 600; }
+  .sec-drag {
+    margin-left: auto;
+    opacity: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+    transition: opacity 0.2s;
+  }
+  .sec-item:hover .sec-drag { opacity: 0.6; }
+
+  /* Center Preview */
+  .editor-center {
+    flex: 1;
+    border-radius: 20px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 32px;
+    overflow: auto;
+    position: relative;
+    background: rgba(124, 58, 237, 0.02);
+    border: 1px solid rgba(124, 58, 237, 0.06);
+  }
+  .cv-paper {
+    width: 580px;
+    min-height: 820px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(124, 58, 237, 0.08), 0 0 0 1px rgba(0,0,0,0.03);
+    padding: 44px;
+    color: #1e1b4b;
+    animation: paperFloat 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes paperFloat {
+    from { opacity: 0; transform: translateY(20px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .cv-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    color: #1e1b4b;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .cv-job {
+    font-size: 15px;
+    color: var(--lavender-deep);
+    font-weight: 500;
+    margin-bottom: 14px;
+  }
+  .cv-contact {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--text-secondary);
+    padding-bottom: 18px;
+    margin-bottom: 22px;
+    border-bottom: 2px solid var(--lavender);
+  }
+  .cv-contact span {
+    padding: 4px 12px;
+    background: rgba(124, 58, 237, 0.05);
+    border-radius: 100px;
+  }
+  .cv-sec-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--lavender-deep);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cv-sec-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--lavender), transparent);
+  }
+  .cv-block { margin-bottom: 22px; }
+  .cv-entry-title { font-weight: 600; font-size: 14px; }
+  .cv-entry-sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
+  .cv-entry-body { font-size: 13px; color: #4b5563; line-height: 1.65; }
+  .cv-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .cv-skill {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 100px;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.06), rgba(244, 63, 94, 0.06));
+    color: var(--lavender-deep);
+    border: 1px solid rgba(124, 58, 237, 0.08);
+  }
+
+  /* Right Panel */
+  .editor-right {
+    width: 320px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .prop-section { padding: 16px 20px; }
+  .prop-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .prop-input {
+    width: 100%;
+    padding: 10px 14px;
+    background: rgba(124, 58, 237, 0.03);
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    margin-bottom: 12px;
+    outline: none;
+  }
+  .prop-input:focus {
+    border-color: var(--lavender);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.08);
+    background: white;
+  }
+  .prop-textarea {
+    width: 100%;
+    padding: 10px 14px;
+    background: rgba(124, 58, 237, 0.03);
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 80px;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+  .prop-textarea:focus {
+    border-color: var(--lavender);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.08);
+    background: white;
+  }
+
+  /* ===== Templates ===== */
+  .tmpl-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  .tmpl-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+    text-align: center;
+    opacity: 0; animation: fadeUp 0.6s ease 0.1s forwards;
+  }
+  .tmpl-sub {
+    font-size: 16px;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-bottom: 48px;
+    opacity: 0; animation: fadeUp 0.6s ease 0.2s forwards;
+  }
+  .tmpl-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+  }
+  .tmpl-card {
+    border-radius: 24px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    animation: cardUp 0.5s ease forwards;
+  }
+  .tmpl-card:nth-child(1) { animation-delay: 0.1s; }
+  .tmpl-card:nth-child(2) { animation-delay: 0.2s; }
+  .tmpl-card:nth-child(3) { animation-delay: 0.3s; }
+  .tmpl-card:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 24px 80px rgba(124, 58, 237, 0.15);
+  }
+  .tmpl-preview {
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .tmpl-preview-1 { background: linear-gradient(135deg, #ede9fe, #fce7f3); }
+  .tmpl-preview-2 { background: linear-gradient(135deg, #dcfce7, #e0f2fe); }
+  .tmpl-preview-3 { background: linear-gradient(135deg, #fef3c7, #fce7f3); }
+  .tmpl-mini {
+    width: 130px;
+    height: 180px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 14px;
+    transition: transform 0.4s ease;
+  }
+  .tmpl-card:hover .tmpl-mini { transform: scale(1.08) translateY(-4px); }
+  .tmpl-line {
+    height: 5px;
+    border-radius: 3px;
+    margin-bottom: 5px;
+  }
+  .tmpl-info {
+    padding: 20px 24px;
+  }
+  .tmpl-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .tmpl-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  .tmpl-tag {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 100px;
+  }
+
+  /* ===== Modal ===== */
+  .modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(30, 27, 75, 0.3);
+    backdrop-filter: blur(12px);
+    z-index: 200;
+    animation: fadeIn 0.3s ease;
+  }
+  .modal-bg.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    border-radius: 24px;
+    padding: 32px;
+    max-width: 440px;
+    width: 90%;
+    animation: modalPop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes modalPop {
+    from { opacity: 0; transform: scale(0.9) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .modal-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .fmt-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .fmt-opt {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(0,0,0,0.06);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: white;
+  }
+  .fmt-opt:hover { border-color: var(--lavender); background: rgba(124, 58, 237, 0.02); }
+  .fmt-opt.selected { border-color: var(--lavender-deep); background: rgba(124, 58, 237, 0.04); }
+  .fmt-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .fmt-pdf { background: linear-gradient(135deg, #fecdd3, #fda4af); color: #be123c; }
+  .fmt-docx { background: linear-gradient(135deg, #bae6fd, #7dd3fc); color: #0369a1; }
+  .fmt-json { background: linear-gradient(135deg, #ddd6fe, #c4b5fd); color: #6d28d9; }
+  .fmt-name { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+  .fmt-sub { font-size: 12px; color: var(--text-muted); }
+  .modal-foot {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(124, 58, 237, 0.15); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(124, 58, 237, 0.25); }
+</style>
+</head>
+<body>
+
+<div class="bg-canvas">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="blob blob-4"></div>
+  <div class="blob blob-5"></div>
+</div>
+
+<div class="content">
+  <!-- Nav -->
+  <nav class="nav glass">
+    <div class="nav-logo">
+      <div class="nav-logo-icon">H</div>
+      <div class="nav-logo-text">HireMe</div>
+    </div>
+    <div class="nav-links">
+      <a class="nav-link active" onclick="go('dashboard')" data-page="dashboard">Dashboard</a>
+      <a class="nav-link" onclick="go('editor')" data-page="editor">Editor</a>
+      <a class="nav-link" onclick="go('templates')" data-page="templates">Templates</a>
+    </div>
+    <div class="nav-right">
+      <button class="btn btn-primary" onclick="openModal()">+ New CV</button>
+      <div class="nav-avatar">AJ</div>
+    </div>
+  </nav>
+
+  <!-- Dashboard -->
+  <div class="page active" id="page-dashboard">
+    <div class="dash-hero">
+      <div class="dash-badge glass">
+        <div class="dash-badge-dot"></div>
+        3 CVs in your collection
+      </div>
+      <h1 class="dash-title">Build something<br><span class="dash-title-gradient">beautiful</span></h1>
+      <p class="dash-subtitle">Your CV is more than a list of jobs. It's a first impression — make it unforgettable.</p>
+      <div class="dash-actions">
+        <button class="btn btn-primary" onclick="openModal()">+ Create CV</button>
+        <button class="btn btn-white" onclick="go('templates')">Browse Templates</button>
+      </div>
+    </div>
+
+    <div class="cv-section">
+      <div class="cv-section-header">
+        <span class="cv-section-label">Your Collection</span>
+        <button class="btn btn-soft" style="padding: 6px 14px; font-size: 13px;">Sort by date</button>
+      </div>
+      <div class="cv-grid">
+        <div class="cv-card glass" onclick="go('editor')">
+          <div class="cv-card-accent" style="background: linear-gradient(90deg, var(--lavender-deep), var(--rose-deep));"></div>
+          <div class="cv-card-top">
+            <div class="cv-card-emoji" style="background: rgba(124, 58, 237, 0.06);">🧑‍💻</div>
+            <div class="cv-card-menu">⋯</div>
+          </div>
+          <div class="cv-card-title">Senior Engineer</div>
+          <div class="cv-card-desc">Fullstack development with 6 years of experience in building scalable apps</div>
+          <div class="cv-card-footer">
+            <span class="cv-card-badge badge-lavender">Modern</span>
+            <span class="cv-card-time">2 hours ago</span>
+          </div>
+        </div>
+
+        <div class="cv-card glass">
+          <div class="cv-card-accent" style="background: linear-gradient(90deg, var(--sage-deep), var(--sky-deep));"></div>
+          <div class="cv-card-top">
+            <div class="cv-card-emoji" style="background: rgba(34, 197, 94, 0.06);">📋</div>
+            <div class="cv-card-menu">⋯</div>
+          </div>
+          <div class="cv-card-title">Product Manager</div>
+          <div class="cv-card-desc">Strategy & cross-functional leadership in fast-paced environments</div>
+          <div class="cv-card-footer">
+            <span class="cv-card-badge badge-sage">Classic</span>
+            <span class="cv-card-time">3 days ago</span>
+          </div>
+        </div>
+
+        <div class="cv-card glass">
+          <div class="cv-card-accent" style="background: linear-gradient(90deg, var(--peach-deep), var(--rose-deep));"></div>
+          <div class="cv-card-top">
+            <div class="cv-card-emoji" style="background: rgba(249, 115, 22, 0.06);">🎨</div>
+            <div class="cv-card-menu">⋯</div>
+          </div>
+          <div class="cv-card-title">UX Designer</div>
+          <div class="cv-card-desc">Human-centered digital experiences for global products</div>
+          <div class="cv-card-footer">
+            <span class="cv-card-badge badge-peach">Visionary</span>
+            <span class="cv-card-time">Draft</span>
+          </div>
+        </div>
+
+        <div class="cv-card-create" onclick="openModal()">
+          <div class="create-icon">+</div>
+          <div class="create-text">Create new CV</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Editor -->
+  <div class="page" id="page-editor">
+    <div class="editor-toolbar glass-strong">
+      <button class="tb-btn" onclick="go('dashboard')">←</button>
+      <div class="tb-sep"></div>
+      <button class="tb-btn active">☷</button>
+      <div class="tb-sep"></div>
+      <button class="tb-btn">↺</button>
+      <button class="tb-btn">↻</button>
+      <div class="tb-sep"></div>
+      <button class="tb-btn">−</button>
+      <span class="tb-zoom">100%</span>
+      <button class="tb-btn">+</button>
+      <div class="save-pill">
+        <div class="save-pill-dot"></div>
+        Saved
+      </div>
+      <div class="tb-sep"></div>
+      <button class="btn btn-primary" style="padding: 7px 16px; font-size: 13px;" onclick="openModal()">↓ Export</button>
+    </div>
+
+    <div class="editor-body">
+      <div class="editor-left glass">
+        <div class="panel-head">
+          <div class="panel-title">Sections</div>
+          <div class="panel-sub">Drag to reorder</div>
+        </div>
+        <div class="section-list">
+          <div class="sec-item active">
+            <div class="sec-icon sec-icon-lavender">👤</div>
+            <span class="sec-label">Personal</span>
+            <span class="sec-drag">⋮⋮</span>
+          </div>
+          <div class="sec-item">
+            <div class="sec-icon sec-icon-sage">📝</div>
+            <span class="sec-label">Summary</span>
+            <span class="sec-drag">⋮⋮</span>
+          </div>
+          <div class="sec-item">
+            <div class="sec-icon sec-icon-peach">💼</div>
+            <span class="sec-label">Experience</span>
+            <span class="sec-drag">⋮⋮</span>
+          </div>
+          <div class="sec-item">
+            <div class="sec-icon sec-icon-sky">🎓</div>
+            <span class="sec-label">Education</span>
+            <span class="sec-drag">⋮⋮</span>
+          </div>
+          <div class="sec-item">
+            <div class="sec-icon sec-icon-rose">🛠</div>
+            <span class="sec-label">Skills</span>
+            <span class="sec-drag">⋮⋮</span>
+          </div>
+          <div class="sec-item">
+            <div class="sec-icon sec-icon-lavender">🌐</div>
+            <span class="sec-label">Languages</span>
+            <span class="sec-drag">⋮⋮</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-center">
+        <div class="cv-paper">
+          <div class="cv-name">Alexandra Johnson</div>
+          <div class="cv-job">Senior Software Engineer</div>
+          <div class="cv-contact">
+            <span>alex@email.com</span>
+            <span>+49 123 456 789</span>
+            <span>Berlin, Germany</span>
+          </div>
+          <div class="cv-block">
+            <div class="cv-sec-title">Summary</div>
+            <div class="cv-entry-body">Experienced software engineer with 6+ years building scalable web applications. Passionate about clean architecture and delivering user-centric products.</div>
+          </div>
+          <div class="cv-block">
+            <div class="cv-sec-title">Experience</div>
+            <div style="margin-bottom: 14px;">
+              <div class="cv-entry-title">Senior Software Engineer</div>
+              <div class="cv-entry-sub">TechCorp GmbH · Berlin · 2021 – Present</div>
+              <div class="cv-entry-body">Led migration to microservices, reduced deployment time by 70%. Mentored 4 junior engineers.</div>
+            </div>
+            <div>
+              <div class="cv-entry-title">Software Engineer</div>
+              <div class="cv-entry-sub">StartupXYZ · Munich · 2018 – 2021</div>
+              <div class="cv-entry-body">Built core SaaS features serving 50K users. Implemented CI/CD pipelines.</div>
+            </div>
+          </div>
+          <div class="cv-block">
+            <div class="cv-sec-title">Skills</div>
+            <div class="cv-skills">
+              <span class="cv-skill">TypeScript</span>
+              <span class="cv-skill">React</span>
+              <span class="cv-skill">Node.js</span>
+              <span class="cv-skill">Go</span>
+              <span class="cv-skill">PostgreSQL</span>
+              <span class="cv-skill">Docker</span>
+              <span class="cv-skill">AWS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-right glass">
+        <div class="panel-head">
+          <div class="panel-title">Personal Details</div>
+          <div class="panel-sub">Edit your information</div>
+        </div>
+        <div class="prop-section" style="flex: 1; overflow-y: auto;">
+          <div class="prop-label">Full Name</div>
+          <input class="prop-input" value="Alexandra Johnson">
+          <div class="prop-label">Job Title</div>
+          <input class="prop-input" value="Senior Software Engineer">
+          <div class="prop-label">Email</div>
+          <input class="prop-input" value="alex@email.com">
+          <div class="prop-label">Phone</div>
+          <input class="prop-input" value="+49 123 456 789">
+          <div class="prop-label">Location</div>
+          <input class="prop-input" value="Berlin, Germany">
+          <div class="prop-label">Summary</div>
+          <textarea class="prop-textarea">Experienced software engineer with 6+ years building scalable web applications.</textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Templates -->
+  <div class="page" id="page-templates">
+    <div class="tmpl-page">
+      <h1 class="tmpl-title">Choose your <span class="dash-title-gradient">style</span></h1>
+      <p class="tmpl-sub">Each template creates a different impression. Pick the one that fits your story.</p>
+      <div class="tmpl-grid">
+        <div class="tmpl-card glass">
+          <div class="tmpl-preview tmpl-preview-1">
+            <div class="tmpl-mini">
+              <div class="tmpl-line" style="width: 70%; height: 7px; background: #1e1b4b;"></div>
+              <div class="tmpl-line" style="width: 50%; height: 4px; background: var(--lavender-deep);"></div>
+              <div style="height: 8px;"></div>
+              <div class="tmpl-line" style="width: 90%; height: 3px; background: #e5e7eb;"></div>
+              <div class="tmpl-line" style="width: 80%; height: 3px; background: #e5e7eb;"></div>
+              <div class="tmpl-line" style="width: 85%; height: 3px; background: #e5e7eb;"></div>
+              <div style="height: 8px;"></div>
+              <div class="tmpl-line" style="width: 40%; height: 3px; background: var(--lavender); opacity: 0.5;"></div>
+              <div class="tmpl-line" style="width: 90%; height: 3px; background: #e5e7eb;"></div>
+              <div class="tmpl-line" style="width: 70%; height: 3px; background: #e5e7eb;"></div>
+            </div>
+          </div>
+          <div class="tmpl-info">
+            <div class="tmpl-name">Classic</div>
+            <div class="tmpl-desc">Clean, timeless structure perfect for corporate roles and executive positions.</div>
+            <div class="tmpl-tag badge-lavender">Popular</div>
+          </div>
+        </div>
+        <div class="tmpl-card glass">
+          <div class="tmpl-preview tmpl-preview-2">
+            <div class="tmpl-mini">
+              <div class="tmpl-line" style="width: 70%; height: 7px; background: #1e1b4b;"></div>
+              <div class="tmpl-line" style="width: 50%; height: 4px; background: #888;"></div>
+              <div style="height: 8px;"></div>
+              <div style="display: flex; gap: 4px; margin-bottom: 6px;">
+                <div style="width: 3px; height: 28px; background: var(--sage-deep); border-radius: 2px;"></div>
+                <div style="flex:1;">
+                  <div class="tmpl-line" style="width: 60%; height: 4px; background: #374151;"></div>
+                  <div class="tmpl-line" style="width: 90%; height: 3px; background: #e5e7eb;"></div>
+                  <div class="tmpl-line" style="width: 80%; height: 3px; background: #e5e7eb;"></div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 4px;">
+                <div style="width: 3px; height: 28px; background: var(--sage-deep); border-radius: 2px;"></div>
+                <div style="flex:1;">
+                  <div class="tmpl-line" style="width: 55%; height: 4px; background: #374151;"></div>
+                  <div class="tmpl-line" style="width: 85%; height: 3px; background: #e5e7eb;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tmpl-info">
+            <div class="tmpl-name">Modern</div>
+            <div class="tmpl-desc">Timeline-based layout with bold accents. Great for creative and tech roles.</div>
+            <div class="tmpl-tag badge-sage">Recommended</div>
+          </div>
+        </div>
+        <div class="tmpl-card glass">
+          <div class="tmpl-preview tmpl-preview-3">
+            <div class="tmpl-mini">
+              <div style="display: flex; height: 100%;">
+                <div style="width: 40%; background: linear-gradient(135deg, var(--peach-deep), var(--rose-deep)); border-radius: 4px 0 0 4px; padding: 6px;">
+                  <div class="tmpl-line" style="width: 80%; height: 4px; background: rgba(255,255,255,0.8);"></div>
+                  <div class="tmpl-line" style="width: 60%; height: 3px; background: rgba(255,255,255,0.4);"></div>
+                </div>
+                <div style="flex:1; padding: 6px;">
+                  <div class="tmpl-line" style="width: 80%; height: 5px; background: var(--peach-deep);"></div>
+                  <div class="tmpl-line" style="width: 50%; height: 3px; background: #999;"></div>
+                  <div style="height: 6px;"></div>
+                  <div class="tmpl-line" style="width: 90%; height: 3px; background: #e5e7eb;"></div>
+                  <div class="tmpl-line" style="width: 80%; height: 3px; background: #e5e7eb;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tmpl-info">
+            <div class="tmpl-name">Visionary</div>
+            <div class="tmpl-desc">Two-column layout with striking sidebar. Stands out for design & consulting.</div>
+            <div class="tmpl-tag badge-peach">New</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modal">
+  <div class="modal glass-strong">
+    <div class="modal-title">Export your CV</div>
+    <div class="modal-desc">Choose a format to download your CV.</div>
+    <div class="fmt-options">
+      <div class="fmt-opt selected" onclick="selFmt(this)">
+        <div class="fmt-icon fmt-pdf">PDF</div>
+        <div>
+          <div class="fmt-name">PDF Document</div>
+          <div class="fmt-sub">Best for sharing and printing</div>
+        </div>
+      </div>
+      <div class="fmt-opt" onclick="selFmt(this)">
+        <div class="fmt-icon fmt-docx">DOC</div>
+        <div>
+          <div class="fmt-name">Word Document</div>
+          <div class="fmt-sub">Editable format for ATS</div>
+        </div>
+      </div>
+      <div class="fmt-opt" onclick="selFmt(this)">
+        <div class="fmt-icon fmt-json">{ }</div>
+        <div>
+          <div class="fmt-name">JSON Data</div>
+          <div class="fmt-sub">Backup or import later</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-white" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary">↓ Download</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function go(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    document.querySelector('[data-page="' + page + '"]').classList.add('active');
+    window.scrollTo(0, 0);
+  }
+  function openModal() { document.getElementById('modal').classList.add('active'); }
+  function closeModal() { document.getElementById('modal').classList.remove('active'); }
+  document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+  function selFmt(el) {
+    document.querySelectorAll('.fmt-opt').forEach(f => f.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+</script>
+</body>
+</html>

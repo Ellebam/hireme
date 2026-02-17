@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HireMe — Editorial Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,300;1,6..72,400;1,6..72,500&family=Work+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafaf9;
+    --paper: #ffffff;
+    --ink: #1c1917;
+    --ink-light: #292524;
+    --vermillion: #dc2626;
+    --vermillion-pale: rgba(220, 38, 38, 0.06);
+    --text: #292524;
+    --text-secondary: #78716c;
+    --text-muted: #a8a29e;
+    --border: #e7e5e4;
+    --border-heavy: #d6d3d1;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Work Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .serif { font-family: 'Newsreader', serif; }
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+
+  /* ===== Navigation ===== */
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: var(--paper);
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+    z-index: 100;
+    border-bottom: 2px solid var(--ink);
+  }
+  .nav-logo {
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+  }
+  .nav-logo-text {
+    font-family: 'Newsreader', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.04em;
+  }
+  .nav-logo-dot {
+    color: var(--vermillion);
+    font-size: 30px;
+    line-height: 1;
+  }
+  .nav-links {
+    display: flex;
+    gap: 0;
+    margin-left: 48px;
+  }
+  .nav-link {
+    padding: 16px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.2s ease;
+    text-decoration: none;
+    position: relative;
+  }
+  .nav-link:hover { color: var(--ink); }
+  .nav-link.active {
+    color: var(--ink);
+  }
+  .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 20px;
+    right: 20px;
+    height: 2px;
+    background: var(--vermillion);
+  }
+  .nav-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .nav-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+  }
+
+  /* ===== Buttons ===== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+  .btn-black {
+    background: var(--ink);
+    color: white;
+    border-radius: 0;
+  }
+  .btn-black:hover {
+    background: #0c0a09;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .btn-red {
+    background: var(--vermillion);
+    color: white;
+    border-radius: 0;
+  }
+  .btn-red:hover { background: #b91c1c; }
+  .btn-outline-blk {
+    background: transparent;
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    border-radius: 0;
+  }
+  .btn-outline-blk:hover {
+    background: var(--ink);
+    color: white;
+  }
+  .btn-text {
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: 0;
+    padding: 10px 12px;
+  }
+  .btn-text:hover { color: var(--ink); }
+
+  /* ===== Pages ===== */
+  .page {
+    display: none;
+    padding-top: 56px;
+    min-height: 100vh;
+    animation: pageIn 0.4s ease;
+  }
+  .page.active { display: block; }
+  @keyframes pageIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* ===== Dashboard ===== */
+  .dash-hero {
+    padding: 80px 40px 0;
+    max-width: 800px;
+  }
+  .hero-overline {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--vermillion);
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: editIn 0.5s ease 0.1s forwards;
+  }
+  .hero-title {
+    font-family: 'Newsreader', serif;
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--ink);
+    letter-spacing: -0.04em;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: editIn 0.5s ease 0.2s forwards;
+  }
+  .hero-title em {
+    font-style: italic;
+    font-weight: 400;
+  }
+  .hero-body {
+    font-size: 18px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    max-width: 520px;
+    margin-bottom: 36px;
+    opacity: 0;
+    animation: editIn 0.5s ease 0.35s forwards;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 64px;
+    opacity: 0;
+    animation: editIn 0.5s ease 0.45s forwards;
+  }
+  @keyframes editIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 2px solid var(--ink);
+    margin: 0 40px;
+  }
+  .divider-light {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0 40px;
+  }
+
+  /* ===== CV List (editorial table style) ===== */
+  .cv-section {
+    padding: 0 40px 60px;
+  }
+  .cv-section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 24px 0 16px;
+  }
+  .cv-section-title {
+    font-family: 'Newsreader', serif;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .cv-section-count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .cv-list {
+    display: flex;
+    flex-direction: column;
+  }
+  .cv-row {
+    display: grid;
+    grid-template-columns: 48px 1fr 120px 100px 40px;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .cv-row:hover {
+    background: var(--vermillion-pale);
+    padding-left: 12px;
+    padding-right: 12px;
+    margin-left: -12px;
+    margin-right: -12px;
+  }
+  .cv-row-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+  .cv-row-info {}
+  .cv-row-title {
+    font-family: 'Newsreader', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 2px;
+    letter-spacing: -0.01em;
+  }
+  .cv-row-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+  .cv-row-template {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+  .cv-row-date {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .cv-row-action {
+    font-size: 18px;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: flex-end;
+    cursor: pointer;
+  }
+  .cv-row-action:hover { color: var(--vermillion); }
+
+  .cv-create-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 24px 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-muted);
+  }
+  .cv-create-row:hover {
+    color: var(--vermillion);
+  }
+  .cv-create-plus {
+    font-family: 'Newsreader', serif;
+    font-size: 24px;
+    font-weight: 300;
+  }
+  .cv-create-label {
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ===== Editor ===== */
+  .editor-bar {
+    height: 48px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 4px;
+  }
+  .eb-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-size: 15px;
+  }
+  .eb-btn:hover { color: var(--ink); }
+  .eb-btn.active { color: var(--vermillion); }
+  .eb-sep {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+    margin: 0 6px;
+  }
+  .eb-zoom {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-secondary);
+    padding: 0 6px;
+  }
+  .save-indicator {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .save-indicator::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #16a34a;
+  }
+
+  .editor-body {
+    display: flex;
+    height: calc(100vh - 104px);
+  }
+  .editor-left {
+    width: 240px;
+    background: var(--paper);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+  }
+  .panel-head {
+    padding: 18px 20px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .panel-title {
+    font-family: 'Newsreader', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .panel-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+  .sec-list { padding: 8px; flex: 1; overflow-y: auto; }
+  .sec-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-bottom: 1px;
+    border-left: 3px solid transparent;
+  }
+  .sec-item:hover { background: rgba(0,0,0,0.02); }
+  .sec-item.active {
+    border-left-color: var(--vermillion);
+    background: var(--vermillion-pale);
+  }
+  .sec-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    width: 20px;
+  }
+  .sec-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+  .sec-item.active .sec-label { color: var(--ink); font-weight: 600; }
+  .sec-drag {
+    margin-left: auto;
+    opacity: 0;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'IBM Plex Mono', monospace;
+    transition: opacity 0.15s;
+  }
+  .sec-item:hover .sec-drag { opacity: 0.5; }
+
+  .editor-center {
+    flex: 1;
+    background: var(--bg);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px;
+    overflow: auto;
+  }
+  .cv-paper {
+    width: 580px;
+    min-height: 820px;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    padding: 56px 48px;
+    color: var(--ink);
+    animation: paperSlide 0.5s ease;
+  }
+  @keyframes paperSlide {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .cv-name {
+    font-family: 'Newsreader', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .cv-job {
+    font-family: 'Newsreader', serif;
+    font-size: 16px;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+  .cv-contact {
+    display: flex;
+    gap: 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-secondary);
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .cv-sec-title {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--vermillion);
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cv-block { margin-bottom: 24px; }
+  .cv-entry-title {
+    font-family: 'Newsreader', serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .cv-entry-sub {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-bottom: 4px;
+  }
+  .cv-entry-body {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.75;
+  }
+  .cv-skills { display: flex; flex-wrap: wrap; gap: 0; }
+  .cv-skill {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 0;
+    color: var(--text);
+  }
+  .cv-skill::after {
+    content: ' · ';
+    color: var(--text-muted);
+  }
+  .cv-skill:last-child::after { content: ''; }
+
+  .editor-right {
+    width: 320px;
+    background: var(--paper);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+  }
+  .prop-section { padding: 16px 20px; }
+  .prop-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .prop-input {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 0;
+    color: var(--text);
+    font-family: 'Work Sans', sans-serif;
+    font-size: 14px;
+    transition: all 0.15s ease;
+    margin-bottom: 14px;
+    outline: none;
+  }
+  .prop-input:focus {
+    border-color: var(--ink);
+    background: var(--paper);
+    box-shadow: none;
+  }
+  .prop-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 0;
+    color: var(--text);
+    font-family: 'Work Sans', sans-serif;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 80px;
+    outline: none;
+    transition: all 0.15s ease;
+  }
+  .prop-textarea:focus {
+    border-color: var(--ink);
+    background: var(--paper);
+  }
+
+  /* ===== Templates ===== */
+  .tmpl-page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 60px 40px 80px;
+  }
+  .tmpl-overline {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--vermillion);
+    margin-bottom: 12px;
+  }
+  .tmpl-title {
+    font-family: 'Newsreader', serif;
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.03em;
+    margin-bottom: 12px;
+    line-height: 1.05;
+  }
+  .tmpl-title em { font-weight: 400; font-style: italic; }
+  .tmpl-sub {
+    font-size: 17px;
+    color: var(--text-secondary);
+    max-width: 480px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+  }
+  .tmpl-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--border);
+    border: 2px solid var(--ink);
+  }
+  .tmpl-card {
+    background: var(--paper);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    overflow: hidden;
+  }
+  .tmpl-card:hover {
+    background: var(--vermillion-pale);
+  }
+  .tmpl-preview {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .tmpl-mini {
+    width: 100px;
+    height: 140px;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    padding: 10px;
+    transition: transform 0.2s ease;
+  }
+  .tmpl-card:hover .tmpl-mini { transform: scale(1.05); }
+  .tmpl-line { height: 4px; border-radius: 0; margin-bottom: 3px; }
+  .tmpl-info { padding: 20px; }
+  .tmpl-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .tmpl-name {
+    font-family: 'Newsreader', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+  .tmpl-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  .tmpl-tag {
+    display: inline-block;
+    margin-top: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--vermillion);
+    border: 1px solid var(--vermillion);
+    padding: 2px 8px;
+  }
+
+  /* ===== Modal ===== */
+  .modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(28, 25, 23, 0.6);
+    z-index: 200;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal-bg.active { display: flex; align-items: center; justify-content: center; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    padding: 36px;
+    max-width: 440px;
+    width: 90%;
+    animation: modalDrop 0.3s ease;
+  }
+  @keyframes modalDrop {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .modal-title {
+    font-family: 'Newsreader', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+  .modal-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+  .fmt-opts { display: flex; flex-direction: column; gap: 0; margin-bottom: 28px; border-top: 1px solid var(--border); }
+  .fmt-opt {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .fmt-opt:hover { background: var(--vermillion-pale); padding-left: 8px; }
+  .fmt-opt.selected { background: var(--vermillion-pale); padding-left: 8px; border-left: 3px solid var(--vermillion); }
+  .fmt-icon {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    width: 44px;
+    text-align: center;
+  }
+  .fi-pdf { color: var(--vermillion); }
+  .fi-doc { color: #2563eb; }
+  .fi-json { color: var(--ink); }
+  .fmt-name { font-weight: 600; font-size: 14px; color: var(--ink); margin-bottom: 2px; }
+  .fmt-sub { font-size: 12px; color: var(--text-muted); }
+  .modal-foot { display: flex; gap: 12px; justify-content: flex-end; }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">
+    <span class="nav-logo-text">HireMe</span><span class="nav-logo-dot">.</span>
+  </div>
+  <div class="nav-links">
+    <a class="nav-link active" onclick="go('dashboard')" data-page="dashboard">Dashboard</a>
+    <a class="nav-link" onclick="go('editor')" data-page="editor">Editor</a>
+    <a class="nav-link" onclick="go('templates')" data-page="templates">Templates</a>
+  </div>
+  <div class="nav-right">
+    <button class="btn btn-black" onclick="openM()">+ New CV</button>
+    <div class="nav-avatar">AJ</div>
+  </div>
+</nav>
+
+<!-- Dashboard -->
+<div class="page active" id="page-dashboard">
+  <div class="dash-hero">
+    <div class="hero-overline">Your Workspace</div>
+    <h1 class="hero-title">Write the story<br>they <em>remember.</em></h1>
+    <p class="hero-body">A CV is not a document. It's a first impression, a handshake, a statement of intent. Make yours count.</p>
+    <div class="hero-actions">
+      <button class="btn btn-red" onclick="openM()">+ Create CV</button>
+      <button class="btn btn-outline-blk" onclick="go('templates')">Templates →</button>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="cv-section">
+    <div class="cv-section-header">
+      <h2 class="cv-section-title">Documents</h2>
+      <span class="cv-section-count">3 entries</span>
+    </div>
+
+    <div class="cv-list">
+      <div class="cv-row" onclick="go('editor')">
+        <div class="cv-row-num">01</div>
+        <div class="cv-row-info">
+          <div class="cv-row-title">Senior Software Engineer</div>
+          <div class="cv-row-desc">Fullstack development, 6 years of experience</div>
+        </div>
+        <div class="cv-row-template">Modern</div>
+        <div class="cv-row-date">2h ago</div>
+        <div class="cv-row-action">→</div>
+      </div>
+      <div class="cv-row">
+        <div class="cv-row-num">02</div>
+        <div class="cv-row-info">
+          <div class="cv-row-title">Product Manager</div>
+          <div class="cv-row-desc">Strategy & cross-functional leadership</div>
+        </div>
+        <div class="cv-row-template">Classic</div>
+        <div class="cv-row-date">3d ago</div>
+        <div class="cv-row-action">→</div>
+      </div>
+      <div class="cv-row">
+        <div class="cv-row-num">03</div>
+        <div class="cv-row-info">
+          <div class="cv-row-title">UX Designer</div>
+          <div class="cv-row-desc">Human-centered digital experiences</div>
+        </div>
+        <div class="cv-row-template">Visionary</div>
+        <div class="cv-row-date">Draft</div>
+        <div class="cv-row-action">→</div>
+      </div>
+    </div>
+
+    <div class="cv-create-row" onclick="openM()">
+      <span class="cv-create-plus">+</span>
+      <span class="cv-create-label">New Document</span>
+    </div>
+  </div>
+</div>
+
+<!-- Editor -->
+<div class="page" id="page-editor">
+  <div class="editor-bar">
+    <button class="eb-btn" onclick="go('dashboard')">←</button>
+    <div class="eb-sep"></div>
+    <button class="eb-btn active">☷</button>
+    <div class="eb-sep"></div>
+    <button class="eb-btn">↺</button>
+    <button class="eb-btn">↻</button>
+    <div class="eb-sep"></div>
+    <button class="eb-btn">−</button>
+    <span class="eb-zoom">100%</span>
+    <button class="eb-btn">+</button>
+    <div class="save-indicator">Saved</div>
+    <div class="eb-sep"></div>
+    <button class="btn btn-black" style="padding:6px 14px;font-size:11px;" onclick="openM()">↓ Export</button>
+  </div>
+
+  <div class="editor-body">
+    <div class="editor-left">
+      <div class="panel-head">
+        <div class="panel-title">Sections</div>
+        <div class="panel-sub">Drag to reorder</div>
+      </div>
+      <div class="sec-list">
+        <div class="sec-item active">
+          <span class="sec-num">01</span>
+          <span class="sec-label">Personal</span>
+          <span class="sec-drag">::</span>
+        </div>
+        <div class="sec-item">
+          <span class="sec-num">02</span>
+          <span class="sec-label">Summary</span>
+          <span class="sec-drag">::</span>
+        </div>
+        <div class="sec-item">
+          <span class="sec-num">03</span>
+          <span class="sec-label">Experience</span>
+          <span class="sec-drag">::</span>
+        </div>
+        <div class="sec-item">
+          <span class="sec-num">04</span>
+          <span class="sec-label">Education</span>
+          <span class="sec-drag">::</span>
+        </div>
+        <div class="sec-item">
+          <span class="sec-num">05</span>
+          <span class="sec-label">Skills</span>
+          <span class="sec-drag">::</span>
+        </div>
+        <div class="sec-item">
+          <span class="sec-num">06</span>
+          <span class="sec-label">Languages</span>
+          <span class="sec-drag">::</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="editor-center">
+      <div class="cv-paper">
+        <div class="cv-name">Alexandra Johnson</div>
+        <div class="cv-job">Senior Software Engineer</div>
+        <div class="cv-contact">
+          <span>alex@email.com</span>
+          <span>+49 123 456 789</span>
+          <span>Berlin, Germany</span>
+        </div>
+        <div class="cv-block">
+          <div class="cv-sec-title">Summary</div>
+          <div class="cv-entry-body">Experienced software engineer with 6+ years building scalable web applications. Passionate about clean architecture, mentoring, and delivering user-centric products that make a difference.</div>
+        </div>
+        <div class="cv-block">
+          <div class="cv-sec-title">Experience</div>
+          <div style="margin-bottom:14px;">
+            <div class="cv-entry-title">Senior Software Engineer</div>
+            <div class="cv-entry-sub">TechCorp GmbH, Berlin — 2021 – Present</div>
+            <div class="cv-entry-body">Led migration of monolithic architecture to microservices. Reduced deployment time by 70%. Mentored a team of 4 junior engineers.</div>
+          </div>
+          <div>
+            <div class="cv-entry-title">Software Engineer</div>
+            <div class="cv-entry-sub">StartupXYZ, Munich — 2018 – 2021</div>
+            <div class="cv-entry-body">Built core features for a SaaS platform serving 50K users. Implemented CI/CD pipelines and comprehensive test coverage.</div>
+          </div>
+        </div>
+        <div class="cv-block">
+          <div class="cv-sec-title">Skills</div>
+          <div class="cv-skills">
+            <span class="cv-skill">TypeScript</span>
+            <span class="cv-skill">React</span>
+            <span class="cv-skill">Node.js</span>
+            <span class="cv-skill">Go</span>
+            <span class="cv-skill">PostgreSQL</span>
+            <span class="cv-skill">Docker</span>
+            <span class="cv-skill">AWS</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="editor-right">
+      <div class="panel-head">
+        <div class="panel-title">Personal</div>
+        <div class="panel-sub">Edit details</div>
+      </div>
+      <div class="prop-section" style="flex:1;overflow-y:auto;">
+        <div class="prop-label">Full Name</div>
+        <input class="prop-input" value="Alexandra Johnson">
+        <div class="prop-label">Job Title</div>
+        <input class="prop-input" value="Senior Software Engineer">
+        <div class="prop-label">Email</div>
+        <input class="prop-input" value="alex@email.com">
+        <div class="prop-label">Phone</div>
+        <input class="prop-input" value="+49 123 456 789">
+        <div class="prop-label">Location</div>
+        <input class="prop-input" value="Berlin, Germany">
+        <div class="prop-label">Summary</div>
+        <textarea class="prop-textarea">Experienced software engineer with 6+ years building scalable web applications.</textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Templates -->
+<div class="page" id="page-templates">
+  <div class="tmpl-page">
+    <div class="tmpl-overline">Templates</div>
+    <h1 class="tmpl-title">Choose a<br><em>format.</em></h1>
+    <p class="tmpl-sub">Each template shapes perception. The right one amplifies your story; the wrong one mutes it.</p>
+    <div class="tmpl-grid">
+      <div class="tmpl-card">
+        <div class="tmpl-preview" style="background:var(--bg);">
+          <div class="tmpl-mini">
+            <div class="tmpl-line" style="width:70%;height:5px;background:var(--ink);"></div>
+            <div class="tmpl-line" style="width:50%;height:3px;background:var(--vermillion);opacity:.5;"></div>
+            <div style="height:6px;"></div>
+            <div class="tmpl-line" style="width:90%;height:2px;background:var(--border-heavy);"></div>
+            <div class="tmpl-line" style="width:80%;height:2px;background:var(--border-heavy);"></div>
+            <div class="tmpl-line" style="width:85%;height:2px;background:var(--border-heavy);"></div>
+          </div>
+        </div>
+        <div class="tmpl-info">
+          <div class="tmpl-num">01</div>
+          <div class="tmpl-name">Classic</div>
+          <div class="tmpl-desc">Timeless. Serif headings, clean structure, no distractions.</div>
+          <div class="tmpl-tag">Popular</div>
+        </div>
+      </div>
+      <div class="tmpl-card">
+        <div class="tmpl-preview" style="background:#f5f5f4;">
+          <div class="tmpl-mini">
+            <div class="tmpl-line" style="width:70%;height:5px;background:var(--ink);"></div>
+            <div class="tmpl-line" style="width:50%;height:3px;background:#888;"></div>
+            <div style="height:6px;"></div>
+            <div style="display:flex;gap:3px;margin-bottom:4px;">
+              <div style="width:2px;height:20px;background:var(--vermillion);"></div>
+              <div style="flex:1;">
+                <div class="tmpl-line" style="width:60%;height:3px;background:var(--ink);"></div>
+                <div class="tmpl-line" style="width:90%;height:2px;background:var(--border-heavy);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tmpl-info">
+          <div class="tmpl-num">02</div>
+          <div class="tmpl-name">Modern</div>
+          <div class="tmpl-desc">Timeline accents. Bold visual hierarchy for tech and creative.</div>
+          <div class="tmpl-tag">Recommended</div>
+        </div>
+      </div>
+      <div class="tmpl-card">
+        <div class="tmpl-preview" style="background:#fafaf9;">
+          <div class="tmpl-mini">
+            <div style="display:flex;height:100%;">
+              <div style="width:35%;background:var(--ink);padding:5px;">
+                <div class="tmpl-line" style="width:80%;height:3px;background:rgba(255,255,255,.6);"></div>
+                <div class="tmpl-line" style="width:60%;height:2px;background:rgba(255,255,255,.3);"></div>
+              </div>
+              <div style="flex:1;padding:5px;">
+                <div class="tmpl-line" style="width:80%;height:4px;background:var(--ink);"></div>
+                <div class="tmpl-line" style="width:50%;height:2px;background:#aaa;"></div>
+                <div style="height:4px;"></div>
+                <div class="tmpl-line" style="width:90%;height:2px;background:var(--border-heavy);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tmpl-info">
+          <div class="tmpl-num">03</div>
+          <div class="tmpl-name">Visionary</div>
+          <div class="tmpl-desc">Two-column. Sidebar focus. For consulting and leadership.</div>
+          <div class="tmpl-tag">New</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-title">Export</div>
+    <div class="modal-desc">Choose a format. Your CV will be generated with the current template.</div>
+    <div class="fmt-opts">
+      <div class="fmt-opt selected" onclick="selF(this)">
+        <div class="fmt-icon fi-pdf">PDF</div>
+        <div><div class="fmt-name">PDF Document</div><div class="fmt-sub">Best for sharing and printing</div></div>
+      </div>
+      <div class="fmt-opt" onclick="selF(this)">
+        <div class="fmt-icon fi-doc">DOCX</div>
+        <div><div class="fmt-name">Word Document</div><div class="fmt-sub">Editable, ATS-friendly</div></div>
+      </div>
+      <div class="fmt-opt" onclick="selF(this)">
+        <div class="fmt-icon fi-json">JSON</div>
+        <div><div class="fmt-name">JSON Data</div><div class="fmt-sub">Structured backup</div></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-text" onclick="closeM()">Cancel</button>
+      <button class="btn btn-black">↓ Download</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function go(p) {
+    document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(x => x.classList.remove('active'));
+    document.getElementById('page-' + p).classList.add('active');
+    document.querySelector('[data-page="' + p + '"]').classList.add('active');
+    window.scrollTo(0, 0);
+  }
+  function openM() { document.getElementById('modal').classList.add('active'); }
+  function closeM() { document.getElementById('modal').classList.remove('active'); }
+  document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeM(); });
+  function selF(el) {
+    document.querySelectorAll('.fmt-opt').forEach(f => f.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+</script>
+</body>
+</html>

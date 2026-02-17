@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HireMe — Paper Craft Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400;1,9..144,600&family=Source+Sans+3:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f8f4ec;
+    --cream-deep: #efe8da;
+    --cream-dark: #e5dbc8;
+    --paper: #fffcf5;
+    --sienna: #a0522d;
+    --sienna-light: #c4845c;
+    --sienna-pale: rgba(160, 82, 45, 0.08);
+    --forest: #3d5a3d;
+    --forest-light: #5a7c5a;
+    --forest-pale: rgba(61, 90, 61, 0.08);
+    --charcoal: #2d2926;
+    --ink: #1a1714;
+    --text: #3d3830;
+    --text-secondary: #7a7168;
+    --text-muted: #a89f94;
+    --border: #ddd5c8;
+    --border-light: #ebe5d8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ===== Texture overlay ===== */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .content { position: relative; z-index: 1; }
+
+  .serif { font-family: 'Fraunces', serif; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* ===== Navigation ===== */
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: var(--paper);
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    z-index: 100;
+  }
+  .nav::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: repeating-linear-gradient(90deg, var(--border) 0px, var(--border) 4px, transparent 4px, transparent 8px);
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .nav-logo-stamp {
+    width: 36px;
+    height: 36px;
+    border: 2px solid var(--sienna);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--sienna);
+    transform: rotate(-2deg);
+    position: relative;
+  }
+  .nav-logo-stamp::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border: 1px solid var(--sienna);
+    border-radius: 7px;
+    opacity: 0.3;
+  }
+  .nav-logo-text {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--charcoal);
+    letter-spacing: -0.02em;
+  }
+  .nav-links {
+    display: flex;
+    gap: 4px;
+    margin-left: 48px;
+  }
+  .nav-link {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    position: relative;
+  }
+  .nav-link:hover { color: var(--charcoal); background: var(--sienna-pale); }
+  .nav-link.active {
+    color: var(--sienna);
+    background: var(--sienna-pale);
+    font-weight: 600;
+  }
+  .nav-link.active::after {
+    content: '~';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--sienna);
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+  }
+  .nav-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .nav-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 4px;
+    border: 2px solid var(--border);
+    background: var(--cream-deep);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--sienna);
+    cursor: pointer;
+  }
+
+  /* ===== Buttons ===== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-decoration: none;
+  }
+  .btn-warm {
+    background: var(--sienna);
+    color: var(--paper);
+    box-shadow: 0 2px 0 #7a3a1a;
+  }
+  .btn-warm:hover {
+    background: #8a4525;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 0 #7a3a1a;
+  }
+  .btn-warm:active {
+    transform: translateY(1px);
+    box-shadow: 0 0px 0 #7a3a1a;
+  }
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 2px solid var(--border);
+  }
+  .btn-outline:hover {
+    border-color: var(--sienna);
+    color: var(--sienna);
+    background: var(--sienna-pale);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+  }
+  .btn-ghost:hover {
+    background: var(--sienna-pale);
+    color: var(--sienna);
+  }
+
+  /* ===== Pages ===== */
+  .page {
+    display: none;
+    padding-top: 64px;
+    min-height: 100vh;
+    animation: pageIn 0.5s ease;
+  }
+  .page.active { display: block; }
+  @keyframes pageIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* ===== Dashboard ===== */
+  .dash-hero {
+    padding: 60px 40px 48px;
+    max-width: 900px;
+  }
+  .dash-rule {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: typeIn 0.5s ease 0.1s forwards;
+  }
+  .dash-rule-line {
+    width: 40px;
+    height: 2px;
+    background: var(--sienna);
+  }
+  .dash-rule-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--sienna);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+  }
+  .dash-title {
+    font-family: 'Fraunces', serif;
+    font-size: 44px;
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--charcoal);
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+    opacity: 0;
+    animation: typeIn 0.5s ease 0.2s forwards;
+  }
+  .dash-title em {
+    font-style: italic;
+    color: var(--sienna);
+    font-weight: 600;
+  }
+  .dash-subtitle {
+    font-size: 17px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    max-width: 480px;
+    opacity: 0;
+    animation: typeIn 0.5s ease 0.35s forwards;
+  }
+  @keyframes typeIn {
+    from { opacity: 0; transform: translateX(-12px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ===== Stats ===== */
+  .stats {
+    display: flex;
+    gap: 0;
+    padding: 0 40px;
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: typeIn 0.5s ease 0.45s forwards;
+  }
+  .stat {
+    padding: 20px 28px;
+    border-right: 2px solid var(--border);
+  }
+  .stat:first-child { padding-left: 0; }
+  .stat:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--charcoal);
+  }
+  .stat-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  /* ===== CV Cards ===== */
+  .cv-section {
+    padding: 0 40px 60px;
+  }
+  .cv-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border);
+  }
+  .cv-section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--charcoal);
+  }
+  .cv-section-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    background: var(--cream-deep);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .cv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+  }
+
+  .cv-card {
+    background: var(--paper);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    opacity: 0;
+    animation: cardSlide 0.4s ease forwards;
+  }
+  .cv-card:nth-child(1) { animation-delay: 0.1s; }
+  .cv-card:nth-child(2) { animation-delay: 0.15s; }
+  .cv-card:nth-child(3) { animation-delay: 0.2s; }
+  .cv-card:nth-child(4) { animation-delay: 0.25s; }
+  @keyframes cardSlide {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .cv-card::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 20px;
+    right: 20px;
+    height: 3px;
+    border-radius: 0 0 3px 3px;
+    transition: all 0.3s ease;
+    opacity: 0;
+  }
+  .cv-card:hover {
+    border-color: var(--sienna-light);
+    box-shadow: 4px 4px 0 var(--cream-dark);
+    transform: translate(-2px, -2px);
+  }
+  .cv-card:hover::before { opacity: 1; }
+  .cv-card:nth-child(1)::before { background: var(--sienna); }
+  .cv-card:nth-child(2)::before { background: var(--forest); }
+  .cv-card:nth-child(3)::before { background: var(--charcoal); }
+
+  .cv-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .cv-card-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--cream-deep);
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .cv-card-menu {
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px;
+    transition: color 0.2s;
+  }
+  .cv-card-menu:hover { color: var(--sienna); }
+  .cv-card-title {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin-bottom: 4px;
+  }
+  .cv-card-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 18px;
+  }
+  .cv-card-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .cv-card-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 4px;
+  }
+  .tag-sienna { background: var(--sienna-pale); color: var(--sienna); border: 1px solid rgba(160, 82, 45, 0.12); }
+  .tag-forest { background: var(--forest-pale); color: var(--forest); border: 1px solid rgba(61, 90, 61, 0.12); }
+  .tag-charcoal { background: rgba(45, 41, 38, 0.06); color: var(--charcoal); border: 1px solid rgba(45, 41, 38, 0.1); }
+  .cv-card-date {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-left: auto;
+  }
+
+  .cv-card-create {
+    background: transparent;
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    transition: all 0.3s ease;
+    opacity: 0;
+    animation: cardSlide 0.4s ease 0.3s forwards;
+  }
+  .cv-card-create:hover {
+    border-color: var(--sienna);
+    background: var(--sienna-pale);
+  }
+  .create-plus {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    color: var(--sienna);
+    margin-bottom: 8px;
+    transition: transform 0.3s ease;
+  }
+  .cv-card-create:hover .create-plus { transform: rotate(90deg); }
+  .create-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  /* ===== Editor ===== */
+  .editor-bar {
+    height: 52px;
+    background: var(--paper);
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 6px;
+  }
+  .eb-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 16px;
+  }
+  .eb-btn:hover { background: var(--sienna-pale); color: var(--sienna); border-color: rgba(160, 82, 45, 0.1); }
+  .eb-btn.active { background: var(--sienna-pale); color: var(--sienna); }
+  .eb-sep {
+    width: 2px;
+    height: 20px;
+    background: var(--border);
+    margin: 0 6px;
+  }
+  .eb-zoom {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-secondary);
+    padding: 0 6px;
+  }
+  .save-badge {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--forest);
+    font-weight: 500;
+  }
+  .save-check {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--forest-pale);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--forest);
+  }
+
+  .editor-body {
+    display: flex;
+    height: calc(100vh - 116px);
+  }
+
+  .editor-left {
+    width: 256px;
+    background: var(--paper);
+    border-right: 2px solid var(--border);
+    display: flex;
+    flex-direction: column;
+  }
+  .panel-head {
+    padding: 18px 20px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .panel-title {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin-bottom: 2px;
+  }
+  .panel-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .section-list { padding: 10px; flex: 1; overflow-y: auto; }
+  .sec-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 2px;
+    border: 1px solid transparent;
+  }
+  .sec-item:hover { background: var(--cream-deep); }
+  .sec-item.active {
+    background: var(--sienna-pale);
+    border-color: rgba(160, 82, 45, 0.12);
+  }
+  .sec-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .sec-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+  .sec-item.active .sec-label { color: var(--sienna); font-weight: 600; }
+  .sec-drag {
+    margin-left: auto;
+    opacity: 0;
+    font-size: 12px;
+    color: var(--text-muted);
+    transition: opacity 0.2s;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .sec-item:hover .sec-drag { opacity: 0.5; }
+
+  .editor-center {
+    flex: 1;
+    background: var(--cream-deep);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 36px;
+    overflow: auto;
+  }
+  .cv-paper {
+    width: 580px;
+    min-height: 820px;
+    background: var(--paper);
+    border: 2px solid var(--border);
+    box-shadow: 6px 6px 0 var(--cream-dark);
+    padding: 48px;
+    color: var(--ink);
+    animation: paperDrop 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes paperDrop {
+    from { opacity: 0; transform: translateY(16px) rotate(-0.5deg); }
+    to { opacity: 1; transform: translateY(0) rotate(0); }
+  }
+  .cv-name {
+    font-family: 'Fraunces', serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    margin-bottom: 2px;
+  }
+  .cv-job {
+    font-size: 15px;
+    color: var(--sienna);
+    font-weight: 500;
+    font-style: italic;
+    margin-bottom: 14px;
+  }
+  .cv-contact {
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-family: 'JetBrains Mono', monospace;
+    padding-bottom: 18px;
+    margin-bottom: 22px;
+    border-bottom: 2px solid var(--sienna);
+  }
+  .cv-sec-title {
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--sienna);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    padding-bottom: 4px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .cv-block { margin-bottom: 22px; }
+  .cv-entry-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .cv-entry-sub {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-bottom: 4px;
+  }
+  .cv-entry-body { font-size: 13px; color: var(--text); line-height: 1.7; }
+  .cv-skills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .cv-skill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 12px;
+    background: var(--sienna-pale);
+    color: var(--sienna);
+    border: 1px solid rgba(160, 82, 45, 0.1);
+    border-radius: 4px;
+  }
+
+  .editor-right {
+    width: 320px;
+    background: var(--paper);
+    border-left: 2px solid var(--border);
+    display: flex;
+    flex-direction: column;
+  }
+  .prop-section { padding: 16px 20px; }
+  .prop-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .prop-input {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--cream);
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    margin-bottom: 12px;
+    outline: none;
+  }
+  .prop-input:focus {
+    border-color: var(--sienna);
+    background: var(--paper);
+    box-shadow: 3px 3px 0 var(--cream-dark);
+  }
+  .prop-textarea {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--cream);
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 80px;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+  .prop-textarea:focus {
+    border-color: var(--sienna);
+    background: var(--paper);
+    box-shadow: 3px 3px 0 var(--cream-dark);
+  }
+
+  /* ===== Templates ===== */
+  .tmpl-page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 60px 40px 80px;
+  }
+  .tmpl-rule {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .tmpl-title {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--charcoal);
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  .tmpl-sub {
+    font-size: 16px;
+    color: var(--text-secondary);
+    max-width: 460px;
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
+  .tmpl-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 20px;
+  }
+  .tmpl-card {
+    background: var(--paper);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .tmpl-card:hover {
+    border-color: var(--sienna-light);
+    box-shadow: 4px 4px 0 var(--cream-dark);
+    transform: translate(-2px, -2px);
+  }
+  .tmpl-preview {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .tmpl-preview-1 { background: var(--cream-deep); }
+  .tmpl-preview-2 { background: #e8ede8; }
+  .tmpl-preview-3 { background: #e8e4de; }
+  .tmpl-mini {
+    width: 120px;
+    height: 170px;
+    background: var(--paper);
+    border: 2px solid var(--border);
+    box-shadow: 3px 3px 0 var(--cream-dark);
+    padding: 12px;
+    transition: transform 0.3s ease;
+  }
+  .tmpl-card:hover .tmpl-mini { transform: translateY(-4px) rotate(-1deg); }
+  .tmpl-line { height: 4px; border-radius: 2px; margin-bottom: 4px; }
+  .tmpl-info { padding: 18px 20px; border-top: 1px dashed var(--border); }
+  .tmpl-name {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin-bottom: 4px;
+  }
+  .tmpl-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+  .tmpl-tag {
+    display: inline-block;
+    margin-top: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ===== Modal ===== */
+  .modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 23, 20, 0.5);
+    z-index: 200;
+    animation: fadeIn 0.3s ease;
+  }
+  .modal-bg.active { display: flex; align-items: center; justify-content: center; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: var(--paper);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 32px;
+    max-width: 440px;
+    width: 90%;
+    box-shadow: 8px 8px 0 var(--cream-dark);
+    animation: modalDrop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes modalDrop {
+    from { opacity: 0; transform: translateY(16px) rotate(-1deg); }
+    to { opacity: 1; transform: translateY(0) rotate(0); }
+  }
+  .modal-title {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--charcoal);
+    margin-bottom: 6px;
+  }
+  .modal-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .fmt-opts { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .fmt-opt {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--paper);
+  }
+  .fmt-opt:hover { border-color: var(--sienna-light); background: var(--sienna-pale); }
+  .fmt-opt.selected { border-color: var(--sienna); background: var(--sienna-pale); box-shadow: 3px 3px 0 var(--cream-dark); }
+  .fmt-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .fi-pdf { background: rgba(192, 57, 43, 0.1); color: #c0392b; border: 1px solid rgba(192, 57, 43, 0.15); }
+  .fi-doc { background: rgba(52, 152, 219, 0.1); color: #2980b9; border: 1px solid rgba(52, 152, 219, 0.15); }
+  .fi-json { background: var(--sienna-pale); color: var(--sienna); border: 1px solid rgba(160, 82, 45, 0.15); }
+  .fmt-name { font-weight: 600; font-size: 14px; color: var(--charcoal); margin-bottom: 2px; }
+  .fmt-sub { font-size: 12px; color: var(--text-muted); }
+  .modal-foot { display: flex; gap: 10px; justify-content: flex-end; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--cream); }
+  ::-webkit-scrollbar-thumb { background: var(--cream-dark); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="content">
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="nav-logo-stamp">H</div>
+    <div class="nav-logo-text">HireMe</div>
+  </div>
+  <div class="nav-links">
+    <a class="nav-link active" onclick="go('dashboard')" data-page="dashboard">Dashboard</a>
+    <a class="nav-link" onclick="go('editor')" data-page="editor">Editor</a>
+    <a class="nav-link" onclick="go('templates')" data-page="templates">Templates</a>
+  </div>
+  <div class="nav-right">
+    <button class="btn btn-warm" onclick="openM()">+ New CV</button>
+    <div class="nav-avatar">AJ</div>
+  </div>
+</nav>
+
+<!-- Dashboard -->
+<div class="page active" id="page-dashboard">
+  <div class="dash-hero">
+    <div class="dash-rule">
+      <div class="dash-rule-line"></div>
+      <span class="dash-rule-text">Your workspace</span>
+    </div>
+    <h1 class="dash-title">Craft your <em>story</em>,<br>one page at a time.</h1>
+    <p class="dash-subtitle">A good CV isn't a list of achievements. It's a carefully composed letter to your future self.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num">3</div>
+      <div class="stat-label">Documents</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">2</div>
+      <div class="stat-label">Exports this week</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">3</div>
+      <div class="stat-label">Templates</div>
+    </div>
+  </div>
+
+  <div class="cv-section">
+    <div class="cv-section-header">
+      <span class="cv-section-title">Documents</span>
+      <span class="cv-section-count">3 items</span>
+    </div>
+    <div class="cv-grid">
+      <div class="cv-card" onclick="go('editor')">
+        <div class="cv-card-top">
+          <span class="cv-card-num">#001</span>
+          <span class="cv-card-menu">⋯</span>
+        </div>
+        <div class="cv-card-title">Senior Software Engineer</div>
+        <div class="cv-card-desc">Fullstack development, 6 years of experience building scalable applications</div>
+        <div class="cv-card-footer">
+          <span class="cv-card-tag tag-sienna">Modern</span>
+          <span class="cv-card-date">2 hours ago</span>
+        </div>
+      </div>
+      <div class="cv-card">
+        <div class="cv-card-top">
+          <span class="cv-card-num">#002</span>
+          <span class="cv-card-menu">⋯</span>
+        </div>
+        <div class="cv-card-title">Product Manager</div>
+        <div class="cv-card-desc">Strategy, cross-functional leadership in fast-paced tech environments</div>
+        <div class="cv-card-footer">
+          <span class="cv-card-tag tag-forest">Classic</span>
+          <span class="cv-card-date">3 days ago</span>
+        </div>
+      </div>
+      <div class="cv-card">
+        <div class="cv-card-top">
+          <span class="cv-card-num">#003</span>
+          <span class="cv-card-menu">⋯</span>
+        </div>
+        <div class="cv-card-title">UX Designer</div>
+        <div class="cv-card-desc">Human-centered design for global digital products</div>
+        <div class="cv-card-footer">
+          <span class="cv-card-tag tag-charcoal">Visionary</span>
+          <span class="cv-card-date">Draft</span>
+        </div>
+      </div>
+      <div class="cv-card-create" onclick="openM()">
+        <div class="create-plus">+</div>
+        <div class="create-label">New document</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Editor -->
+<div class="page" id="page-editor">
+  <div class="editor-bar">
+    <button class="eb-btn" onclick="go('dashboard')">←</button>
+    <div class="eb-sep"></div>
+    <button class="eb-btn active">☷</button>
+    <div class="eb-sep"></div>
+    <button class="eb-btn">↺</button>
+    <button class="eb-btn">↻</button>
+    <div class="eb-sep"></div>
+    <button class="eb-btn">−</button>
+    <span class="eb-zoom">100%</span>
+    <button class="eb-btn">+</button>
+    <div class="save-badge">
+      <div class="save-check">✓</div>
+      Saved
+    </div>
+    <div class="eb-sep"></div>
+    <button class="btn btn-warm" style="padding: 7px 16px; font-size: 13px;" onclick="openM()">↓ Export</button>
+  </div>
+
+  <div class="editor-body">
+    <div class="editor-left">
+      <div class="panel-head">
+        <div class="panel-title">Sections</div>
+        <div class="panel-sub">// drag to reorder</div>
+      </div>
+      <div class="section-list">
+        <div class="sec-item active">
+          <div class="sec-dot" style="background: var(--sienna);"></div>
+          <span class="sec-label">Personal</span>
+          <span class="sec-drag">::</span>
+        </div>
+        <div class="sec-item">
+          <div class="sec-dot" style="background: var(--forest);"></div>
+          <span class="sec-label">Summary</span>
+          <span class="sec-drag">::</span>
+        </div>
+        <div class="sec-item">
+          <div class="sec-dot" style="background: var(--sienna-light);"></div>
+          <span class="sec-label">Experience</span>
+          <span class="sec-drag">::</span>
+        </div>
+        <div class="sec-item">
+          <div class="sec-dot" style="background: #6b8cae;"></div>
+          <span class="sec-label">Education</span>
+          <span class="sec-drag">::</span>
+        </div>
+        <div class="sec-item">
+          <div class="sec-dot" style="background: var(--charcoal);"></div>
+          <span class="sec-label">Skills</span>
+          <span class="sec-drag">::</span>
+        </div>
+        <div class="sec-item">
+          <div class="sec-dot" style="background: var(--forest-light);"></div>
+          <span class="sec-label">Languages</span>
+          <span class="sec-drag">::</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="editor-center">
+      <div class="cv-paper">
+        <div class="cv-name">Alexandra Johnson</div>
+        <div class="cv-job">Senior Software Engineer</div>
+        <div class="cv-contact">
+          <span>alex@email.com</span>
+          <span>+49 123 456 789</span>
+          <span>Berlin, DE</span>
+        </div>
+        <div class="cv-block">
+          <div class="cv-sec-title">Summary</div>
+          <div class="cv-entry-body">Experienced software engineer with 6+ years building scalable web applications. Passionate about clean architecture and user-centric products.</div>
+        </div>
+        <div class="cv-block">
+          <div class="cv-sec-title">Experience</div>
+          <div style="margin-bottom: 14px;">
+            <div class="cv-entry-title">Senior Software Engineer</div>
+            <div class="cv-entry-sub">TechCorp GmbH — Berlin — 2021 – Present</div>
+            <div class="cv-entry-body">Led migration to microservices. Reduced deployment time by 70%. Mentored 4 junior engineers.</div>
+          </div>
+          <div>
+            <div class="cv-entry-title">Software Engineer</div>
+            <div class="cv-entry-sub">StartupXYZ — Munich — 2018 – 2021</div>
+            <div class="cv-entry-body">Built core features for a SaaS platform serving 50K users.</div>
+          </div>
+        </div>
+        <div class="cv-block">
+          <div class="cv-sec-title">Skills</div>
+          <div class="cv-skills">
+            <span class="cv-skill">TypeScript</span>
+            <span class="cv-skill">React</span>
+            <span class="cv-skill">Node.js</span>
+            <span class="cv-skill">Go</span>
+            <span class="cv-skill">PostgreSQL</span>
+            <span class="cv-skill">Docker</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="editor-right">
+      <div class="panel-head">
+        <div class="panel-title">Personal Details</div>
+        <div class="panel-sub">// edit your info</div>
+      </div>
+      <div class="prop-section" style="flex: 1; overflow-y: auto;">
+        <div class="prop-label">Name</div>
+        <input class="prop-input" value="Alexandra Johnson">
+        <div class="prop-label">Title</div>
+        <input class="prop-input" value="Senior Software Engineer">
+        <div class="prop-label">Email</div>
+        <input class="prop-input" value="alex@email.com">
+        <div class="prop-label">Phone</div>
+        <input class="prop-input" value="+49 123 456 789">
+        <div class="prop-label">Location</div>
+        <input class="prop-input" value="Berlin, Germany">
+        <div class="prop-label">Summary</div>
+        <textarea class="prop-textarea">Experienced software engineer with 6+ years building scalable web applications.</textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Templates -->
+<div class="page" id="page-templates">
+  <div class="tmpl-page">
+    <div class="tmpl-rule">
+      <div class="dash-rule-line"></div>
+      <span class="dash-rule-text">Templates</span>
+    </div>
+    <h1 class="tmpl-title">Pick your <em class="serif" style="color:var(--sienna); font-style:italic;">canvas</em></h1>
+    <p class="tmpl-sub">Each template shapes how your story is read. Choose the one that feels right.</p>
+    <div class="tmpl-grid">
+      <div class="tmpl-card">
+        <div class="tmpl-preview tmpl-preview-1">
+          <div class="tmpl-mini">
+            <div class="tmpl-line" style="width: 70%; height: 6px; background: var(--ink);"></div>
+            <div class="tmpl-line" style="width: 50%; height: 3px; background: var(--sienna);"></div>
+            <div style="height: 6px;"></div>
+            <div class="tmpl-line" style="width: 90%; height: 2px; background: var(--cream-dark);"></div>
+            <div class="tmpl-line" style="width: 80%; height: 2px; background: var(--cream-dark);"></div>
+            <div class="tmpl-line" style="width: 85%; height: 2px; background: var(--cream-dark);"></div>
+          </div>
+        </div>
+        <div class="tmpl-info">
+          <div class="tmpl-name">Classic</div>
+          <div class="tmpl-desc">Timeless structure. Serif headings, clean lines. For corporate and executive roles.</div>
+          <div class="tmpl-tag tag-sienna">Popular</div>
+        </div>
+      </div>
+      <div class="tmpl-card">
+        <div class="tmpl-preview tmpl-preview-2">
+          <div class="tmpl-mini">
+            <div class="tmpl-line" style="width: 70%; height: 6px; background: var(--ink);"></div>
+            <div class="tmpl-line" style="width: 50%; height: 3px; background: #888;"></div>
+            <div style="height: 6px;"></div>
+            <div style="display:flex;gap:3px;margin-bottom:5px;">
+              <div style="width:3px;height:24px;background:var(--forest);border-radius:1px;"></div>
+              <div style="flex:1;">
+                <div class="tmpl-line" style="width:60%;height:3px;background:var(--ink);"></div>
+                <div class="tmpl-line" style="width:90%;height:2px;background:var(--cream-dark);"></div>
+                <div class="tmpl-line" style="width:80%;height:2px;background:var(--cream-dark);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tmpl-info">
+          <div class="tmpl-name">Modern</div>
+          <div class="tmpl-desc">Timeline layout with bold accents. For creative professionals and tech.</div>
+          <div class="tmpl-tag tag-forest">Recommended</div>
+        </div>
+      </div>
+      <div class="tmpl-card">
+        <div class="tmpl-preview tmpl-preview-3">
+          <div class="tmpl-mini">
+            <div style="display:flex;height:100%;">
+              <div style="width:38%;background:var(--sienna);border-radius:2px 0 0 2px;padding:6px;">
+                <div class="tmpl-line" style="width:80%;height:3px;background:rgba(255,255,255,.7);"></div>
+                <div class="tmpl-line" style="width:60%;height:2px;background:rgba(255,255,255,.4);"></div>
+              </div>
+              <div style="flex:1;padding:6px;">
+                <div class="tmpl-line" style="width:80%;height:4px;background:var(--sienna);"></div>
+                <div class="tmpl-line" style="width:50%;height:2px;background:#999;"></div>
+                <div style="height:6px;"></div>
+                <div class="tmpl-line" style="width:90%;height:2px;background:var(--cream-dark);"></div>
+                <div class="tmpl-line" style="width:80%;height:2px;background:var(--cream-dark);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tmpl-info">
+          <div class="tmpl-name">Visionary</div>
+          <div class="tmpl-desc">Bold two-column with sidebar. Stands out for design and consulting.</div>
+          <div class="tmpl-tag tag-charcoal">New</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-title">Export your CV</div>
+    <div class="modal-desc">Choose a format to download. Uses your current template and content.</div>
+    <div class="fmt-opts">
+      <div class="fmt-opt selected" onclick="selF(this)">
+        <div class="fmt-icon fi-pdf">PDF</div>
+        <div><div class="fmt-name">PDF Document</div><div class="fmt-sub">Best for sharing and printing</div></div>
+      </div>
+      <div class="fmt-opt" onclick="selF(this)">
+        <div class="fmt-icon fi-doc">DOC</div>
+        <div><div class="fmt-name">Word Document</div><div class="fmt-sub">Editable for ATS systems</div></div>
+      </div>
+      <div class="fmt-opt" onclick="selF(this)">
+        <div class="fmt-icon fi-json">{ }</div>
+        <div><div class="fmt-name">JSON Data</div><div class="fmt-sub">Backup or import</div></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeM()">Cancel</button>
+      <button class="btn btn-warm">↓ Download</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function go(p) {
+    document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(x => x.classList.remove('active'));
+    document.getElementById('page-' + p).classList.add('active');
+    document.querySelector('[data-page="' + p + '"]').classList.add('active');
+    window.scrollTo(0, 0);
+  }
+  function openM() { document.getElementById('modal').classList.add('active'); }
+  function closeM() { document.getElementById('modal').classList.remove('active'); }
+  document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeM(); });
+  function selF(el) {
+    document.querySelectorAll('.fmt-opt').forEach(f => f.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+</script>
+</body>
+</html>
