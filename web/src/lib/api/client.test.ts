@@ -207,4 +207,109 @@ describe('ApiClient', () => {
       }
     });
   });
+
+  describe('exportApi', () => {
+    it('should return blob on successful export', async () => {
+      const mockBlob = new Blob(['pdf-data'], { type: 'application/pdf' });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        blob: () => Promise.resolve(mockBlob),
+      });
+
+      const result = await api.export.export('cv-123', 'pdf');
+
+      expect(result).toBe(mockBlob);
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/api/v1/export/pdf'),
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({ cvId: 'cv-123' }),
+        })
+      );
+    });
+
+    it('should send correct request body for docx', async () => {
+      const mockBlob = new Blob(['docx-data']);
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        blob: () => Promise.resolve(mockBlob),
+      });
+
+      await api.export.export('cv-456', 'docx');
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/api/v1/export/docx'),
+        expect.objectContaining({
+          body: JSON.stringify({ cvId: 'cv-456' }),
+        })
+      );
+    });
+
+    it('should throw ApiError on HTTP error', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        json: () =>
+          Promise.resolve({
+            error: { code: 'export_failed', message: 'Gotenberg error' },
+          }),
+      });
+
+      try {
+        await api.export.export('cv-1', 'pdf');
+        expect.fail('Should have thrown');
+      } catch (err) {
+        expect(err).toBeInstanceOf(ApiError);
+        expect((err as ApiError).status).toBe(500);
+        expect((err as ApiError).message).toBe('Gotenberg error');
+      }
+    });
+
+    it('should throw ApiError with default message on unparseable error body', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 502,
+        json: () => Promise.reject(new Error('not json')),
+      });
+
+      try {
+        await api.export.export('cv-1', 'pdf');
+        expect.fail('Should have thrown');
+      } catch (err) {
+        expect(err).toBeInstanceOf(ApiError);
+        expect((err as ApiError).status).toBe(502);
+        expect((err as ApiError).message).toBe('Export failed');
+      }
+    });
+
+    it('should throw ApiError on abort (timeout path)', async () => {
+      // Directly test the abort error handling path:
+      // When fetch rejects with AbortError, export should throw ApiError
+      mockFetch.mockRejectedValueOnce(
+        new DOMException('The operation was aborted.', 'AbortError')
+      );
+
+      try {
+        await api.export.export('cv-1', 'pdf');
+        expect.fail('Should have thrown');
+      } catch (err) {
+        expect(err).toBeInstanceOf(ApiError);
+        expect((err as ApiError).status).toBe(0);
+        expect((err as ApiError).message).toContain('timed out');
+      }
+    });
+
+    it('should throw ApiError on network error', async () => {
+      mockFetch.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+
+      try {
+        await api.export.export('cv-1', 'pdf');
+        expect.fail('Should have thrown');
+      } catch (err) {
+        expect(err).toBeInstanceOf(ApiError);
+        expect((err as ApiError).status).toBe(0);
+        expect((err as ApiError).message).toContain('network error');
+      }
+    });
+  });
 });
