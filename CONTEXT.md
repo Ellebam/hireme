@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — T-001–T-007 done, 8 tasks remaining, 8 unblocked
+**Status:** Task-based workflow active — T-001–T-007 + T-011/T-012 done, 6 tasks remaining, 6 unblocked
 
 ### What's Working
 
@@ -21,7 +21,7 @@
 **Frontend:**
 - ✅ Three-column editor layout (palette | preview | properties)
 - ✅ Dashboard page with CV list
-- ✅ 6 section editors (Personal, Summary, Experience, Education, Skills, Languages)
+- ✅ 8 section editors (Personal, Summary, Experience, Education, Skills, Languages, Certifications, Projects)
 - ✅ Drag & drop section reordering (dnd-kit)
 - ✅ Live A4 CV preview with zoom (50-200%)
 - ✅ Undo/redo with 50-step history
@@ -234,8 +234,6 @@ task api:sqlc          # Generate sqlc code
 | T-008 | P1 interaction tests — editors | — | S |
 | T-009 | P1 interaction tests — export error paths | — | XS |
 | T-010 | P2 UX regression tests | — | S |
-| T-011 | Add Certifications section | — | S |
-| T-012 | Add Projects section | — | S |
 | T-013 | R2 cloud storage implementation | — | M |
 | T-014 | OAuth authentication (Google OIDC) | — | M |
 | T-015 | Multiple CV support | — | M |
@@ -250,6 +248,8 @@ task api:sqlc          # Generate sqlc code
 | T-003 | Implement PDF export via Gotenberg | feat/t-003-pdf-export |
 | T-004 | Implement DOCX export via godocx | feat/t-004-docx-export |
 | T-005 | Wire frontend export modal to real API | (shipped in MVP) |
+| T-011 | Add Certifications section | feat/t-011-012-certifications-projects |
+| T-012 | Add Projects section | feat/t-011-012-certifications-projects |
 
 ---
 
