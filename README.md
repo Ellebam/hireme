@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/hireme1.png" alt="HireMe Logo" width="160" />
+  <img src="https://raw.githubusercontent.com/Ellebam/hireme/main/docs/hireme1.png" alt="HireMe Logo" width="160" />
 </p>
 
 <h1 align="center">HireMe</h1>
@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/hireme2.png" alt="HireMe Hero" width="480" />
+  <img src="https://raw.githubusercontent.com/Ellebam/hireme/main/docs/hireme2.png" alt="HireMe Hero" width="480" />
 </p>
 
 ---
