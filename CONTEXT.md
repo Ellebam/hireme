@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — T-001–T-012 + T-016 done, 16 tasks in backlog (9 unblocked, 3 blocked, 4 need splitting when picked up)
+**Status:** Task-based workflow active — T-001–T-012, T-016, T-023 done, 15 tasks in backlog (8 unblocked, 3 blocked, 4 need splitting when picked up)
 
 ### What's Working
 
@@ -239,7 +239,6 @@ task api:sqlc          # Generate sqlc code
 | T-018 | Section click UX — remove redundant button, auto-open editor | — | XS |
 | T-019 | Replace date pickers with month/year picker component | — | S |
 | T-020 | Tag input for technologies field (extract from SkillTag) | — | XS–S |
-| T-023 | README overhaul — content + design | — | XS |
 
 ### Backlog — P2 (Features)
 | ID | Task | Blocked By | Size |
@@ -272,6 +271,7 @@ task api:sqlc          # Generate sqlc code
 | T-011 | Add Certifications section | feat/t-011-012-certifications-projects |
 | T-012 | Add Projects section | feat/t-011-012-certifications-projects |
 | T-016 | Fix save bug after template switch | fix/t-016-save-after-template-switch |
+| T-023 | README overhaul — content + design | docs/t-023-readme-overhaul |
 
 ---
 
