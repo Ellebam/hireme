@@ -309,6 +309,7 @@
           "items": {
             "type": "object",
             "properties": {
+              "id": { "type": "string", "format": "uuid" },
               "language": { "type": "string", "maxLength": 50 },
               "proficiency": {
                 "type": "string",
@@ -316,7 +317,7 @@
               },
               "certification": { "type": "string", "maxLength": 100 }
             },
-            "required": ["language", "proficiency"],
+            "required": ["id", "language", "proficiency"],
             "additionalProperties": false
           },
           "maxItems": 10
