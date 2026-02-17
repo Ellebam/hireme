@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — T-001–T-007 + T-011/T-012 done, 6 tasks remaining, 6 unblocked
+**Status:** Task-based workflow active — T-001–T-012 done, 3 tasks remaining, 3 unblocked
 
 ### What's Working
 
@@ -37,7 +37,7 @@
 - ✅ Delete confirmation dialog on CV card
 - ✅ Back-to-dashboard link in editor toolbar
 - ✅ shadcn/ui dropdown-menu component
-- ✅ 127 passing tests (Vitest)
+- ✅ 167 passing tests (Vitest)
 - ✅ Build verified, full stack integration tested
 
 ### Remaining Work
@@ -231,9 +231,6 @@ task api:sqlc          # Generate sqlc code
 ### Backlog
 | ID | Task | Blocked By | Size |
 |----|------|------------|------|
-| T-008 | P1 interaction tests — editors | — | S |
-| T-009 | P1 interaction tests — export error paths | — | XS |
-| T-010 | P2 UX regression tests | — | S |
 | T-013 | R2 cloud storage implementation | — | M |
 | T-014 | OAuth authentication (Google OIDC) | — | M |
 | T-015 | Multiple CV support | — | M |
@@ -250,38 +247,13 @@ task api:sqlc          # Generate sqlc code
 | T-005 | Wire frontend export modal to real API | (shipped in MVP) |
 | T-011 | Add Certifications section | feat/t-011-012-certifications-projects |
 | T-012 | Add Projects section | feat/t-011-012-certifications-projects |
+| T-008 | P1 interaction tests — editors | test/t-008-010-interaction-ux-tests |
+| T-009 | P1 interaction tests — export error paths | test/t-008-010-interaction-ux-tests |
+| T-010 | P2 UX regression tests | test/t-008-010-interaction-ux-tests |
 
 ---
 
 ## Task Details
-
-**T-008: P1 interaction tests — editors** — S
-- ExperienceEditor + SkillsEditor interaction tests
-- Add/edit/delete entries via modal forms using `@testing-library/user-event`
-- Acceptance: Tests cover add, edit, delete flows
-
-**T-009: P1 interaction tests — export error paths** — XS
-- Verify abort timeout and network errors map to `ApiError`
-- Acceptance: Error path tests passing
-
-**T-010: P2 UX regression tests** — S
-- Keyboard shortcuts: verify Ctrl+Z/Y trigger undo/redo
-- DnD section reorder: verify store updates
-- Acceptance: Tests for shortcuts and DnD passing
-
-**T-011: Add Certifications section** — S
-- `CertificationsEditor.tsx` (modal form for cert entries)
-- Add to `PropertiesPanel` switch + all 3 templates
-- Schema already defines `certificationsContent`
-- Tests: editor smoke test, interaction test, template render test
-- Acceptance: Can add/edit/delete certifications, visible in preview
-
-**T-012: Add Projects section** — S
-- `ProjectsEditor.tsx` (modal form for project entries)
-- Add to `PropertiesPanel` switch + all 3 templates
-- Schema already defines `projectsContent`
-- Tests: editor smoke test, interaction test, template render test
-- Acceptance: Can add/edit/delete projects, visible in preview
 
 **T-013: R2 cloud storage implementation** — M
 - Implement `R2Storage` methods using AWS SDK
@@ -297,11 +269,10 @@ task api:sqlc          # Generate sqlc code
 
 ### Dependency Graph
 ```
-T-008 through T-012: ALL INDEPENDENT (any order)
-T-013, T-014, T-015: Future backlog, independent
+T-013, T-014, T-015: ALL INDEPENDENT (any order)
 ```
 
-All 8 remaining tasks have zero dependencies and can be picked up in any order.
+All 3 remaining tasks have zero dependencies and can be picked up in any order.
 
 ---
 

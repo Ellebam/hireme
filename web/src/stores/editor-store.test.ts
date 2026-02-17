@@ -227,6 +227,27 @@ describe('EditorStore', () => {
 
       expect(useEditorStore.getState().isDirty).toBe(true);
     });
+
+    it('should undo section reorder', () => {
+      const originalOrder = useEditorStore.getState().cvContent?.sections.map((s) => s.id) || [];
+
+      useEditorStore.getState().reorderSections('sec-languages', 'sec-summary');
+      useEditorStore.getState().undo();
+
+      const restoredOrder = useEditorStore.getState().cvContent?.sections.map((s) => s.id) || [];
+      expect(restoredOrder).toEqual(originalOrder);
+    });
+
+    it('should redo section reorder', () => {
+      useEditorStore.getState().reorderSections('sec-languages', 'sec-summary');
+      const reorderedSections = useEditorStore.getState().cvContent?.sections.map((s) => s.id) || [];
+
+      useEditorStore.getState().undo();
+      useEditorStore.getState().redo();
+
+      const redoneOrder = useEditorStore.getState().cvContent?.sections.map((s) => s.id) || [];
+      expect(redoneOrder).toEqual(reorderedSections);
+    });
   });
 
   describe('toggleSectionVisibility', () => {
