@@ -217,7 +217,7 @@ func TestGenerate_UnknownSectionSkipped(t *testing.T) {
 			Content: mustJSON(domain.PersonalContent{FirstName: "Test"}),
 		},
 		domain.CVSection{
-			ID: "2", Type: "certifications", Order: 1, Visible: true,
+			ID: "2", Type: "awards", Order: 1, Visible: true,
 			Content: json.RawMessage(`{"entries":[]}`),
 		},
 	)
@@ -230,6 +230,82 @@ func TestGenerate_UnknownSectionSkipped(t *testing.T) {
 	xml := readDocumentXML(t, result)
 	if !strings.Contains(xml, "Test") {
 		t.Error("expected personal section content")
+	}
+}
+
+func TestGenerate_CertificationsSection(t *testing.T) {
+	gen := NewGodocxGenerator()
+	expiry := "2026-12"
+	content := docxContent(domain.CVSection{
+		ID: "1", Type: "certifications", Order: 0, Visible: true,
+		Content: mustJSON(domain.CertificationsContent{Entries: []domain.CertificationEntry{
+			{
+				ID:           "cert-1",
+				Name:         "AWS Solutions Architect",
+				Issuer:       "Amazon Web Services",
+				Date:         "2023-06",
+				ExpiryDate:   &expiry,
+				CredentialID: "ABC-123",
+			},
+		}}),
+	})
+
+	result, err := gen.Generate(content)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	xml := readDocumentXML(t, result)
+	for _, expected := range []string{
+		"Certifications",
+		"AWS Solutions Architect",
+		"Amazon Web Services",
+		"Jun 2023",
+		"Dec 2026",
+		"ID: ABC-123",
+	} {
+		if !strings.Contains(xml, expected) {
+			t.Errorf("expected %q in document.xml, not found", expected)
+		}
+	}
+}
+
+func TestGenerate_ProjectsSection(t *testing.T) {
+	gen := NewGodocxGenerator()
+	endDate := "2024-01"
+	content := docxContent(domain.CVSection{
+		ID: "1", Type: "projects", Order: 0, Visible: true,
+		Content: mustJSON(domain.ProjectsContent{Entries: []domain.ProjectEntry{
+			{
+				ID:           "proj-1",
+				Name:         "HireMe",
+				Role:         "Lead Developer",
+				Description:  "CV builder application",
+				StartDate:    "2023-01",
+				EndDate:      &endDate,
+				Technologies: []string{"Go", "Next.js", "PostgreSQL"},
+			},
+		}}),
+	})
+
+	result, err := gen.Generate(content)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	xml := readDocumentXML(t, result)
+	for _, expected := range []string{
+		"Projects",
+		"HireMe",
+		"Lead Developer",
+		"CV builder application",
+		"Jan 2023",
+		"Jan 2024",
+		"Go, Next.js, PostgreSQL",
+	} {
+		if !strings.Contains(xml, expected) {
+			t.Errorf("expected %q in document.xml, not found", expected)
+		}
 	}
 }
 

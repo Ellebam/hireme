@@ -70,6 +70,10 @@ func (g *GodocxGenerator) Generate(content domain.CVContent) ([]byte, error) {
 			addSkillsSection(doc, title, sec)
 		case domain.SectionTypeLanguages:
 			addLanguagesSection(doc, title, sec)
+		case domain.SectionTypeCertifications:
+			addCertificationsSection(doc, title, sec)
+		case domain.SectionTypeProjects:
+			addProjectsSection(doc, title, sec)
 		default:
 			// Unknown section types silently skipped
 		}
@@ -196,5 +200,60 @@ func addLanguagesSection(doc *docx.RootDoc, title string, sec domain.CVSection) 
 			text += " — " + entry.Proficiency
 		}
 		doc.AddParagraph(text)
+	}
+}
+
+func addCertificationsSection(doc *docx.RootDoc, title string, sec domain.CVSection) {
+	certs := ParseCertifications(sec.Content)
+	doc.AddHeading(title, 1) //nolint:errcheck
+
+	for _, entry := range certs.Entries {
+		para := doc.AddEmptyParagraph()
+		para.AddText(entry.Name).Bold(true)
+
+		var details []string
+		if entry.Issuer != "" {
+			details = append(details, entry.Issuer)
+		}
+		if entry.Date != "" {
+			details = append(details, certDateRange(entry.Date, entry.ExpiryDate))
+		}
+		if len(details) > 0 {
+			para.AddText(" — " + strings.Join(details, " | "))
+		}
+
+		if entry.CredentialID != "" {
+			doc.AddParagraph("ID: " + entry.CredentialID)
+		}
+	}
+}
+
+func addProjectsSection(doc *docx.RootDoc, title string, sec domain.CVSection) {
+	projects := ParseProjects(sec.Content)
+	doc.AddHeading(title, 1) //nolint:errcheck
+
+	for _, entry := range projects.Entries {
+		para := doc.AddEmptyParagraph()
+		para.AddText(entry.Name).Bold(true)
+
+		var details []string
+		if entry.Role != "" {
+			details = append(details, entry.Role)
+		}
+		dateRange := formatDateRange(entry.StartDate, entry.EndDate, false)
+		if dateRange != "" {
+			details = append(details, dateRange)
+		}
+		if len(details) > 0 {
+			para.AddText(" — " + strings.Join(details, " | "))
+		}
+
+		if entry.Description != "" {
+			doc.AddParagraph(entry.Description)
+		}
+
+		if len(entry.Technologies) > 0 {
+			doc.AddParagraph("Technologies: " + strings.Join(entry.Technologies, ", "))
+		}
 	}
 }

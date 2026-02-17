@@ -173,6 +173,39 @@
           </div>
           {{end}}{{end}}
         </div>
+      {{else if eq .Type "certifications"}}
+        <div class="visionary-main-section">
+          <h2 class="visionary-main-section-title" style="color: {{$.Styling.PrimaryColor}}; border-bottom: 2px solid {{$.Styling.PrimaryColor}}">{{.Title}}</h2>
+          {{with .Certifications}}{{range .Entries}}
+          <div style="margin-bottom: 12px;">
+            <div class="visionary-exp-header">
+              <h3 style="font-size: 0.875em; font-weight: 600; color: #111827;">{{.Name}}</h3>
+              {{if .Date}}<span class="date" style="color: {{$.Styling.SecondaryColor}}">{{certDateRange .Date .ExpiryDate}}</span>{{end}}
+            </div>
+            {{if .Issuer}}<p style="font-size: 0.875em; color: {{$.Styling.PrimaryColor}}">{{.Issuer}}</p>{{end}}
+            {{if .CredentialID}}<p class="visionary-edu-grade" style="color: {{$.Styling.SecondaryColor}}">ID: {{.CredentialID}}</p>{{end}}
+            {{if .URL}}<a href="{{.URL}}" style="font-size: 0.75em; color: {{$.Styling.PrimaryColor}}; text-decoration: underline;">Verify</a>{{end}}
+          </div>
+          {{end}}{{end}}
+        </div>
+      {{else if eq .Type "projects"}}
+        <div class="visionary-main-section">
+          <h2 class="visionary-main-section-title" style="color: {{$.Styling.PrimaryColor}}; border-bottom: 2px solid {{$.Styling.PrimaryColor}}">{{.Title}}</h2>
+          {{with .Projects}}{{range .Entries}}
+          <div class="visionary-exp-entry">
+            <div class="visionary-exp-header">
+              <h3>{{.Name}}</h3>
+              {{with dateRange .StartDate .EndDate false}}<span class="date" style="color: {{$.Styling.SecondaryColor}}">{{.}}</span>{{end}}
+            </div>
+            {{if .Role}}<p class="visionary-exp-company" style="color: {{$.Styling.PrimaryColor}}">{{.Role}}</p>{{end}}
+            {{if .Description}}<p class="visionary-exp-desc" style="color: {{$.Styling.SecondaryColor}}">{{.Description}}</p>{{end}}
+            {{if .Technologies}}
+            <p class="visionary-exp-desc" style="color: {{$.Styling.SecondaryColor}}; font-style: italic;">{{techList .Technologies}}</p>
+            {{end}}
+            {{if .URL}}<a href="{{.URL}}" style="font-size: 0.75em; color: {{$.Styling.PrimaryColor}}; text-decoration: underline;">View project</a>{{end}}
+          </div>
+          {{end}}{{end}}
+        </div>
       {{else}}
         <div class="visionary-main-section">
           <h2 class="visionary-main-section-title" style="color: {{$.Styling.PrimaryColor}}; border-bottom: 2px solid {{$.Styling.PrimaryColor}}">{{.Title}}</h2>

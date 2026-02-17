@@ -117,6 +117,41 @@
       </div>
       {{end}}
     </div>
+  {{else if eq .Type "certifications"}}
+    <div>
+      <h2 class="classic-section-title" style="border-bottom: 1px solid {{$.Styling.PrimaryColor}}; color: {{$.Styling.PrimaryColor}}">{{.Title}}</h2>
+      {{with .Certifications}}{{range .Entries}}
+      <div class="classic-entry">
+        <div class="classic-entry-header">
+          <div>
+            <span class="title">{{.Name}}</span>
+            {{if .Issuer}}<span class="subtitle"> at {{.Issuer}}</span>{{end}}
+          </div>
+          {{if .Date}}<span class="date" style="color: {{$.Styling.SecondaryColor}}">{{certDateRange .Date .ExpiryDate}}</span>{{end}}
+        </div>
+        {{if .CredentialID}}<p class="description" style="color: {{$.Styling.SecondaryColor}}">ID: {{.CredentialID}}</p>{{end}}
+        {{if .URL}}<a href="{{.URL}}" style="color: {{$.Styling.PrimaryColor}}; font-size: 0.875em; text-decoration: underline;">Verify</a>{{end}}
+      </div>
+      {{end}}{{end}}
+    </div>
+  {{else if eq .Type "projects"}}
+    <div>
+      <h2 class="classic-section-title" style="border-bottom: 1px solid {{$.Styling.PrimaryColor}}; color: {{$.Styling.PrimaryColor}}">{{.Title}}</h2>
+      {{with .Projects}}{{range .Entries}}
+      <div class="classic-entry">
+        <div class="classic-entry-header">
+          <div>
+            <span class="title">{{.Name}}</span>
+            {{if .Role}}<span class="subtitle" style="color: {{$.Styling.SecondaryColor}}"> &middot; {{.Role}}</span>{{end}}
+          </div>
+          {{with dateRange .StartDate .EndDate false}}<span class="date" style="color: {{$.Styling.SecondaryColor}}">{{.}}</span>{{end}}
+        </div>
+        {{if .Description}}<p class="description">{{.Description}}</p>{{end}}
+        {{if .Technologies}}<p class="description" style="color: {{$.Styling.SecondaryColor}}">{{techList .Technologies}}</p>{{end}}
+        {{if .URL}}<a href="{{.URL}}" style="color: {{$.Styling.PrimaryColor}}; font-size: 0.875em; text-decoration: underline;">View project</a>{{end}}
+      </div>
+      {{end}}{{end}}
+    </div>
   {{else}}
     <div>
       <h2 class="classic-section-title" style="border-bottom: 1px solid {{$.Styling.PrimaryColor}}; color: {{$.Styling.PrimaryColor}}">{{.Title}}</h2>

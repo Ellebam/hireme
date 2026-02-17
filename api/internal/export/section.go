@@ -53,3 +53,19 @@ func ParseLanguages(raw json.RawMessage) domain.LanguagesContent {
 	_ = json.Unmarshal(raw, &content)
 	return content
 }
+
+// ParseCertifications parses certifications section content from raw JSON.
+// Returns zero-value struct on parse failure.
+func ParseCertifications(raw json.RawMessage) domain.CertificationsContent {
+	var content domain.CertificationsContent
+	_ = json.Unmarshal(raw, &content)
+	return content
+}
+
+// ParseProjects parses projects section content from raw JSON.
+// Returns zero-value struct on parse failure.
+func ParseProjects(raw json.RawMessage) domain.ProjectsContent {
+	var content domain.ProjectsContent
+	_ = json.Unmarshal(raw, &content)
+	return content
+}

@@ -183,3 +183,36 @@ type LanguageEntry struct {
 	Proficiency   string `json:"proficiency"`
 	Certification string `json:"certification,omitempty"`
 }
+
+// CertificationsContent represents the certifications section
+type CertificationsContent struct {
+	Entries []CertificationEntry `json:"entries"`
+}
+
+// CertificationEntry represents a single certification
+type CertificationEntry struct {
+	ID           string  `json:"id"`
+	Name         string  `json:"name"`
+	Issuer       string  `json:"issuer"`
+	Date         string  `json:"date,omitempty"`
+	ExpiryDate   *string `json:"expiryDate,omitempty"`
+	CredentialID string  `json:"credentialId,omitempty"`
+	URL          string  `json:"url,omitempty"`
+}
+
+// ProjectsContent represents the projects section
+type ProjectsContent struct {
+	Entries []ProjectEntry `json:"entries"`
+}
+
+// ProjectEntry represents a single project
+type ProjectEntry struct {
+	ID           string   `json:"id"`
+	Name         string   `json:"name"`
+	Role         string   `json:"role,omitempty"`
+	Description  string   `json:"description"`
+	URL          string   `json:"url,omitempty"`
+	Technologies []string `json:"technologies,omitempty"`
+	StartDate    string   `json:"startDate,omitempty"`
+	EndDate      *string  `json:"endDate,omitempty"`
+}
