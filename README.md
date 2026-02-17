@@ -1,22 +1,13 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/Ellebam/hireme/docs/t-023-readme-overhaul/docs/hireme1.png" alt="HireMe Logo" width="160" />
-</p>
-
-<h1 align="center">HireMe</h1>
-
-<p align="center">
+<div align="center">
+  <table><tr>
+    <td><img src="https://raw.githubusercontent.com/Ellebam/hireme/main/docs/hireme1.png" alt="HireMe Logo" width="120" /></td>
+    <td><h1>HireMe</h1></td>
+  </tr></table>
   <strong>Open-source, schema-driven CV builder for professionals.</strong><br />
-  Build, customize, and export beautiful CVs with a modern drag-and-drop editor.
-</p>
-
-<p align="center">
+  Build, customize, and export beautiful CVs with a modern drag-and-drop editor.<br /><br />
   <a href="https://github.com/Ellebam/hireme/actions/workflows/ci.yml"><img src="https://github.com/Ellebam/hireme/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License" /></a>
-</p>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/Ellebam/hireme/docs/t-023-readme-overhaul/docs/hireme2.png" alt="HireMe Hero" width="480" />
-</p>
+</div>
 
 ---
 
@@ -42,6 +33,10 @@
 | Export | Gotenberg (HTML → PDF), godocx (CV data → DOCX) |
 | Testing | Vitest (170+ frontend tests), Go testing (backend) |
 | CI/CD | GitHub Actions — lint, test, typecheck, build |
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Ellebam/hireme/main/docs/hireme2.png" alt="HireMe Hero" width="480" />
+</p>
 
 ## Quick Start
 
