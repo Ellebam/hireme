@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HireMe — Editorial Craft</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,300;1,6..72,400;1,6..72,500&family=Source+Sans+3:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f8f5ee;
+    --cream-deep: #f0ebe0;
+    --cream-dark: #e2dacb;
+    --paper: #fffdf7;
+    --ink: #1a1714;
+    --charcoal: #2d2926;
+    --vermillion: #c0392b;
+    --vermillion-pale: rgba(192, 57, 43, 0.06);
+    --sienna: #9a6b45;
+    --text: #3d3830;
+    --text-secondary: #74695c;
+    --text-muted: #a89f94;
+    --border: #d8d0c2;
+    --border-heavy: #c4b9a8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.015'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .content { position: relative; z-index: 1; }
+  .serif { font-family: 'Newsreader', serif; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* ===== Navigation ===== */
+  .nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 60px;
+    background: var(--paper);
+    border-bottom: 2px solid var(--ink);
+    display: flex;
+    align-items: center;
+    padding: 0 36px;
+    z-index: 100;
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .nav-logo-stamp {
+    width: 34px;
+    height: 34px;
+    border: 2px solid var(--vermillion);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Newsreader', serif;
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--vermillion);
+    transform: rotate(-2deg);
+  }
+  .nav-logo-text {
+    font-family: 'Newsreader', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.03em;
+  }
+  .nav-links {
+    display: flex;
+    gap: 0;
+    margin-left: 48px;
+  }
+  .nav-link {
+    padding: 18px 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.2s ease;
+    text-decoration: none;
+    position: relative;
+  }
+  .nav-link:hover { color: var(--ink); }
+  .nav-link.active { color: var(--ink); }
+  .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 20px; right: 20px;
+    height: 2px;
+    background: var(--vermillion);
+  }
+  .nav-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .nav-avatar {
+    width: 32px;
+    height: 32px;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Newsreader', serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--sienna);
+    cursor: pointer;
+  }
+
+  /* ===== Buttons ===== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--ink);
+    color: var(--paper);
+    box-shadow: 3px 3px 0 var(--cream-dark);
+  }
+  .btn-primary:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--cream-dark);
+  }
+  .btn-red {
+    background: var(--vermillion);
+    color: white;
+    box-shadow: 3px 3px 0 var(--cream-dark);
+  }
+  .btn-red:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--cream-dark);
+  }
+  .btn-outline {
+    background: transparent;
+    color: var(--ink);
+    border: 2px solid var(--ink);
+  }
+  .btn-outline:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    padding: 10px 12px;
+  }
+  .btn-ghost:hover { color: var(--ink); }
+
+  /* ===== Pages ===== */
+  .page {
+    display: none;
+    padding-top: 60px;
+    min-height: 100vh;
+    animation: pageIn 0.4s ease;
+  }
+  .page.active { display: block; }
+  @keyframes pageIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* ===== Dashboard ===== */
+  .dash-hero {
+    padding: 72px 40px 0;
+    max-width: 840px;
+  }
+  .hero-rule {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: slideIn 0.5s ease 0.1s forwards;
+  }
+  .hero-rule-line {
+    width: 36px;
+    height: 2px;
+    background: var(--vermillion);
+  }
+  .hero-rule-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--vermillion);
+  }
+  .hero-title {
+    font-family: 'Newsreader', serif;
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1.08;
+    color: var(--ink);
+    letter-spacing: -0.03em;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: slideIn 0.5s ease 0.2s forwards;
+  }
+  .hero-title em { font-style: italic; font-weight: 400; color: var(--sienna); }
+  .hero-body {
+    font-size: 17px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    max-width: 500px;
+    margin-bottom: 36px;
+    opacity: 0;
+    animation: slideIn 0.5s ease 0.35s forwards;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 56px;
+    opacity: 0;
+    animation: slideIn 0.5s ease 0.45s forwards;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-12px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 2px solid var(--ink);
+    margin: 0 40px;
+  }
+  .divider-dashed {
+    border: none;
+    border-top: 1px dashed var(--border);
+    margin: 0 40px;
+  }
+
+  /* ===== CV List ===== */
+  .cv-section { padding: 0 40px 60px; }
+  .cv-section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 24px 0 16px;
+  }
+  .cv-section-title {
+    font-family: 'Newsreader', serif;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .cv-section-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    background: var(--cream-deep);
+    padding: 2px 8px;
+  }
+  .cv-list { display: flex; flex-direction: column; }
+  .cv-row {
+    display: grid;
+    grid-template-columns: 48px 1fr 120px 100px 40px;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px dashed var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .cv-row:hover {
+    background: var(--vermillion-pale);
+    padding-left: 12px;
+    margin-left: -12px;
+    margin-right: -12px;
+    padding-right: 12px;
+    box-shadow: 4px 4px 0 var(--cream-dark);
+  }
+  .cv-row-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .cv-row-title {
+    font-family: 'Newsreader', serif;
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 2px;
+    letter-spacing: -0.01em;
+  }
+  .cv-row-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .cv-row-template {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+  .cv-row-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .cv-row-action {
+    font-size: 18px;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: flex-end;
+  }
+  .cv-row-action:hover { color: var(--vermillion); }
+  .cv-create-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 24px 0;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+  }
+  .cv-create-row:hover { color: var(--vermillion); }
+  .cv-create-plus {
+    font-family: 'Newsreader', serif;
+    font-size: 24px;
+    font-weight: 300;
+  }
+  .cv-create-label {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ===== Editor ===== */
+  .editor-bar {
+    height: 50px;
+    background: var(--paper);
+    border-bottom: 1px dashed var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 4px;
+  }
+  .eb-btn {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-size: 15px;
+  }
+  .eb-btn:hover { color: var(--ink); background: var(--vermillion-pale); border-color: rgba(192, 57, 43, 0.1); }
+  .eb-btn.active { color: var(--vermillion); background: var(--vermillion-pale); }
+  .eb-sep { width: 1px; height: 20px; background: var(--border); margin: 0 6px; }
+  .eb-zoom {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-secondary);
+    padding: 0 6px;
+  }
+  .save-indicator {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .save-indicator::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #3d7a3d;
+  }
+  .editor-body { display: flex; height: calc(100vh - 110px); }
+  .editor-left {
+    width: 248px;
+    background: var(--paper);
+    border-right: 2px solid var(--border);
+    display: flex;
+    flex-direction: column;
+  }
+  .panel-head {
+    padding: 18px 20px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .panel-title {
+    font-family: 'Newsreader', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .panel-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .sec-list { padding: 8px; flex: 1; overflow-y: auto; }
+  .sec-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-bottom: 1px;
+    border-left: 3px solid transparent;
+  }
+  .sec-item:hover { background: rgba(0,0,0,0.02); }
+  .sec-item.active {
+    border-left-color: var(--vermillion);
+    background: var(--vermillion-pale);
+  }
+  .sec-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    width: 20px;
+  }
+  .sec-label { font-size: 14px; font-weight: 500; color: var(--text-secondary); }
+  .sec-item.active .sec-label { color: var(--ink); font-weight: 600; }
+  .sec-drag {
+    margin-left: auto;
+    opacity: 0;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    transition: opacity 0.15s;
+  }
+  .sec-item:hover .sec-drag { opacity: 0.5; }
+  .editor-center {
+    flex: 1;
+    background: var(--cream-deep);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px;
+    overflow: auto;
+  }
+  .cv-paper {
+    width: 580px;
+    min-height: 820px;
+    background: var(--paper);
+    border: 2px solid var(--border);
+    box-shadow: 6px 6px 0 var(--cream-dark);
+    padding: 52px 48px;
+    color: var(--ink);
+    animation: paperDrop 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes paperDrop {
+    from { opacity: 0; transform: translateY(12px) rotate(-0.3deg); }
+    to { opacity: 1; transform: translateY(0) rotate(0); }
+  }
+  .cv-name {
+    font-family: 'Newsreader', serif;
+    font-size: 34px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .cv-job {
+    font-family: 'Newsreader', serif;
+    font-size: 16px;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--sienna);
+    margin-bottom: 14px;
+  }
+  .cv-contact {
+    display: flex;
+    gap: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-secondary);
+    padding-bottom: 18px;
+    margin-bottom: 22px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .cv-sec-title {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--vermillion);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .cv-block { margin-bottom: 22px; }
+  .cv-entry-title {
+    font-family: 'Newsreader', serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .cv-entry-sub {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-bottom: 4px;
+  }
+  .cv-entry-body { font-size: 13px; color: var(--text); line-height: 1.75; }
+  .cv-skills { display: flex; flex-wrap: wrap; gap: 0; }
+  .cv-skill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 0;
+    color: var(--text);
+  }
+  .cv-skill::after { content: ' · '; color: var(--text-muted); }
+  .cv-skill:last-child::after { content: ''; }
+  .editor-right {
+    width: 320px;
+    background: var(--paper);
+    border-left: 2px solid var(--border);
+    display: flex;
+    flex-direction: column;
+  }
+  .prop-section { padding: 16px 20px; }
+  .prop-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .prop-input {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--cream);
+    border: 2px solid var(--border);
+    color: var(--text);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 14px;
+    transition: all 0.15s ease;
+    margin-bottom: 12px;
+    outline: none;
+  }
+  .prop-input:focus {
+    border-color: var(--ink);
+    background: var(--paper);
+    box-shadow: 3px 3px 0 var(--cream-dark);
+  }
+  .prop-textarea {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--cream);
+    border: 2px solid var(--border);
+    color: var(--text);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 80px;
+    outline: none;
+    transition: all 0.15s ease;
+  }
+  .prop-textarea:focus {
+    border-color: var(--ink);
+    background: var(--paper);
+    box-shadow: 3px 3px 0 var(--cream-dark);
+  }
+
+  /* ===== Templates ===== */
+  .tmpl-page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 60px 40px 80px;
+  }
+  .tmpl-rule {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .tmpl-title {
+    font-family: 'Newsreader', serif;
+    font-size: 44px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.03em;
+    margin-bottom: 10px;
+    line-height: 1.1;
+  }
+  .tmpl-title em { font-weight: 400; font-style: italic; color: var(--sienna); }
+  .tmpl-sub {
+    font-size: 16px;
+    color: var(--text-secondary);
+    max-width: 460px;
+    line-height: 1.7;
+    margin-bottom: 44px;
+  }
+  .tmpl-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .tmpl-card {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    overflow: hidden;
+  }
+  .tmpl-card:hover {
+    border-color: rgba(192, 57, 43, 0.2);
+    box-shadow: 0 12px 32px rgba(192, 57, 43, 0.08);
+    transform: translateY(-4px);
+  }
+  .tmpl-preview {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--cream-deep);
+  }
+  .tmpl-mini {
+    width: 110px;
+    height: 155px;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+    padding: 10px;
+    transition: transform 0.25s ease;
+  }
+  .tmpl-card:hover .tmpl-mini { transform: translateY(-6px) rotate(-1deg); }
+  .tmpl-line { height: 4px; margin-bottom: 3px; border-radius: 2px; }
+  .tmpl-info { padding: 20px; }
+  .tmpl-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .tmpl-name {
+    font-family: 'Newsreader', serif;
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 4px;
+    letter-spacing: -0.01em;
+  }
+  .tmpl-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+  .tmpl-tag {
+    display: inline-block;
+    margin-top: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--vermillion);
+    background: var(--vermillion-pale);
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  /* ===== Modal ===== */
+  .modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 23, 20, 0.55);
+    z-index: 200;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal-bg.active { display: flex; align-items: center; justify-content: center; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    padding: 36px;
+    max-width: 440px;
+    width: 90%;
+    box-shadow: 8px 8px 0 var(--cream-dark);
+    animation: modalDrop 0.3s ease;
+  }
+  @keyframes modalDrop {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .modal-title {
+    font-family: 'Newsreader', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+  .modal-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+  .fmt-opts {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: 28px;
+    border-top: 1px dashed var(--border);
+  }
+  .fmt-opt {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px dashed var(--border);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .fmt-opt:hover { background: var(--vermillion-pale); padding-left: 8px; }
+  .fmt-opt.selected { background: var(--vermillion-pale); padding-left: 8px; border-left: 3px solid var(--vermillion); }
+  .fmt-icon {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    width: 44px;
+    text-align: center;
+  }
+  .fi-pdf { color: var(--vermillion); }
+  .fi-doc { color: #2563eb; }
+  .fi-json { color: var(--ink); }
+  .fmt-name { font-weight: 600; font-size: 14px; color: var(--ink); margin-bottom: 2px; }
+  .fmt-sub { font-size: 12px; color: var(--text-muted); }
+  .modal-foot { display: flex; gap: 12px; justify-content: flex-end; }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--cream); }
+  ::-webkit-scrollbar-thumb { background: var(--cream-dark); }
+</style>
+</head>
+<body>
+<div class="content">
+
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="nav-logo-stamp">H</div>
+    <span class="nav-logo-text">HireMe</span>
+  </div>
+  <div class="nav-links">
+    <a class="nav-link active" onclick="go('dashboard')" data-page="dashboard">Dashboard</a>
+    <a class="nav-link" onclick="go('editor')" data-page="editor">Editor</a>
+    <a class="nav-link" onclick="go('templates')" data-page="templates">Templates</a>
+  </div>
+  <div class="nav-right">
+    <button class="btn btn-primary" onclick="openM()">+ New CV</button>
+    <div class="nav-avatar">AJ</div>
+  </div>
+</nav>
+
+<!-- Dashboard -->
+<div class="page active" id="page-dashboard">
+  <div class="dash-hero">
+    <div class="hero-rule">
+      <div class="hero-rule-line"></div>
+      <span class="hero-rule-text">Your workspace</span>
+    </div>
+    <h1 class="hero-title">Write the story<br>they <em>remember.</em></h1>
+    <p class="hero-body">A CV is not a list. It's a carefully composed letter — part design, part craft, all you.</p>
+    <div class="hero-actions">
+      <button class="btn btn-red" onclick="openM()">+ Create CV</button>
+      <button class="btn btn-outline" onclick="go('templates')">Templates &rarr;</button>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="cv-section">
+    <div class="cv-section-header">
+      <h2 class="cv-section-title">Documents</h2>
+      <span class="cv-section-count">3 entries</span>
+    </div>
+    <div class="cv-list">
+      <div class="cv-row" onclick="go('editor')">
+        <div class="cv-row-num">01</div>
+        <div><div class="cv-row-title">Senior Software Engineer</div><div class="cv-row-desc">Fullstack development, 6 years of experience</div></div>
+        <div class="cv-row-template">Modern</div>
+        <div class="cv-row-date">2h ago</div>
+        <div class="cv-row-action">&rarr;</div>
+      </div>
+      <div class="cv-row">
+        <div class="cv-row-num">02</div>
+        <div><div class="cv-row-title">Product Manager</div><div class="cv-row-desc">Strategy &amp; cross-functional leadership</div></div>
+        <div class="cv-row-template">Classic</div>
+        <div class="cv-row-date">3d ago</div>
+        <div class="cv-row-action">&rarr;</div>
+      </div>
+      <div class="cv-row">
+        <div class="cv-row-num">03</div>
+        <div><div class="cv-row-title">UX Designer</div><div class="cv-row-desc">Human-centered digital experiences</div></div>
+        <div class="cv-row-template">Visionary</div>
+        <div class="cv-row-date">Draft</div>
+        <div class="cv-row-action">&rarr;</div>
+      </div>
+    </div>
+    <div class="cv-create-row" onclick="openM()">
+      <span class="cv-create-plus">+</span>
+      <span class="cv-create-label">New Document</span>
+    </div>
+  </div>
+</div>
+
+<!-- Editor -->
+<div class="page" id="page-editor">
+  <div class="editor-bar">
+    <button class="eb-btn" onclick="go('dashboard')">&larr;</button>
+    <div class="eb-sep"></div>
+    <button class="eb-btn active">&#9783;</button>
+    <div class="eb-sep"></div>
+    <button class="eb-btn">&#8634;</button>
+    <button class="eb-btn">&#8635;</button>
+    <div class="eb-sep"></div>
+    <button class="eb-btn">&minus;</button>
+    <span class="eb-zoom">100%</span>
+    <button class="eb-btn">+</button>
+    <div class="save-indicator">Saved</div>
+    <div class="eb-sep"></div>
+    <button class="btn btn-primary" style="padding:6px 14px;font-size:11px;" onclick="openM()">&darr; Export</button>
+  </div>
+  <div class="editor-body">
+    <div class="editor-left">
+      <div class="panel-head">
+        <div class="panel-title">Sections</div>
+        <div class="panel-sub">// drag to reorder</div>
+      </div>
+      <div class="sec-list">
+        <div class="sec-item active"><span class="sec-num">01</span><span class="sec-label">Personal</span><span class="sec-drag">::</span></div>
+        <div class="sec-item"><span class="sec-num">02</span><span class="sec-label">Summary</span><span class="sec-drag">::</span></div>
+        <div class="sec-item"><span class="sec-num">03</span><span class="sec-label">Experience</span><span class="sec-drag">::</span></div>
+        <div class="sec-item"><span class="sec-num">04</span><span class="sec-label">Education</span><span class="sec-drag">::</span></div>
+        <div class="sec-item"><span class="sec-num">05</span><span class="sec-label">Skills</span><span class="sec-drag">::</span></div>
+        <div class="sec-item"><span class="sec-num">06</span><span class="sec-label">Languages</span><span class="sec-drag">::</span></div>
+      </div>
+    </div>
+    <div class="editor-center">
+      <div class="cv-paper">
+        <div class="cv-name">Alexandra Johnson</div>
+        <div class="cv-job">Senior Software Engineer</div>
+        <div class="cv-contact">
+          <span>alex@email.com</span>
+          <span>+49 123 456 789</span>
+          <span>Berlin, Germany</span>
+        </div>
+        <div class="cv-block">
+          <div class="cv-sec-title">Summary</div>
+          <div class="cv-entry-body">Experienced software engineer with 6+ years building scalable web applications. Passionate about clean architecture, mentoring, and delivering user-centric products.</div>
+        </div>
+        <div class="cv-block">
+          <div class="cv-sec-title">Experience</div>
+          <div style="margin-bottom:14px;">
+            <div class="cv-entry-title">Senior Software Engineer</div>
+            <div class="cv-entry-sub">TechCorp GmbH, Berlin &mdash; 2021 &ndash; Present</div>
+            <div class="cv-entry-body">Led migration to microservices. Reduced deployment time by 70%. Mentored 4 junior engineers.</div>
+          </div>
+          <div>
+            <div class="cv-entry-title">Software Engineer</div>
+            <div class="cv-entry-sub">StartupXYZ, Munich &mdash; 2018 &ndash; 2021</div>
+            <div class="cv-entry-body">Built core features for a SaaS platform serving 50K users.</div>
+          </div>
+        </div>
+        <div class="cv-block">
+          <div class="cv-sec-title">Skills</div>
+          <div class="cv-skills">
+            <span class="cv-skill">TypeScript</span>
+            <span class="cv-skill">React</span>
+            <span class="cv-skill">Node.js</span>
+            <span class="cv-skill">Go</span>
+            <span class="cv-skill">PostgreSQL</span>
+            <span class="cv-skill">Docker</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="editor-right">
+      <div class="panel-head">
+        <div class="panel-title">Personal</div>
+        <div class="panel-sub">// edit details</div>
+      </div>
+      <div class="prop-section" style="flex:1;overflow-y:auto;">
+        <div class="prop-label">Full Name</div>
+        <input class="prop-input" value="Alexandra Johnson">
+        <div class="prop-label">Job Title</div>
+        <input class="prop-input" value="Senior Software Engineer">
+        <div class="prop-label">Email</div>
+        <input class="prop-input" value="alex@email.com">
+        <div class="prop-label">Phone</div>
+        <input class="prop-input" value="+49 123 456 789">
+        <div class="prop-label">Location</div>
+        <input class="prop-input" value="Berlin, Germany">
+        <div class="prop-label">Summary</div>
+        <textarea class="prop-textarea">Experienced software engineer with 6+ years building scalable web applications.</textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Templates -->
+<div class="page" id="page-templates">
+  <div class="tmpl-page">
+    <div class="tmpl-rule">
+      <div class="hero-rule-line"></div>
+      <span class="hero-rule-text">Templates</span>
+    </div>
+    <h1 class="tmpl-title">Choose a<br><em>format.</em></h1>
+    <p class="tmpl-sub">Each template shapes perception. The right one amplifies your story.</p>
+    <div class="tmpl-grid">
+      <div class="tmpl-card">
+        <div class="tmpl-preview">
+          <div class="tmpl-mini">
+            <div class="tmpl-line" style="width:70%;height:5px;background:var(--ink);"></div>
+            <div class="tmpl-line" style="width:50%;height:3px;background:var(--vermillion);opacity:.5;"></div>
+            <div style="height:6px;"></div>
+            <div class="tmpl-line" style="width:90%;height:2px;background:var(--border);"></div>
+            <div class="tmpl-line" style="width:80%;height:2px;background:var(--border);"></div>
+            <div class="tmpl-line" style="width:85%;height:2px;background:var(--border);"></div>
+          </div>
+        </div>
+        <div class="tmpl-info">
+          <div class="tmpl-num">01</div>
+          <div class="tmpl-name">Classic</div>
+          <div class="tmpl-desc">Timeless. Serif headings, clean structure, no distractions.</div>
+          <div class="tmpl-tag">Popular</div>
+        </div>
+      </div>
+      <div class="tmpl-card">
+        <div class="tmpl-preview">
+          <div class="tmpl-mini">
+            <div class="tmpl-line" style="width:70%;height:5px;background:var(--ink);"></div>
+            <div class="tmpl-line" style="width:50%;height:3px;background:#888;"></div>
+            <div style="height:6px;"></div>
+            <div style="display:flex;gap:3px;margin-bottom:4px;">
+              <div style="width:3px;height:20px;background:var(--vermillion);"></div>
+              <div style="flex:1;">
+                <div class="tmpl-line" style="width:60%;height:3px;background:var(--ink);"></div>
+                <div class="tmpl-line" style="width:90%;height:2px;background:var(--border);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tmpl-info">
+          <div class="tmpl-num">02</div>
+          <div class="tmpl-name">Modern</div>
+          <div class="tmpl-desc">Timeline accents. Bold visual hierarchy for tech roles.</div>
+          <div class="tmpl-tag">Recommended</div>
+        </div>
+      </div>
+      <div class="tmpl-card">
+        <div class="tmpl-preview">
+          <div class="tmpl-mini">
+            <div style="display:flex;height:100%;">
+              <div style="width:35%;background:var(--ink);padding:5px;">
+                <div class="tmpl-line" style="width:80%;height:3px;background:rgba(255,255,255,.6);"></div>
+                <div class="tmpl-line" style="width:60%;height:2px;background:rgba(255,255,255,.3);"></div>
+              </div>
+              <div style="flex:1;padding:5px;">
+                <div class="tmpl-line" style="width:80%;height:4px;background:var(--ink);"></div>
+                <div class="tmpl-line" style="width:50%;height:2px;background:#aaa;"></div>
+                <div style="height:4px;"></div>
+                <div class="tmpl-line" style="width:90%;height:2px;background:var(--border);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tmpl-info">
+          <div class="tmpl-num">03</div>
+          <div class="tmpl-name">Visionary</div>
+          <div class="tmpl-desc">Two-column sidebar. For consulting and leadership roles.</div>
+          <div class="tmpl-tag">New</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-title">Export</div>
+    <div class="modal-desc">Choose a format. Your CV will be generated with the current template.</div>
+    <div class="fmt-opts">
+      <div class="fmt-opt selected" onclick="selF(this)">
+        <div class="fmt-icon fi-pdf">PDF</div>
+        <div><div class="fmt-name">PDF Document</div><div class="fmt-sub">Best for sharing and printing</div></div>
+      </div>
+      <div class="fmt-opt" onclick="selF(this)">
+        <div class="fmt-icon fi-doc">DOCX</div>
+        <div><div class="fmt-name">Word Document</div><div class="fmt-sub">Editable, ATS-friendly</div></div>
+      </div>
+      <div class="fmt-opt" onclick="selF(this)">
+        <div class="fmt-icon fi-json">JSON</div>
+        <div><div class="fmt-name">JSON Data</div><div class="fmt-sub">Structured backup</div></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeM()">Cancel</button>
+      <button class="btn btn-primary">&darr; Download</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function go(p) {
+    document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(x => x.classList.remove('active'));
+    document.getElementById('page-' + p).classList.add('active');
+    document.querySelector('[data-page="' + p + '"]').classList.add('active');
+    window.scrollTo(0, 0);
+  }
+  function openM() { document.getElementById('modal').classList.add('active'); }
+  function closeM() { document.getElementById('modal').classList.remove('active'); }
+  document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeM(); });
+  function selF(el) {
+    document.querySelectorAll('.fmt-opt').forEach(f => f.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+</script>
+</body>
+</html>

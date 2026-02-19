@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — T-001–T-012, T-016, T-023 done, 15 tasks in backlog (8 unblocked, 3 blocked, 4 need splitting when picked up)
+**Status:** Task-based workflow active — T-001–T-012, T-016, T-023, T-024, T-030 done, 15 tasks in backlog (10 unblocked, 2 blocked, 4 need splitting when picked up)
 
 ### What's Working
 
@@ -245,8 +245,7 @@ task api:sqlc          # Generate sqlc code
 |----|------|------------|------|
 | T-021 | Export markdown + bundle download (PDF+DOCX+JSON+MD zip) | — | S |
 | T-022 | JSON round-trip import | — | S |
-| T-024 | Design direction — define visual identity, palette, typography | — | S |
-| T-025 | Implement design overhaul | T-024 | M |
+| T-025 | Implement design overhaul | — | M |
 | T-026 | DOCX export styling overhaul — match actual CV templates | T-025 | M |
 | T-027 | Markdown import (parse exported markdown back into CV) | T-021 | S–M |
 | T-028 | CV import from uploaded DOCX/PDF — app-based extraction | — | M |
@@ -272,6 +271,8 @@ task api:sqlc          # Generate sqlc code
 | T-012 | Add Projects section | feat/t-011-012-certifications-projects |
 | T-016 | Fix save bug after template switch | fix/t-016-save-after-template-switch |
 | T-023 | README overhaul — content + design | docs/t-023-readme-overhaul |
+| T-024 | Design direction — define visual identity, palette, typography | (decided: Editorial Craft prototype) |
+| T-030 | Extract design system from Editorial Craft prototype | feat/t-030-design-system |
 
 ---
 
@@ -323,13 +324,17 @@ task api:sqlc          # Generate sqlc code
 - Backend validation already exists (`validator.CVValidator`)
 - Files: new import UI (dashboard or editor toolbar), `editor-store.ts`
 
-**T-024: Design direction** — S
-- Collaborative task: define visual identity, color palette, typography, component style
-- Output: design tokens, reference screenshots/mockups, Tailwind theme config decisions
-- No code changes — purely design exploration and decision-making
+**T-030: Extract design system from Editorial Craft prototype** — S
+- Source: `design-prototypes/01-editorial-craft.html` (approved prototype from designer)
+- Extract every design token, component pattern, spacing rule, animation, and interaction pattern
+- Document as a comprehensive design system spec that serves as single source of truth for all frontend work
+- Output: `DESIGN-SYSTEM.md` — design tokens (colors, typography, spacing, shadows, borders, radii, animations), component catalog (every UI pattern: nav, buttons, cards, inputs, modals, sections, lists, tags, dividers, editor chrome), Tailwind theme mapping, shadcn/ui adaptation notes
+- Cover: color palette (14 CSS vars), 3 font families (Newsreader/Source Sans 3/JetBrains Mono), button variants (primary/red/outline/ghost), input/textarea styles, active/hover states, the "editorial" aesthetic rules (offset shadows, dashed borders, uppercase labels, vermillion accents)
+- No code changes — purely extraction and documentation
+- Supersedes T-024 (design direction decided via designer prototype)
 
-**T-025: Implement design overhaul** — M (blocked by T-024)
-- Apply design decisions from T-024 across the app
+**T-025: Implement design overhaul** — M (blocked by T-030)
+- Apply design decisions from T-030 across the app
 - Update Tailwind config (CSS variables for shadcn), component spacing, typography, colors
 - Files: `tailwind.config.ts`, shadcn theme, all template components, dashboard, editor chrome
 - Requires careful regression testing — shadcn CSS variable changes ripple everywhere
@@ -374,12 +379,12 @@ task api:sqlc          # Generate sqlc code
 ### Dependency Graph
 ```
 INDEPENDENT (can start anytime):
-  T-017, T-018, T-019, T-020, T-023
-  T-021, T-022, T-028
+  T-017, T-018, T-019, T-020
+  T-021, T-022, T-025, T-028
   T-013, T-014, T-015
 
 DEPENDENCY CHAINS:
-  T-024 (design direction) → T-025 (implement design) → T-026 (DOCX styling)
+  T-025 (implement design) → T-026 (DOCX styling)
   T-021 (markdown export) → T-027 (markdown import)
 
 T-029 (consultant profile): independent but needs splitting when picked up
@@ -393,7 +398,7 @@ T-029 (consultant profile): independent but needs splitting when picked up
 4. **T-020** (tag input) — fast, pattern already exists
 
 **Phase 2 — Features + polish:**
-6. **T-024** (design direction) — collaborative, unlocks T-025/T-026
+6. **T-030** (design system extraction) — prototype received, unlocks T-025/T-026
 7. **T-021** (markdown + bundle) — new capability, unlocks T-027
 8. **T-022** (JSON import) — completes export/import story
 9. **T-023** (README) — housekeeping
