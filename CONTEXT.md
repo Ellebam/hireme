@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — T-001–T-012, T-016–T-017, T-023–T-025, T-030 done, 13 tasks in backlog (10 unblocked, 1 blocked, 4 need splitting when picked up)
+**Status:** Task-based workflow active — T-001–T-012, T-016–T-020, T-023–T-025, T-030 done, 10 tasks in backlog (7 unblocked, 1 blocked, 4 need splitting when picked up)
 
 ### What's Working
 
@@ -37,7 +37,7 @@
 - ✅ Delete confirmation dialog on CV card
 - ✅ Back-to-dashboard link in editor toolbar
 - ✅ shadcn/ui dropdown-menu component
-- ✅ 170 passing tests (Vitest)
+- ✅ 200 passing tests (Vitest)
 - ✅ Build verified, full stack integration tested
 
 ### Remaining Work
@@ -228,13 +228,6 @@ task api:sqlc          # Generate sqlc code
 |----|------|--------|------------|--------|
 | — | — | — | — | — |
 
-### Backlog — P1 (UX Fixes)
-| ID | Task | Blocked By | Size |
-|----|------|------------|------|
-| T-018 | Section click UX — remove redundant button, auto-open editor | — | XS |
-| T-019 | Replace date pickers with month/year picker component | — | S |
-| T-020 | Tag input for technologies field (extract from SkillTag) | — | XS–S |
-
 ### Backlog — P2 (Features)
 | ID | Task | Blocked By | Size |
 |----|------|------------|------|
@@ -269,34 +262,13 @@ task api:sqlc          # Generate sqlc code
 | T-025 | Implement editorial design overhaul | feat/t-025-design-overhaul (#40) |
 | T-030 | Extract design system from Editorial Craft prototype | feat/t-030-design-system |
 | T-017 | Responsive layout + clipping fixes | feat/t-017-responsive-layout (#41) |
+| T-018 | Section click UX — single-click opens properties | feat/t-018-020-ux-fixes (#42) |
+| T-019 | Replace date pickers with MonthYearPicker | feat/t-018-020-ux-fixes (#42) |
+| T-020 | Tag input for technologies field | feat/t-018-020-ux-fixes (#42) |
 
 ---
 
 ## Task Details
-
-### P1 — UX Fixes
-
-**T-018: Section click UX** — XS
-- "Click to edit" button renders even when properties panel is already open — hide it
-- Single click on section should open properties panel (currently requires double-click)
-- Fix: change `handleSectionClick` in `CVPreview.tsx` to also call `setRightSidebarOpen(true)`
-- Files: `CVPreview.tsx`, template components, `ui-store.ts`
-
-**T-019: Replace date pickers** — S
-- Current `<input type="month">` is ugly and inconsistent across browsers
-- Build custom `MonthYearPicker` component (Radix Popover + two selects, no new library)
-- Replace in: `ExperienceEditor.tsx`, `EducationEditor.tsx`, `ProjectsEditor.tsx`
-
-**T-020: Tag input for technologies** — XS–S
-- Technologies field in `ProjectsEditor.tsx` uses `<Textarea>` (one-per-line)
-- Data model already supports `string[]` — only the input UX needs changing
-- `SkillsEditor.tsx` already has `SkillTag` component (lines 228-291) — extract into reusable `TagInput`
-- Files: `ProjectsEditor.tsx`, `SkillsEditor.tsx` (extract), new `TagInput` component
-
-**T-023: README overhaul** — XS
-- Documentation only, no code changes
-- Update content to reflect current state, improve design
-- Inspiration: https://github.com/openclaw/openclaw/blob/main/README.md
 
 ### P2 — Features
 
@@ -312,22 +284,7 @@ task api:sqlc          # Generate sqlc code
 - Backend validation already exists (`validator.CVValidator`)
 - Files: new import UI (dashboard or editor toolbar), `editor-store.ts`
 
-**T-030: Extract design system from Editorial Craft prototype** — S
-- Source: `design-prototypes/01-editorial-craft.html` (approved prototype from designer)
-- Extract every design token, component pattern, spacing rule, animation, and interaction pattern
-- Document as a comprehensive design system spec that serves as single source of truth for all frontend work
-- Output: `DESIGN-SYSTEM.md` — design tokens (colors, typography, spacing, shadows, borders, radii, animations), component catalog (every UI pattern: nav, buttons, cards, inputs, modals, sections, lists, tags, dividers, editor chrome), Tailwind theme mapping, shadcn/ui adaptation notes
-- Cover: color palette (14 CSS vars), 3 font families (Newsreader/Source Sans 3/JetBrains Mono), button variants (primary/red/outline/ghost), input/textarea styles, active/hover states, the "editorial" aesthetic rules (offset shadows, dashed borders, uppercase labels, vermillion accents)
-- No code changes — purely extraction and documentation
-- Supersedes T-024 (design direction decided via designer prototype)
-
-**T-025: Implement design overhaul** — M (blocked by T-030)
-- Apply design decisions from T-030 across the app
-- Update Tailwind config (CSS variables for shadcn), component spacing, typography, colors
-- Files: `tailwind.config.ts`, shadcn theme, all template components, dashboard, editor chrome
-- Requires careful regression testing — shadcn CSS variable changes ripple everywhere
-
-**T-026: DOCX export styling overhaul** — M (blocked by T-025)
+**T-026: DOCX export styling overhaul** — M
 - Make DOCX output match the finalized CV template designs
 - Backend Go work: map design decisions to `godocx` paragraph/run styles
 - Note: `godocx` may not support multi-column layouts (Visionary template) — scope to best-effort
@@ -367,37 +324,28 @@ task api:sqlc          # Generate sqlc code
 ### Dependency Graph
 ```
 INDEPENDENT (can start anytime):
-  T-018, T-019, T-020
-  T-021, T-022, T-025, T-028
+  T-021, T-022, T-028
   T-013, T-014, T-015
 
 DEPENDENCY CHAINS:
-  T-025 (implement design) → T-026 (DOCX styling)
   T-021 (markdown export) → T-027 (markdown import)
 
 T-029 (consultant profile): independent but needs splitting when picked up
 ```
 
 ### Recommended Sequencing
-**Phase 1 — Quick UX wins:**
-1. **T-018** (edit UX) — XS, fast win
-2. **T-019** (date pickers) — visible on every CV
-3. **T-020** (tag input) — fast, pattern already exists
+**Phase 1 — Features + polish:**
+1. **T-021** (markdown + bundle) — new capability, unlocks T-027
+2. **T-022** (JSON import) — completes export/import story
 
-**Phase 2 — Features + polish:**
-6. **T-030** (design system extraction) — prototype received, unlocks T-025/T-026
-7. **T-021** (markdown + bundle) — new capability, unlocks T-027
-8. **T-022** (JSON import) — completes export/import story
-9. **T-023** (README) — housekeeping
+**Phase 2 — Design implementation + blocked tasks:**
+3. **T-026** (DOCX styling)
+4. **T-027** (markdown import)
+5. **T-028** (CV upload/extract)
 
-**Phase 3 — Design implementation + blocked tasks:**
-10. **T-025** (design overhaul) → **T-026** (DOCX styling)
-11. **T-027** (markdown import)
-12. **T-028** (CV upload/extract)
-
-**Phase 4 — Infrastructure + architecture:**
-13. **T-013/T-014/T-015** — R2, OAuth, multi-CV
-14. **T-029** (consultant profile) — split into sub-tasks first
+**Phase 3 — Infrastructure + architecture:**
+6. **T-013/T-014/T-015** — R2, OAuth, multi-CV
+7. **T-029** (consultant profile) — split into sub-tasks first
 
 ---
 
