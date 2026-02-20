@@ -41,24 +41,30 @@ export function TagInput({
     [value, onChange]
   );
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (inputValue.trim()) {
-        addTags(inputValue);
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (inputValue.trim()) {
+          addTags(inputValue);
+        }
+      } else if (e.key === 'Backspace' && inputValue === '' && value.length > 0) {
+        removeTag(value.length - 1);
       }
-    } else if (e.key === 'Backspace' && inputValue === '' && value.length > 0) {
-      removeTag(value.length - 1);
-    }
-  };
+    },
+    [inputValue, addTags, removeTag, value.length]
+  );
 
-  const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
-    const pasted = e.clipboardData.getData('text');
-    if (pasted.includes(',') || pasted.includes('\n')) {
-      e.preventDefault();
-      addTags(pasted);
-    }
-  };
+  const handlePaste = useCallback(
+    (e: ClipboardEvent<HTMLInputElement>) => {
+      const pasted = e.clipboardData.getData('text');
+      if (pasted.includes(',') || pasted.includes('\n')) {
+        e.preventDefault();
+        addTags(pasted);
+      }
+    },
+    [addTags]
+  );
 
   return (
     <div
@@ -68,7 +74,7 @@ export function TagInput({
     >
       {value.map((tag, index) => (
         <span
-          key={`${tag}-${index}`}
+          key={tag}
           className="inline-flex items-center gap-1 bg-primary/10 text-primary px-2 py-0.5 text-sm"
         >
           {tag}

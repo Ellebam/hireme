@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useId } from 'react';
 import { CalendarDays, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Popover, PopoverTrigger, PopoverContent } from './popover';
@@ -28,7 +28,7 @@ function formatMonthYear(value: string): string {
   return `${MONTHS[monthIndex]} ${year}`;
 }
 
-interface MonthYearPickerProps {
+export interface MonthYearPickerProps {
   value?: string;
   onChange: (value: string) => void;
   disabled?: boolean;
@@ -46,6 +46,9 @@ export function MonthYearPicker({
   const [open, setOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState<string>('');
   const [selectedYear, setSelectedYear] = useState<string>('');
+  const generatedId = useId();
+  const monthSelectId = `${generatedId}-month`;
+  const yearSelectId = `${generatedId}-year`;
 
   useEffect(() => {
     if (value) {
@@ -85,42 +88,40 @@ export function MonthYearPicker({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <button
-          id={id}
-          type="button"
-          disabled={disabled}
-          className={cn(
-            'flex h-10 w-full items-center justify-between border-2 border-input bg-secondary px-3 py-[9px] text-sm transition-all duration-150 focus-visible:outline-none focus-visible:border-primary focus-visible:bg-card focus-visible:shadow-offset-sm disabled:cursor-not-allowed disabled:opacity-50',
-            !displayValue && 'text-muted-foreground'
-          )}
-        >
-          <span className="flex items-center gap-2">
+      <div className="flex w-full items-center gap-1">
+        <PopoverTrigger asChild>
+          <button
+            id={id}
+            type="button"
+            disabled={disabled}
+            className={cn(
+              'flex h-10 flex-1 items-center gap-2 border-2 border-input bg-secondary px-3 py-[9px] text-sm transition-all duration-150 focus-visible:outline-none focus-visible:border-primary focus-visible:bg-card focus-visible:shadow-offset-sm disabled:cursor-not-allowed disabled:opacity-50',
+              !displayValue && 'text-muted-foreground'
+            )}
+          >
             <CalendarDays className="h-4 w-4 text-muted-foreground" />
             {displayValue || placeholder}
-          </span>
-          {displayValue && !disabled && (
-            <span
-              role="button"
-              aria-label="Clear date"
-              className="text-muted-foreground hover:text-foreground"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleClear();
-              }}
-            >
-              <X className="h-3.5 w-3.5" />
-            </span>
-          )}
-        </button>
-      </PopoverTrigger>
+          </button>
+        </PopoverTrigger>
+        {displayValue && !disabled && (
+          <button
+            type="button"
+            aria-label="Clear date"
+            onClick={handleClear}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        )}
+      </div>
       <PopoverContent align="start" className="w-[240px] p-3">
         <div className="space-y-3">
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <label htmlFor={monthSelectId} className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Month
             </label>
             <select
+              id={monthSelectId}
               value={selectedMonth}
               onChange={(e) => handleMonthChange(e.target.value)}
               className="flex h-9 w-full border-2 border-input bg-secondary px-2 py-1 text-sm focus:outline-none focus:border-primary"
@@ -134,10 +135,11 @@ export function MonthYearPicker({
             </select>
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <label htmlFor={yearSelectId} className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Year
             </label>
             <select
+              id={yearSelectId}
               value={selectedYear}
               onChange={(e) => handleYearChange(e.target.value)}
               className="flex h-9 w-full border-2 border-input bg-secondary px-2 py-1 text-sm focus:outline-none focus:border-primary"

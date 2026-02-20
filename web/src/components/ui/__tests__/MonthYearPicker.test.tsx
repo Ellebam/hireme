@@ -51,9 +51,8 @@ describe('MonthYearPicker', () => {
     await user.click(screen.getByText('Select date'));
 
     // Select month first (March = 03)
-    const selects = screen.getAllByRole('combobox');
-    const monthSelect = selects[0];
-    const yearSelect = selects[1];
+    const monthSelect = screen.getByRole('combobox', { name: /month/i });
+    const yearSelect = screen.getByRole('combobox', { name: /year/i });
 
     await user.selectOptions(monthSelect, '03');
     // Month selected but no year yet — should not emit
