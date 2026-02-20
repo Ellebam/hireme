@@ -17,6 +17,7 @@ describe('UIStore', () => {
       deleteSectionId: null,
       previewScale: 1.0,
       previewScrollPosition: 0,
+      autoFitScale: 1.0,
       mobileMenuOpen: false,
       activeMobilePanel: 'preview',
       theme: 'system',
@@ -152,6 +153,72 @@ describe('UIStore', () => {
   });
 
   // ========================================================================
+  // Auto-Fit Controls
+  // ========================================================================
+
+  describe('auto-fit controls', () => {
+    it('should set auto-fit scale', () => {
+      useUIStore.getState().setAutoFitScale(0.8);
+      expect(useUIStore.getState().autoFitScale).toBe(0.8);
+    });
+
+    it('should clamp auto-fit scale to min value', () => {
+      useUIStore.getState().setAutoFitScale(0.1);
+      expect(useUIStore.getState().autoFitScale).toBe(0.5);
+    });
+
+    it('should clamp auto-fit scale to max value', () => {
+      useUIStore.getState().setAutoFitScale(5.0);
+      expect(useUIStore.getState().autoFitScale).toBe(2.0);
+    });
+
+    it('should clamp auto-fit scale for zero', () => {
+      useUIStore.getState().setAutoFitScale(0);
+      expect(useUIStore.getState().autoFitScale).toBe(0.5);
+    });
+
+    it('should reset zoom to auto-fit scale', () => {
+      useUIStore.getState().setAutoFitScale(0.7);
+      useUIStore.getState().setPreviewScale(1.5);
+      useUIStore.getState().resetZoom();
+      expect(useUIStore.getState().previewScale).toBe(0.7);
+    });
+
+    it('should reset zoom to 1.0 when auto-fit scale is default', () => {
+      useUIStore.getState().setPreviewScale(0.5);
+      useUIStore.getState().resetZoom();
+      expect(useUIStore.getState().previewScale).toBe(1.0);
+    });
+
+    it('should not modify previewScale when setting auto-fit scale', () => {
+      useUIStore.getState().setPreviewScale(1.5);
+      useUIStore.getState().setAutoFitScale(0.8);
+      expect(useUIStore.getState().previewScale).toBe(1.5);
+    });
+
+    it('should not modify autoFitScale when zooming', () => {
+      useUIStore.getState().setAutoFitScale(0.7);
+      useUIStore.getState().zoomIn();
+      useUIStore.getState().zoomOut();
+      expect(useUIStore.getState().autoFitScale).toBe(0.7);
+    });
+
+    it('should handle full workflow: auto-fit, manual zoom, reset', () => {
+      // Simulate auto-fit setting scale
+      useUIStore.getState().setAutoFitScale(0.7);
+      useUIStore.getState().setPreviewScale(0.7);
+
+      // User manually zooms in
+      useUIStore.getState().zoomIn();
+      expect(useUIStore.getState().previewScale).toBe(0.8);
+
+      // Reset returns to auto-fit scale
+      useUIStore.getState().resetZoom();
+      expect(useUIStore.getState().previewScale).toBe(0.7);
+    });
+  });
+
+  // ========================================================================
   // Mobile
   // ========================================================================
 
@@ -203,6 +270,7 @@ describe('UIStore', () => {
       useUIStore.getState().toggleLeftSidebar();
       useUIStore.getState().openExportModal();
       useUIStore.getState().setPreviewScale(1.5);
+      useUIStore.getState().setAutoFitScale(0.7);
       useUIStore.getState().setTheme('dark');
 
       useUIStore.getState().reset();
@@ -211,6 +279,7 @@ describe('UIStore', () => {
       expect(state.leftSidebarOpen).toBe(true);
       expect(state.exportModalOpen).toBe(false);
       expect(state.previewScale).toBe(1.0);
+      expect(state.autoFitScale).toBe(1.0);
       expect(state.theme).toBe('system');
     });
   });

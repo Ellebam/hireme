@@ -26,6 +26,7 @@ interface UIState {
   // Preview
   previewScale: number;
   previewScrollPosition: number;
+  autoFitScale: number;
 
   // Mobile
   mobileMenuOpen: boolean;
@@ -52,6 +53,7 @@ interface UIActions {
 
   // Preview
   setPreviewScale: (scale: number) => void;
+  setAutoFitScale: (scale: number) => void;
   zoomIn: () => void;
   zoomOut: () => void;
   resetZoom: () => void;
@@ -88,6 +90,7 @@ const initialState: UIState = {
   deleteSectionId: null,
   previewScale: DEFAULT_ZOOM,
   previewScrollPosition: 0,
+  autoFitScale: DEFAULT_ZOOM,
   mobileMenuOpen: false,
   activeMobilePanel: 'preview',
   theme: 'system',
@@ -160,6 +163,11 @@ export const useUIStore = create<UIStore>()(
           set({ previewScale: clampedScale });
         },
 
+        setAutoFitScale: (scale) => {
+          const clamped = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, scale));
+          set({ autoFitScale: clamped });
+        },
+
         zoomIn: () => {
           const { previewScale } = get();
           const newScale = Math.min(MAX_ZOOM, previewScale + ZOOM_STEP);
@@ -173,7 +181,7 @@ export const useUIStore = create<UIStore>()(
         },
 
         resetZoom: () => {
-          set({ previewScale: DEFAULT_ZOOM });
+          set({ previewScale: get().autoFitScale });
         },
 
         setPreviewScrollPosition: (position) => {
