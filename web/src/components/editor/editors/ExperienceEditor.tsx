@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Plus, Trash2, Edit, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { MonthYearPicker } from '@/components/ui/month-year-picker';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
@@ -240,20 +241,18 @@ function ExperienceEntryModal({ entry, open, onClose, onSave }: ExperienceEntryM
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="startDate">Start Date</Label>
-              <Input
+              <MonthYearPicker
                 id="startDate"
-                type="month"
                 value={data.startDate}
-                onChange={(e) => updateField('startDate', e.target.value)}
+                onChange={(value) => updateField('startDate', value)}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="endDate">End Date</Label>
-              <Input
+              <MonthYearPicker
                 id="endDate"
-                type="month"
                 value={data.endDate || ''}
-                onChange={(e) => updateField('endDate', e.target.value || null)}
+                onChange={(value) => updateField('endDate', value || null)}
                 disabled={data.current}
               />
             </div>

@@ -19,13 +19,6 @@ export function CVPreview() {
   const handleSectionClick = useCallback(
     (id: string) => {
       selectSection(id);
-    },
-    [selectSection]
-  );
-
-  const handleSectionDoubleClick = useCallback(
-    (id: string) => {
-      selectSection(id);
       setRightSidebarOpen(true);
     },
     [selectSection, setRightSidebarOpen]
@@ -66,7 +59,6 @@ export function CVPreview() {
     styling: cvContent.styling,
     selectedSectionId,
     onSectionClick: handleSectionClick,
-    onSectionDoubleClick: handleSectionDoubleClick,
   };
 
   return (

@@ -20,7 +20,6 @@ export interface TemplateProps {
   styling?: CVStyling;
   selectedSectionId: string | null;
   onSectionClick: (id: string) => void;
-  onSectionDoubleClick: (id: string) => void;
 }
 
 function formatDate(dateStr: string): string {
@@ -37,7 +36,6 @@ export function ClassicTemplate({
   styling,
   selectedSectionId,
   onSectionClick,
-  onSectionDoubleClick,
 }: TemplateProps) {
   const primaryColor = styling?.primaryColor || '#c0392b';
   const secondaryColor = styling?.secondaryColor || '#64748b';
@@ -58,13 +56,7 @@ export function ClassicTemplate({
           isSelected && 'bg-primary/10 ring-2 ring-primary/30'
         )}
         onClick={() => onSectionClick(section.id)}
-        onDoubleClick={() => onSectionDoubleClick(section.id)}
       >
-        {isSelected && (
-          <div className="absolute top-2 right-2 px-2 py-1 bg-primary text-primary-foreground text-xs rounded">
-            Click to edit
-          </div>
-        )}
         {children}
       </div>
     );

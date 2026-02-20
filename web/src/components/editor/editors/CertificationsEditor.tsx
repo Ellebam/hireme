@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Plus, Trash2, Edit, GripVertical, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { MonthYearPicker } from '@/components/ui/month-year-picker';
 import { Label } from '@/components/ui/label';
 import {
   Dialog,
@@ -220,20 +221,18 @@ function CertificationEntryModal({ entry, open, onClose, onSave }: Certification
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="date">Issue Date</Label>
-              <Input
+              <MonthYearPicker
                 id="date"
-                type="month"
                 value={data.date || ''}
-                onChange={(e) => updateField('date', e.target.value)}
+                onChange={(value) => updateField('date', value)}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="expiryDate">Expiry Date</Label>
-              <Input
+              <MonthYearPicker
                 id="expiryDate"
-                type="month"
                 value={data.expiryDate || ''}
-                onChange={(e) => updateField('expiryDate', e.target.value || null)}
+                onChange={(value) => updateField('expiryDate', value || null)}
               />
             </div>
           </div>
