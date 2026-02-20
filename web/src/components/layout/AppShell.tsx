@@ -18,7 +18,7 @@ export function AppShell({
 }: AppShellProps) {
   return (
     <TooltipProvider delayDuration={300}>
-      <div className={fullHeight ? 'flex flex-col h-screen' : 'min-h-screen'}>
+      <div className={fullHeight ? 'flex flex-col h-screen relative z-[1]' : 'min-h-screen relative z-[1]'}>
         {showHeader && <Header />}
         <main className={fullHeight ? 'flex-1 overflow-hidden' : 'flex-1'}>
           {children}

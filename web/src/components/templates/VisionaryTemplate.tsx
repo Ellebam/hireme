@@ -41,7 +41,7 @@ export function VisionaryTemplate({
   onSectionClick,
   onSectionDoubleClick,
 }: TemplateProps) {
-  const primaryColor = styling?.primaryColor || '#2563eb';
+  const primaryColor = styling?.primaryColor || '#c0392b';
   const secondaryColor = styling?.secondaryColor || '#64748b';
 
   const visibleSections = sections.filter((s) => s.visible !== false);

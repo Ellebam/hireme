@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { EditorLayout } from '@/components/editor';
@@ -10,12 +10,15 @@ import { useAutoSave, useKeyboardShortcuts } from '@/hooks';
 import { api, ApiError } from '@/lib/api';
 import { starterTemplate } from '@/lib/templates';
 import { logger } from '@/lib/logger';
+import { TEMPLATE_IDS, type TemplateId } from '@/types/cv';
 
-export default function EditorPage() {
+function EditorContent() {
   const router = useRouter();
-  const { setCV, reset } = useEditorStore();
+  const searchParams = useSearchParams();
+  const { setCV, reset, updateTemplateId, cvContent } = useEditorStore();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [templateApplied, setTemplateApplied] = useState(false);
 
   // Enable auto-save and keyboard shortcuts
   useAutoSave();
@@ -79,6 +82,19 @@ export default function EditorPage() {
     };
   }, [setCV, reset]);
 
+  // Apply template from URL query param after CV loads
+  useEffect(() => {
+    if (templateApplied || !cvContent) return;
+    const templateParam = searchParams.get('template');
+    if (templateParam && (TEMPLATE_IDS as readonly string[]).includes(templateParam)) {
+      if (cvContent.templateId !== templateParam) {
+        logger.info('Editor', 'Applying template from URL', { template: templateParam });
+        updateTemplateId(templateParam as TemplateId);
+      }
+      setTemplateApplied(true);
+    }
+  }, [cvContent, searchParams, templateApplied, updateTemplateId]);
+
   if (loading) {
     return (
       <div className="h-screen flex items-center justify-center">
@@ -120,9 +136,26 @@ export default function EditorPage() {
 
   return (
     <TooltipProvider delayDuration={300}>
-      <div className="h-screen">
+      <div className="h-screen relative z-[1]">
         <EditorLayout />
       </div>
     </TooltipProvider>
+  );
+}
+
+export default function EditorPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="h-screen flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-sm text-muted-foreground">Loading editor...</p>
+          </div>
+        </div>
+      }
+    >
+      <EditorContent />
+    </Suspense>
   );
 }

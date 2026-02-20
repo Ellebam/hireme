@@ -64,7 +64,7 @@ describe('DashboardPage', () => {
     render(<DashboardPage />);
 
     // During loading, the heading is still shown but content is skeleton
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+    expect(screen.getByText('Your Workspace')).toBeInTheDocument();
   });
 
   it('renders CV card after data loads', async () => {

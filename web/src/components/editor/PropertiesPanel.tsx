@@ -2,7 +2,6 @@
 
 import { Trash2, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { useEditorStore, useSelectedSection } from '@/stores';
 import { useUIStore } from '@/stores';
 import { SECTION_LABELS } from '@/types/cv';
@@ -15,12 +14,12 @@ export function PropertiesPanel() {
 
   if (!section) {
     return (
-      <div className="h-full flex flex-col bg-muted/30">
-        <div className="p-4 border-b">
-          <h2 className="font-semibold text-sm">Properties</h2>
+      <div className="h-full flex flex-col bg-card">
+        <div className="px-4 py-3 border-b-2 border-ink">
+          <h2 className="font-serif text-sm font-semibold">Properties</h2>
         </div>
         <div className="flex-1 flex items-center justify-center p-4">
-          <p className="text-sm text-muted-foreground text-center">
+          <p className="text-sm text-[hsl(var(--text-secondary))] text-center">
             Select a section from the preview to edit its properties
           </p>
         </div>
@@ -37,11 +36,11 @@ export function PropertiesPanel() {
   };
 
   return (
-    <div className="h-full flex flex-col bg-muted/30">
+    <div className="h-full flex flex-col bg-card">
       {/* Header */}
-      <div className="p-4 border-b">
+      <div className="px-4 py-3 border-b-2 border-ink">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-sm">
+          <h2 className="font-serif text-sm font-semibold">
             {section.title || SECTION_LABELS[section.type]}
           </h2>
           <div className="flex items-center gap-1">
@@ -67,7 +66,7 @@ export function PropertiesPanel() {
             </Button>
           </div>
         </div>
-        <p className="text-xs text-muted-foreground mt-1">
+        <p className="text-[0.6875rem] text-[hsl(var(--text-secondary))] mt-0.5">
           {section.visible !== false
             ? 'This section will appear in exports'
             : 'This section is hidden from exports'}

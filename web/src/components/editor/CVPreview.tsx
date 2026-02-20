@@ -48,7 +48,7 @@ export function CVPreview() {
   };
 
   return (
-    <div className="flex-1 overflow-auto bg-muted/50 p-8">
+    <div className="flex-1 overflow-auto bg-secondary p-8">
       <div className="flex justify-center">
         <div
           style={{
@@ -57,7 +57,7 @@ export function CVPreview() {
           }}
         >
           <div
-            className="bg-white shadow-lg rounded overflow-hidden"
+            className="bg-card border-2 border-border shadow-offset-lg animate-paper-drop overflow-hidden"
             style={{
               width: A4_WIDTH,
               minHeight: A4_HEIGHT,
@@ -84,11 +84,10 @@ export function CVPreview() {
 function EmptyPreview() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[400px] text-center p-12">
-      <div className="text-6xl mb-4 opacity-20">📄</div>
-      <h3 className="text-lg font-medium text-muted-foreground">
+      <h3 className="font-serif text-lg font-semibold text-muted-foreground">
         Your CV is empty
       </h3>
-      <p className="text-sm text-muted-foreground mt-2 max-w-xs">
+      <p className="text-sm text-[hsl(var(--text-secondary))] mt-2 max-w-xs">
         Add sections from the palette on the left to start building your CV
       </p>
     </div>
