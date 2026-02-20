@@ -220,9 +220,9 @@ export const useUIStore = create<UIStore>()(
         name: 'hireme-ui',
         partialize: (state) => ({
           // Only persist these UI preferences
+          // previewScale excluded: set by ResizeObserver on mount
           leftSidebarOpen: state.leftSidebarOpen,
           rightSidebarOpen: state.rightSidebarOpen,
-          previewScale: state.previewScale,
           theme: state.theme,
         }),
       }

@@ -140,10 +140,10 @@ describe('UIStore', () => {
       expect(useUIStore.getState().previewScale).toBe(0.5);
     });
 
-    it('should reset zoom to default', () => {
+    it('should reset zoom to autoFitScale', () => {
       useUIStore.getState().setPreviewScale(1.8);
       useUIStore.getState().resetZoom();
-      expect(useUIStore.getState().previewScale).toBe(1.0);
+      expect(useUIStore.getState().previewScale).toBe(useUIStore.getState().autoFitScale);
     });
 
     it('should set scroll position', () => {

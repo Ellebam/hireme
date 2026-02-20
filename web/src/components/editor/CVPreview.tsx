@@ -11,6 +11,7 @@ const A4_HEIGHT = 1123;
 
 export function CVPreview() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const initialScaleSet = useRef(false);
   const sections = useVisibleSections();
   const { cvContent, selectedSectionId, selectSection } = useEditorStore();
   const { previewScale, setPreviewScale, setAutoFitScale, setRightSidebarOpen } = useUIStore();
@@ -40,7 +41,10 @@ export function CVPreview() {
       if (contentWidth <= 0) return;
       const fitScale = Math.min(1.0, contentWidth / A4_WIDTH);
       setAutoFitScale(fitScale);
-      setPreviewScale(fitScale);
+      if (!initialScaleSet.current) {
+        setPreviewScale(fitScale);
+        initialScaleSet.current = true;
+      }
     });
 
     observer.observe(container);
