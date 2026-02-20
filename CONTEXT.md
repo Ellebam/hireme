@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — T-001–T-012, T-016, T-023, T-024, T-030 done, 15 tasks in backlog (10 unblocked, 2 blocked, 4 need splitting when picked up)
+**Status:** Task-based workflow active — T-001–T-012, T-016, T-023–T-025, T-030 done, 14 tasks in backlog (11 unblocked, 1 blocked, 4 need splitting when picked up)
 
 ### What's Working
 
@@ -245,8 +245,7 @@ task api:sqlc          # Generate sqlc code
 |----|------|------------|------|
 | T-021 | Export markdown + bundle download (PDF+DOCX+JSON+MD zip) | — | S |
 | T-022 | JSON round-trip import | — | S |
-| T-025 | Implement design overhaul | — | M |
-| T-026 | DOCX export styling overhaul — match actual CV templates | T-025 | M |
+| T-026 | DOCX export styling overhaul — match actual CV templates | — | M |
 | T-027 | Markdown import (parse exported markdown back into CV) | T-021 | S–M |
 | T-028 | CV import from uploaded DOCX/PDF — app-based extraction | — | M |
 | T-029 | Consultant profile CV type — new section structure + template | — | M+ |
@@ -254,7 +253,7 @@ task api:sqlc          # Generate sqlc code
 | T-014 | OAuth authentication (Google OIDC) | — | M |
 | T-015 | Multiple CV support | — | M |
 
-### Done (T-001 – T-012)
+### Done
 | ID | Task | PR |
 |----|------|----|
 | T-001 | Verify template switching persists to backend | feat/t-001-template-persist |
@@ -272,6 +271,7 @@ task api:sqlc          # Generate sqlc code
 | T-016 | Fix save bug after template switch | fix/t-016-save-after-template-switch |
 | T-023 | README overhaul — content + design | docs/t-023-readme-overhaul |
 | T-024 | Design direction — define visual identity, palette, typography | (decided: Editorial Craft prototype) |
+| T-025 | Implement editorial design overhaul | feat/t-025-design-overhaul (#40) |
 | T-030 | Extract design system from Editorial Craft prototype | feat/t-030-design-system |
 
 ---
