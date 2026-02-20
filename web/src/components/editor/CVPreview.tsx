@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useVisibleSections, useEditorStore } from '@/stores';
 import { useUIStore } from '@/stores';
 import { ClassicTemplate, ModernTemplate, VisionaryTemplate } from '@/components/templates';
@@ -10,9 +10,11 @@ const A4_WIDTH = 794;
 const A4_HEIGHT = 1123;
 
 export function CVPreview() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const initialScaleSet = useRef(false);
   const sections = useVisibleSections();
   const { cvContent, selectedSectionId, selectSection } = useEditorStore();
-  const { previewScale, setRightSidebarOpen } = useUIStore();
+  const { previewScale, setPreviewScale, setAutoFitScale, setRightSidebarOpen } = useUIStore();
 
   const handleSectionClick = useCallback(
     (id: string) => {
@@ -28,6 +30,26 @@ export function CVPreview() {
     },
     [selectSection, setRightSidebarOpen]
   );
+
+  // Auto-fit preview scale to container width
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const observer = new ResizeObserver((entries) => {
+      const contentWidth = entries[0].contentRect.width;
+      if (contentWidth <= 0) return;
+      const fitScale = Math.min(1.0, contentWidth / A4_WIDTH);
+      setAutoFitScale(fitScale);
+      if (!initialScaleSet.current) {
+        setPreviewScale(fitScale);
+        initialScaleSet.current = true;
+      }
+    });
+
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [setAutoFitScale, setPreviewScale]);
 
   if (!cvContent) {
     return (
@@ -48,7 +70,7 @@ export function CVPreview() {
   };
 
   return (
-    <div className="flex-1 overflow-auto bg-secondary p-8">
+    <div ref={containerRef} className="flex-1 overflow-auto bg-secondary p-8">
       <div className="flex justify-center">
         <div
           style={{

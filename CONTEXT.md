@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — T-001–T-012, T-016, T-023–T-025, T-030 done, 14 tasks in backlog (11 unblocked, 1 blocked, 4 need splitting when picked up)
+**Status:** Task-based workflow active — T-001–T-012, T-016–T-017, T-023–T-025, T-030 done, 13 tasks in backlog (10 unblocked, 1 blocked, 4 need splitting when picked up)
 
 ### What's Working
 
@@ -228,11 +228,6 @@ task api:sqlc          # Generate sqlc code
 |----|------|--------|------------|--------|
 | — | — | — | — | — |
 
-### Backlog — P0 (Bugs)
-| ID | Task | Blocked By | Size |
-|----|------|------------|------|
-| T-017 | Responsive layout + clipping fixes | — | S–M |
-
 ### Backlog — P1 (UX Fixes)
 | ID | Task | Blocked By | Size |
 |----|------|------------|------|
@@ -273,18 +268,11 @@ task api:sqlc          # Generate sqlc code
 | T-024 | Design direction — define visual identity, palette, typography | (decided: Editorial Craft prototype) |
 | T-025 | Implement editorial design overhaul | feat/t-025-design-overhaul (#40) |
 | T-030 | Extract design system from Editorial Craft prototype | feat/t-030-design-system |
+| T-017 | Responsive layout + clipping fixes | feat/t-017-responsive-layout (#41) |
 
 ---
 
 ## Task Details
-
-### P0 — Bugs
-
-**T-017: Responsive layout + clipping fixes** — S–M
-- A4 preview uses fixed 794px width + CSS transform scale — clips at narrow viewports
-- Half-screen windows cause layout overflow (transform origin issue)
-- Fix: auto-fit preview scale to available width, revisit sidebar collapse breakpoints
-- Files: `EditorLayout.tsx`, `CVPreview.tsx`, `ui-store.ts`
 
 ### P1 — UX Fixes
 
@@ -379,7 +367,7 @@ task api:sqlc          # Generate sqlc code
 ### Dependency Graph
 ```
 INDEPENDENT (can start anytime):
-  T-017, T-018, T-019, T-020
+  T-018, T-019, T-020
   T-021, T-022, T-025, T-028
   T-013, T-014, T-015
 
@@ -391,11 +379,10 @@ T-029 (consultant profile): independent but needs splitting when picked up
 ```
 
 ### Recommended Sequencing
-**Phase 1 — Bugs + quick UX wins:**
-1. **T-017** (responsive) — P0, broken for split-screen users
-2. **T-018** (edit UX) — XS, fast win
-3. **T-019** (date pickers) — visible on every CV
-4. **T-020** (tag input) — fast, pattern already exists
+**Phase 1 — Quick UX wins:**
+1. **T-018** (edit UX) — XS, fast win
+2. **T-019** (date pickers) — visible on every CV
+3. **T-020** (tag input) — fast, pattern already exists
 
 **Phase 2 — Features + polish:**
 6. **T-030** (design system extraction) — prototype received, unlocks T-025/T-026
