@@ -2,19 +2,15 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  FileText,
-  LayoutDashboard,
-  Menu,
-  X,
-} from 'lucide-react';
+import { Menu, X, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
 const navItems = [
-  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/editor', label: 'Editor', icon: FileText },
+  { href: '/', label: 'Dashboard' },
+  { href: '/editor', label: 'Editor' },
+  { href: '/templates', label: 'Templates' },
 ];
 
 export function Header() {
@@ -22,16 +18,20 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-14 items-center px-4 md:px-6">
+    <header className="sticky top-0 z-50 w-full h-[60px] bg-card border-b-2 border-ink">
+      <div className="flex h-full items-center px-9">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 font-bold text-lg">
-          <FileText className="h-5 w-5 text-primary" />
-          <span>HireMe</span>
+        <Link href="/" className="flex items-center gap-3">
+          <div className="w-[34px] h-[34px] border-2 border-accent flex items-center justify-center font-serif font-bold text-[17px] text-accent -rotate-[2deg]">
+            H
+          </div>
+          <span className="font-serif text-2xl font-bold text-primary tracking-[-0.03em]">
+            HireMe
+          </span>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="ml-8 hidden md:flex items-center gap-1">
+        <nav className="ml-8 hidden md:flex items-center gap-0">
           {navItems.map((item) => {
             const isActive = item.href === '/'
               ? pathname === '/'
@@ -41,13 +41,12 @@ export function Header() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                  'relative px-5 py-[18px] text-xs font-semibold uppercase tracking-[0.125em] transition-colors duration-200',
                   isActive
-                    ? 'bg-accent text-accent-foreground'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                    ? 'text-primary after:absolute after:bottom-[-2px] after:left-5 after:right-5 after:h-0.5 after:bg-accent'
+                    : 'text-[hsl(var(--text-secondary))] hover:text-primary'
                 )}
               >
-                <item.icon className="h-4 w-4" />
                 {item.label}
               </Link>
             );
@@ -57,11 +56,17 @@ export function Header() {
         {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Desktop Actions */}
-        <div className="hidden md:flex items-center gap-2">
-          <Button variant="default" size="sm" asChild>
-            <Link href="/editor">Create CV</Link>
+        {/* New CV Button + User Avatar */}
+        <div className="hidden md:flex items-center gap-3">
+          <Button asChild size="sm">
+            <Link href="/editor">
+              <Plus className="h-3.5 w-3.5 mr-1.5" />
+              New CV
+            </Link>
           </Button>
+          <div className="w-8 h-8 border-2 border-border flex items-center justify-center font-serif font-semibold text-[13px] text-sienna cursor-pointer">
+            U
+          </div>
         </div>
 
         {/* Mobile Menu Button */}
@@ -83,8 +88,8 @@ export function Header() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t bg-background">
-          <nav className="flex flex-col p-4 gap-2">
+        <div className="md:hidden border-t-2 border-ink bg-card">
+          <nav className="flex flex-col p-4 gap-1">
             {navItems.map((item) => {
               const isActive = item.href === '/'
                 ? pathname === '/'
@@ -95,24 +100,16 @@ export function Header() {
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
-                    'flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                    'px-5 py-3 text-xs font-semibold uppercase tracking-[0.125em] transition-colors duration-200',
                     isActive
-                      ? 'bg-accent text-accent-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                      ? 'text-primary border-l-[3px] border-accent bg-[hsl(var(--vermillion-pale))]'
+                      : 'text-[hsl(var(--text-secondary))] hover:text-primary border-l-[3px] border-transparent'
                   )}
                 >
-                  <item.icon className="h-5 w-5" />
                   {item.label}
                 </Link>
               );
             })}
-            <div className="pt-2 border-t mt-2">
-              <Button variant="default" size="sm" className="w-full" asChild>
-                <Link href="/editor" onClick={() => setMobileMenuOpen(false)}>
-                  Create CV
-                </Link>
-              </Button>
-            </div>
           </nav>
         </div>
       )}

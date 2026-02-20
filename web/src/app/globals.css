@@ -4,48 +4,61 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+    --background: 42.0 41.7% 95.3%;
+    --foreground: 36.9 11.9% 21.4%;
+    --card: 45.0 100.0% 98.4%;
+    --card-foreground: 30.0 13.0% 9.0%;
+    --popover: 45.0 100.0% 98.4%;
+    --popover-foreground: 30.0 13.0% 9.0%;
+    --primary: 30.0 13.0% 9.0%;
+    --primary-foreground: 45.0 100.0% 98.4%;
+    --secondary: 41.2 34.8% 91.0%;
+    --secondary-foreground: 36.9 11.9% 21.4%;
+    --muted: 41.2 34.8% 91.0%;
+    --muted-foreground: 33.0 10.3% 62.0%;
+    --accent: 5.6 63.4% 46.1%;
+    --accent-foreground: 45.0 100.0% 98.4%;
+    --destructive: 5.6 63.4% 46.1%;
+    --destructive-foreground: 45.0 100.0% 98.4%;
+    --border: 38.2 22.0% 80.4%;
+    --input: 38.2 22.0% 80.4%;
+    --ring: 30.0 13.0% 9.0%;
+    --radius: 0rem;
+
+    --cream-dark: 39.1 28.4% 84.1%;
+    --ink: 30.0 13.0% 9.0%;
+    --sienna: 26.8 38.1% 43.7%;
+    --vermillion-pale: 5.6 63.4% 46.1% / 0.06;
+    --text-secondary: 32.5 11.5% 40.8%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --background: 30.0 13.0% 9.0%;
+    --foreground: 41.2 34.8% 91.0%;
+    --card: 25.7 8.4% 16.3%;
+    --card-foreground: 41.2 34.8% 91.0%;
+    --popover: 25.7 8.4% 16.3%;
+    --popover-foreground: 41.2 34.8% 91.0%;
+    --primary: 42.0 41.7% 95.3%;
+    --primary-foreground: 30.0 13.0% 9.0%;
+    --secondary: 30.0 10.0% 13.0%;
+    --secondary-foreground: 39.1 28.4% 84.1%;
+    --muted: 30.0 10.0% 13.0%;
+    --muted-foreground: 33.0 10.3% 62.0%;
+    --accent: 5.6 63.4% 46.1%;
+    --accent-foreground: 42.0 41.7% 95.3%;
+    --destructive: 5.6 70.0% 52.0%;
+    --destructive-foreground: 42.0 41.7% 95.3%;
+    --border: 30.0 8.0% 22.0%;
+    --input: 30.0 8.0% 22.0%;
+    --ring: 42.0 41.7% 95.3%;
+    --radius: 0rem;
+
+    --cream-dark: 25.0 10.0% 6.0%;
+    --ink: 42.0 41.7% 95.3%;
+    --sienna: 26.8 38.1% 53.0%;
+    --vermillion-pale: 5.6 63.4% 46.1% / 0.12;
+    --text-secondary: 33.0 12.0% 65.0%;
   }
 }
 
@@ -56,4 +69,23 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: hsl(var(--background)); }
+::-webkit-scrollbar-thumb { background: hsl(var(--cream-dark)); }
+
+/* Background texture */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.015'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+.dark body::before {
+  filter: invert(1);
 }

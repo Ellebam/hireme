@@ -45,7 +45,7 @@ Agent files in `.claude/agents/` for detailed processes.
 ### Working on a Task
 1. `/investigate <task>` — PM traces code, documents findings, prepares handoff
 2. `/plan <task>` — Architect researches, makes decisions, writes implementation plan
-3. `/qa-plan <task>` — QA audits coverage gaps, appends test recommendations
+3. `/qa-plan <task>` — **Always run after `/plan`.** QA audits coverage gaps, appends test recommendations
 4. `/implement <task>` — Engineer implements code + tests per plan, runs verification
 5. `/local-qa` — Full local QA gate before commit (tests, types, build, E2E)
 6. If QA finds issues: `/plan <task>` (re-plan mode) → `/implement <task>` (re-implementation mode)

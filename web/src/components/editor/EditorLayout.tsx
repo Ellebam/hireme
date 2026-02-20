@@ -46,8 +46,8 @@ export function EditorLayout() {
         {/* Left Sidebar - Section Palette */}
         <div
           className={cn(
-            'border-r flex-shrink-0 transition-all duration-200 overflow-hidden',
-            leftSidebarOpen ? 'w-60' : 'w-0 border-r-0'
+            'border-r-2 flex-shrink-0 transition-all duration-200 overflow-hidden',
+            leftSidebarOpen ? 'w-[248px]' : 'w-0 border-r-0'
           )}
         >
           <SectionPalette />
@@ -59,8 +59,8 @@ export function EditorLayout() {
         {/* Right Sidebar - Properties Panel */}
         <div
           className={cn(
-            'border-l flex-shrink-0 transition-all duration-200 overflow-hidden',
-            rightSidebarOpen ? 'w-80' : 'w-0 border-l-0'
+            'border-l-2 flex-shrink-0 transition-all duration-200 overflow-hidden',
+            rightSidebarOpen ? 'w-[320px]' : 'w-0 border-l-0'
           )}
         >
           <PropertiesPanel />

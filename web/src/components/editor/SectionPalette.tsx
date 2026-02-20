@@ -93,18 +93,18 @@ export function SectionPalette() {
     : null;
 
   return (
-    <div className="h-full flex flex-col bg-muted/30">
+    <div className="h-full flex flex-col bg-card">
       {/* Header */}
-      <div className="p-4 border-b">
-        <h2 className="font-semibold text-sm">Add Section</h2>
-        <p className="text-xs text-muted-foreground mt-1">
+      <div className="px-4 py-3 border-b-2 border-ink">
+        <h2 className="font-serif text-sm font-semibold">Add Section</h2>
+        <p className="text-[0.6875rem] text-[hsl(var(--text-secondary))] mt-0.5">
           Click to add a new section to your CV
         </p>
       </div>
 
       {/* Section Buttons */}
       <div className="flex-1 overflow-y-auto p-3">
-        <div className="grid gap-2">
+        <div className="grid gap-1.5">
           {mvpSectionTypes.map((type) => {
             const Icon = sectionIcons[type];
             const label = SECTION_LABELS[type];
@@ -149,13 +149,13 @@ export function SectionPalette() {
         </div>
 
         {/* Divider */}
-        <div className="my-4 border-t" />
+        <div className="my-4 border-t border-dashed border-border" />
 
         {/* Structure View with Drag & Drop */}
         <div>
-          <h3 className="text-xs font-medium text-muted-foreground mb-2 px-1">
+          <h3 className="font-mono text-[0.6875rem] font-medium text-[hsl(var(--text-secondary))] uppercase tracking-[0.05em] mb-2 px-1">
             CV Structure
-            <span className="ml-2 text-muted-foreground/70">(drag to reorder)</span>
+            <span className="ml-2 opacity-60">(drag to reorder)</span>
           </h3>
           <DndContext
             sensors={sensors}
@@ -235,16 +235,17 @@ function SectionItemContent({
   return (
     <div
       className={cn(
-        'flex items-center gap-2 px-2 py-1.5 rounded text-sm cursor-pointer',
-        'hover:bg-accent transition-colors',
-        isSelected && 'bg-primary/10 text-primary',
+        'flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer transition-all duration-150',
+        'hover:bg-[hsl(var(--vermillion-pale))]',
+        isSelected && 'bg-[hsl(var(--vermillion-pale))] text-primary border-l-[3px] border-accent pl-1.5',
+        !isSelected && 'border-l-[3px] border-transparent',
         section.visible === false && 'opacity-60',
-        isDragging && 'bg-accent shadow-lg ring-2 ring-primary/20'
+        isDragging && 'bg-[hsl(var(--vermillion-pale))] shadow-offset-sm'
       )}
       onClick={onClick}
     >
       <div {...dragHandleProps} className="cursor-grab touch-none">
-        <GripVertical className="h-3.5 w-3.5 text-muted-foreground" />
+        <GripVertical className="h-3.5 w-3.5 text-[hsl(var(--text-secondary))]" />
       </div>
       <Icon className="h-3.5 w-3.5 shrink-0" />
       <span className="truncate flex-1">

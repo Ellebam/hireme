@@ -119,55 +119,50 @@ export function ExportModal() {
     <Dialog open={exportModalOpen} onOpenChange={(open) => !open && closeExportModal()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Export CV</DialogTitle>
+          <DialogTitle className="font-serif text-[1.625rem] font-bold tracking-[-0.02em]">Export CV</DialogTitle>
           <DialogDescription>
             Choose a format to export your CV
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-3 py-4">
-          {exportFormats.map((format) => {
-            const Icon = format.icon;
-            const isSelected = selectedFormat === format.id;
+        <div className="py-4">
+          <div className="border-t border-dashed border-border">
+            {exportFormats.map((format) => {
+              const Icon = format.icon;
+              const isSelected = selectedFormat === format.id;
 
-            return (
-              <button
-                type="button"
-                key={format.id}
-                onClick={() => setSelectedFormat(format.id)}
-                className={cn(
-                  'w-full flex items-center gap-4 p-4 rounded-lg border text-left transition-colors',
-                  isSelected
-                    ? 'border-primary bg-primary/5'
-                    : 'border-border hover:bg-accent'
-                )}
-              >
-                <div
+              return (
+                <button
+                  type="button"
+                  key={format.id}
+                  onClick={() => setSelectedFormat(format.id)}
                   className={cn(
-                    'p-2 rounded-lg',
-                    isSelected ? 'bg-primary/10 text-primary' : 'bg-muted'
+                    'w-full flex items-center gap-4 px-4 py-3 border-b border-dashed border-border text-left transition-all duration-150',
+                    isSelected
+                      ? 'bg-[hsl(var(--vermillion-pale))] border-l-[3px] border-l-accent pl-3.5'
+                      : 'hover:bg-[hsl(var(--vermillion-pale))] border-l-[3px] border-l-transparent pl-3.5'
                   )}
                 >
-                  <Icon className="h-5 w-5" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium">{format.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {format.description}
-                  </p>
-                </div>
-                {isSelected && (
-                  <div className="h-5 w-5 rounded-full bg-primary flex items-center justify-center">
-                    <Check className="h-3 w-3 text-primary-foreground" />
+                  <Icon className={cn('h-5 w-5', isSelected ? 'text-accent' : 'text-[hsl(var(--text-secondary))]')} />
+                  <div className="flex-1">
+                    <p className="font-serif font-semibold text-sm">{format.name}</p>
+                    <p className="text-[0.6875rem] text-[hsl(var(--text-secondary))]">
+                      {format.description}
+                    </p>
                   </div>
-                )}
-              </button>
-            );
-          })}
+                  {isSelected && (
+                    <div className="h-5 w-5 bg-accent flex items-center justify-center">
+                      <Check className="h-3 w-3 text-accent-foreground" />
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {error && (
-          <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
+          <div className="p-3 border-2 border-destructive bg-destructive/10 text-destructive text-sm">
             {error}
           </div>
         )}
