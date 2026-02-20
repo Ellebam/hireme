@@ -20,7 +20,6 @@ interface TemplateProps {
   styling?: CVStyling;
   selectedSectionId: string | null;
   onSectionClick: (id: string) => void;
-  onSectionDoubleClick: (id: string) => void;
 }
 
 const SIDEBAR_TYPES = new Set(['personal', 'skills', 'languages']);
@@ -39,7 +38,6 @@ export function VisionaryTemplate({
   styling,
   selectedSectionId,
   onSectionClick,
-  onSectionDoubleClick,
 }: TemplateProps) {
   const primaryColor = styling?.primaryColor || '#c0392b';
   const secondaryColor = styling?.secondaryColor || '#64748b';
@@ -78,7 +76,6 @@ export function VisionaryTemplate({
                   isSelected && 'ring-2 ring-white/50'
                 )}
                 onClick={() => onSectionClick(section.id)}
-                onDoubleClick={() => onSectionDoubleClick(section.id)}
               >
                 {section.type === 'personal' && (
                   <SidebarPersonal
@@ -137,14 +134,7 @@ export function VisionaryTemplate({
                 isSelected && 'ring-2 ring-primary/30'
               )}
               onClick={() => onSectionClick(section.id)}
-              onDoubleClick={() => onSectionDoubleClick(section.id)}
             >
-              {isSelected && (
-                <div className="absolute top-2 right-2 px-2 py-1 bg-primary text-primary-foreground text-xs rounded">
-                  Click to edit
-                </div>
-              )}
-
               {section.type === 'summary' && (
                 <MainSummary
                   content={section.content as SummaryContent}

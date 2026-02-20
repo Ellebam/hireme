@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { MonthYearPicker } from '@/components/ui/month-year-picker';
+import { TagInput } from '@/components/ui/tag-input';
 import {
   Dialog,
   DialogContent,
@@ -163,13 +165,11 @@ interface ProjectEntryModalProps {
 
 function ProjectEntryModal({ entry, open, onClose, onSave }: ProjectEntryModalProps) {
   const [formData, setFormData] = useState<ProjectEntry | null>(null);
-  const [technologiesText, setTechnologiesText] = useState('');
 
   // Sync form data when entry changes
   useEffect(() => {
     if (entry) {
       setFormData({ ...entry });
-      setTechnologiesText((entry.technologies || []).join('\n'));
     }
   }, [entry]);
 
@@ -186,11 +186,7 @@ function ProjectEntryModal({ entry, open, onClose, onSave }: ProjectEntryModalPr
 
   const handleSave = () => {
     if (!formData) return;
-    const technologies = technologiesText
-      .split('\n')
-      .map((t) => t.trim())
-      .filter(Boolean);
-    onSave({ ...formData, technologies });
+    onSave(formData);
   };
 
   return (
@@ -241,38 +237,30 @@ function ProjectEntryModal({ entry, open, onClose, onSave }: ProjectEntryModalPr
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="startDate">Start Date</Label>
-              <Input
+              <MonthYearPicker
                 id="startDate"
-                type="month"
                 value={data.startDate || ''}
-                onChange={(e) => updateField('startDate', e.target.value)}
+                onChange={(value) => updateField('startDate', value)}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="endDate">End Date</Label>
-              <Input
+              <MonthYearPicker
                 id="endDate"
-                type="month"
                 value={data.endDate || ''}
-                onChange={(e) => updateField('endDate', e.target.value || null)}
+                onChange={(value) => updateField('endDate', value || null)}
               />
             </div>
           </div>
 
           {/* Technologies */}
           <div className="space-y-2">
-            <Label htmlFor="technologies">
-              Technologies
-              <span className="text-muted-foreground font-normal ml-2">
-                (one per line)
-              </span>
-            </Label>
-            <Textarea
+            <Label htmlFor="technologies">Technologies</Label>
+            <TagInput
               id="technologies"
-              value={technologiesText}
-              onChange={(e) => setTechnologiesText(e.target.value)}
-              placeholder="React&#10;Node.js&#10;PostgreSQL"
-              className="min-h-[100px]"
+              value={data.technologies || []}
+              onChange={(tags) => updateField('technologies', tags)}
+              placeholder="Type a technology and press Enter"
             />
           </div>
 
