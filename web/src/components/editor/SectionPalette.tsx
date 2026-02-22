@@ -15,6 +15,7 @@ import {
   Users,
   Plus,
   GripVertical,
+  Trash2,
 } from 'lucide-react';
 import {
   DndContext,
@@ -29,7 +30,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { useEditorStore, useSortedSections } from '@/stores';
+import { useEditorStore, useSortedSections, useUIStore } from '@/stores';
 import { SECTION_LABELS, type SectionType, type CVSection } from '@/types/cv';
 import { cn } from '@/lib/utils';
 import { useDndSensors, collisionDetection, sortStrategy, useSortableItem } from '@/lib/dnd';
@@ -64,6 +65,7 @@ const mvpSectionTypes: SectionType[] = [
 
 export function SectionPalette() {
   const { addSection, reorderSections, selectSection, selectedSectionId } = useEditorStore();
+  const { openDeleteConfirmModal } = useUIStore();
   const sections = useSortedSections();
   const sensors = useDndSensors();
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -171,6 +173,7 @@ export function SectionPalette() {
                     section={section}
                     isSelected={section.id === selectedSectionId}
                     onSelect={() => selectSection(section.id)}
+                    onDelete={(e) => { e.stopPropagation(); openDeleteConfirmModal(section.id); }}
                   />
                 ))}
               </div>
@@ -197,9 +200,10 @@ interface SortableSectionItemProps {
   section: CVSection;
   isSelected: boolean;
   onSelect: () => void;
+  onDelete: (e: React.MouseEvent) => void;
 }
 
-function SortableSectionItem({ section, isSelected, onSelect }: SortableSectionItemProps) {
+function SortableSectionItem({ section, isSelected, onSelect, onDelete }: SortableSectionItemProps) {
   const { ref, style, isDragging, dragHandleProps } = useSortableItem(section.id);
 
   return (
@@ -210,6 +214,7 @@ function SortableSectionItem({ section, isSelected, onSelect }: SortableSectionI
         isDragging={isDragging}
         dragHandleProps={dragHandleProps}
         onClick={onSelect}
+        onDelete={onDelete}
       />
     </div>
   );
@@ -221,6 +226,7 @@ interface SectionItemContentProps {
   isDragging?: boolean;
   dragHandleProps?: Record<string, unknown>;
   onClick?: () => void;
+  onDelete?: (e: React.MouseEvent) => void;
 }
 
 function SectionItemContent({
@@ -229,13 +235,14 @@ function SectionItemContent({
   isDragging,
   dragHandleProps,
   onClick,
+  onDelete,
 }: SectionItemContentProps) {
   const Icon = sectionIcons[section.type] || Plus;
 
   return (
     <div
       className={cn(
-        'flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer transition-all duration-150',
+        'group/item flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer transition-all duration-150',
         'hover:bg-[hsl(var(--vermillion-pale))]',
         isSelected && 'bg-[hsl(var(--vermillion-pale))] text-primary border-l-[3px] border-accent pl-1.5',
         !isSelected && 'border-l-[3px] border-transparent',
@@ -253,6 +260,16 @@ function SectionItemContent({
       </span>
       {section.visible === false && (
         <span className="text-xs text-muted-foreground">hidden</span>
+      )}
+      {onDelete && (
+        <button
+          type="button"
+          onClick={onDelete}
+          className="opacity-0 group-hover/item:opacity-100 focus-visible:opacity-100 p-0.5 text-muted-foreground hover:text-destructive transition-opacity"
+          aria-label={`Delete ${section.title || SECTION_LABELS[section.type]}`}
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
       )}
     </div>
   );

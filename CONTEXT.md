@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — T-001–T-012, T-016–T-020, T-023–T-025, T-030, T-033–T-034 done, 11 tasks in backlog (2 P1, 9 P2; 9 unblocked, 1 blocked, 4 need splitting when picked up)
+**Status:** Task-based workflow active — T-001–T-012, T-016–T-020, T-023–T-025, T-030, T-032–T-034 done, 10 tasks in backlog (2 P1, 8 P2; 8 unblocked, 1 blocked, 4 need splitting when picked up)
 
 ### What's Working
 
@@ -238,7 +238,6 @@ task api:sqlc          # Generate sqlc code
 | ID | Task | Blocked By | Size |
 |----|------|------------|------|
 | T-031 | True responsive editor — collapsible sidebars + mobile layout | — | M |
-| T-032 | Section delete button in palette sidebar | — | XS |
 | T-021 | Export markdown + bundle download (PDF+DOCX+JSON+MD zip) | — | S |
 | T-022 | JSON round-trip import | — | S |
 | T-027 | Markdown import (parse exported markdown back into CV) | T-021 | S–M |
@@ -273,6 +272,7 @@ task api:sqlc          # Generate sqlc code
 | T-020 | Tag input for technologies field | feat/t-018-020-ux-fixes (#42) |
 | T-033 | Editor pane design system alignment | feat/t-033-editor-design-alignment (#43) |
 | T-034 | Unified header across all pages (including editor) | feat/t-034-unified-header (#44) |
+| T-032 | Section delete button in palette sidebar | feat/t-032-section-delete-button (#45) |
 
 ---
 
@@ -331,12 +331,6 @@ task api:sqlc          # Generate sqlc code
 - Touch-friendly interactions for drag & drop on mobile
 - Files: `EditorLayout.tsx`, `SectionPalette.tsx`, `PropertiesPanel.tsx`
 
-**T-032: Section delete button in palette sidebar** — XS
-- Add a small delete icon to each draggable section item in the SectionPalette
-- Allows removing a section directly from the sidebar without opening properties
-- Needs confirmation (reuses existing delete pattern) to prevent accidental removal
-- Files: `SectionPalette.tsx`
-
 **T-015: Multiple CV support** — M (needs splitting when picked up)
 - Dashboard shows list, editor route `/editor/[id]`, create new CV
 - Tests: routing tests, dashboard list test
@@ -345,7 +339,7 @@ task api:sqlc          # Generate sqlc code
 ```
 INDEPENDENT (can start anytime):
   T-026, T-015 (P1)
-  T-031, T-032 (P2)
+  T-031 (P2)
   T-021, T-022, T-028
   T-013, T-014
 
@@ -361,8 +355,7 @@ T-029 (consultant profile): independent but needs splitting when picked up
 2. **T-015** (multiple CV support) — core feature, needs splitting
 
 **Phase 2 — P2 UX + features:**
-4. **T-032** (section delete button) — XS quick win
-5. **T-031** (responsive/mobile) — bigger UX effort
+4. **T-031** (responsive/mobile) — bigger UX effort
 6. **T-021** (markdown + bundle) — new capability, unlocks T-027
 7. **T-022** (JSON import) — completes export/import story
 

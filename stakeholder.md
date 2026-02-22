@@ -1,12 +1,7 @@
 # ideas
-- we absolutely need a mobile version of our app since currently it looks really bad on smaller screens
-- in the editor the draggable items should have a small icon to be able to delete the whole section from the left sidebar directly
-  
 
 
 # Bugs
-
+- The modals of the editors that need to be accessed explicitly (e.g. Experience editor) will open the editor first on the bottom right corner and after a slight delay the pop-up will move to the center. It might be an issue with the animation but it does look very odd. This is repeated through all editors that open an additional component.
 
 # Findings
-- The UI is still not responsive enough. When we make the screen smaller the editor does get smaller but the sidebars aren't. This is not responsive, it is only sloppy. We need to update the UI to be truly responsive
-- the editor pane combined with the cvs do not match the general design style of the current app and our design system. We should match them so our app looks consistent on all pages

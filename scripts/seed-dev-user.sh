@@ -10,7 +10,7 @@ if [ -f .env.local ]; then
 fi
 
 # Default values if not set
-DATABASE_URL="${DATABASE_URL:-postgres://hireme:hireme_dev_password@localhost:5432/hireme?sslmode=disable}"
+DATABASE_URL="${DATABASE_URL:-postgres://hireme:hireme_dev_password@localhost:5433/hireme?sslmode=disable}"
 DEV_USER_ID="${AUTH_BYPASS_USER_ID:-dev-user-001}"
 
 echo "🌱 Seeding development user..."
