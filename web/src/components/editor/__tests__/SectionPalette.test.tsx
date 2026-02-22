@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { ReactNode } from 'react';
 import { render, screen } from '@/test/utils';
 import userEvent from '@testing-library/user-event';
 
@@ -57,14 +58,14 @@ vi.mock('@/lib/dnd', () => ({
 }));
 
 vi.mock('@dnd-kit/core', () => ({
-  DndContext: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  DragOverlay: ({ children }: { children: React.ReactNode }) => (
+  DndContext: ({ children }: { children: ReactNode }) => <>{children}</>,
+  DragOverlay: ({ children }: { children: ReactNode }) => (
     <div data-testid="drag-overlay">{children}</div>
   ),
 }));
 
 vi.mock('@dnd-kit/sortable', () => ({
-  SortableContext: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  SortableContext: ({ children }: { children: ReactNode }) => <>{children}</>,
 }));
 
 vi.mock('@/components/ui/tooltip', () => ({

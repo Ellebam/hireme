@@ -265,7 +265,7 @@ function SectionItemContent({
         <button
           type="button"
           onClick={onDelete}
-          className="opacity-0 group-hover/item:opacity-100 p-0.5 text-muted-foreground hover:text-destructive transition-opacity"
+          className="opacity-0 group-hover/item:opacity-100 focus-visible:opacity-100 p-0.5 text-muted-foreground hover:text-destructive transition-opacity"
           aria-label={`Delete ${section.title || SECTION_LABELS[section.type]}`}
         >
           <Trash2 className="h-3.5 w-3.5" />
