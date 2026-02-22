@@ -49,7 +49,7 @@ export function EditorToolbar() {
   const currentPrimaryColor = cvContent?.styling?.primaryColor || '#c0392b';
 
   return (
-    <div className="h-[50px] border-b border-dashed border-border bg-card px-5 flex items-center gap-1">
+    <div className="h-[50px] border-b-2 border-ink bg-card px-5 flex items-center gap-1">
       {/* Back to Dashboard */}
       <Tooltip>
         <TooltipTrigger asChild>

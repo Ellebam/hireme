@@ -44,11 +44,9 @@ export function SummaryEditor({ sectionId, content }: SummaryEditorProps) {
         </p>
         <p
           className={
-            charCount < recommendedMin
-              ? 'text-amber-500'
-              : charCount > recommendedMax
-                ? 'text-amber-500'
-                : 'text-green-500'
+            charCount < recommendedMin || charCount > recommendedMax
+              ? 'text-sienna'
+              : 'text-green-500'
           }
         >
           {charCount} characters
