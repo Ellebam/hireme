@@ -74,7 +74,7 @@ export function PropertiesPanel() {
       </div>
 
       {/* Content Editor */}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-4 [&_label]:font-mono [&_label]:text-[0.6875rem] [&_label]:uppercase [&_label]:tracking-[0.05em]">
         <SectionEditor section={section} />
       </div>
     </div>

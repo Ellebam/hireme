@@ -112,7 +112,7 @@ export function SkillsEditor({ sectionId, content }: SkillsEditorProps) {
       </div>
 
       {categories.length === 0 ? (
-        <div className="text-center py-8 border border-dashed rounded-lg">
+        <div className="text-center py-8 border-2 border-dashed border-border rounded-lg">
           <p className="text-muted-foreground mb-2">No skill categories added</p>
           <Button variant="outline" size="sm" onClick={addCategory}>
             <Plus className="h-4 w-4 mr-1" />
@@ -160,7 +160,7 @@ function SkillCategoryCard({
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <div className="rounded-lg border bg-card p-4 space-y-3">
+    <div className="rounded-lg border-2 bg-card p-4 space-y-3">
       {/* Category Header */}
       <div className="flex items-center gap-2">
         <div className="cursor-grab text-muted-foreground">
@@ -245,7 +245,7 @@ function SkillTag({ skill, onUpdate, onDelete }: SkillTagProps) {
           onChange={(e) =>
             onUpdate({ level: (e.target.value as SkillLevel) || undefined })
           }
-          className="h-6 text-xs border rounded px-1 bg-background"
+          className="h-6 text-xs border-2 border-input rounded px-1 bg-secondary focus:outline-none focus:border-primary focus:shadow-offset-sm transition-all duration-150"
         >
           <option value="">No level</option>
           {SKILL_LEVELS.map((level) => (
@@ -267,7 +267,7 @@ function SkillTag({ skill, onUpdate, onDelete }: SkillTagProps) {
 
   return (
     <div
-      className="flex items-center gap-1 px-3 py-1 rounded-md bg-muted hover:bg-accent cursor-pointer group"
+      className="flex items-center gap-1 px-3 py-1 rounded-md bg-muted hover:bg-[hsl(var(--vermillion-pale))] cursor-pointer group"
       onClick={() => setIsEditing(true)}
     >
       <span className="text-sm">{skill.name}</span>

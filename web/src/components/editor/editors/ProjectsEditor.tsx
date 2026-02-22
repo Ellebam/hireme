@@ -86,7 +86,7 @@ export function ProjectsEditor({ sectionId, content }: ProjectsEditorProps) {
       </div>
 
       {entries.length === 0 ? (
-        <div className="text-center py-8 border border-dashed rounded-lg">
+        <div className="text-center py-8 border-2 border-dashed border-border rounded-lg">
           <FolderKanban className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
           <p className="text-muted-foreground mb-2">No projects added</p>
           <Button variant="outline" size="sm" onClick={addEntry}>
@@ -126,7 +126,7 @@ interface ProjectEntryCardProps {
 
 function ProjectEntryCard({ entry, onEdit, onDelete }: ProjectEntryCardProps) {
   return (
-    <div className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors group">
+    <div className="flex items-center gap-3 p-3 rounded-lg border-2 bg-card hover:bg-[hsl(var(--vermillion-pale))] transition-colors group">
       <div className="cursor-grab text-muted-foreground hover:text-foreground">
         <GripVertical className="h-4 w-4" />
       </div>

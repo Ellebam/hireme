@@ -156,7 +156,7 @@ export function PersonalEditor({ sectionId, content }: PersonalEditorProps) {
               onChange={(e) =>
                 updateLink(index, { type: e.target.value as LinkType })
               }
-              className="h-10 rounded-md border border-input bg-background px-2 text-sm"
+              className="h-10 rounded-md border-2 border-input bg-secondary px-2 text-sm focus:outline-none focus:border-primary focus:bg-card focus:shadow-offset-sm transition-all duration-150"
             >
               <option value="linkedin">LinkedIn</option>
               <option value="github">GitHub</option>
@@ -183,7 +183,7 @@ export function PersonalEditor({ sectionId, content }: PersonalEditorProps) {
         ))}
 
         {(!content.links || content.links.length === 0) && (
-          <p className="text-sm text-muted-foreground text-center py-4 border border-dashed rounded-lg">
+          <p className="text-sm text-muted-foreground text-center py-4 border-2 border-dashed border-border rounded-lg">
             No links added yet
           </p>
         )}

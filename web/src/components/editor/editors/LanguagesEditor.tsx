@@ -68,7 +68,7 @@ export function LanguagesEditor({ sectionId, content }: LanguagesEditorProps) {
       </div>
 
       {entries.length === 0 ? (
-        <div className="text-center py-8 border border-dashed rounded-lg">
+        <div className="text-center py-8 border-2 border-dashed border-border rounded-lg">
           <Languages className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
           <p className="text-muted-foreground mb-2">No languages added</p>
           <Button variant="outline" size="sm" onClick={addEntry}>
@@ -100,7 +100,7 @@ interface LanguageEntryRowProps {
 
 function LanguageEntryRow({ entry, onUpdate, onDelete }: LanguageEntryRowProps) {
   return (
-    <div className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors group">
+    <div className="flex items-center gap-3 p-3 rounded-lg border-2 bg-card hover:bg-[hsl(var(--vermillion-pale))] transition-colors group">
       <div className="cursor-grab text-muted-foreground hover:text-foreground">
         <GripVertical className="h-4 w-4" />
       </div>
@@ -117,7 +117,7 @@ function LanguageEntryRow({ entry, onUpdate, onDelete }: LanguageEntryRowProps) 
           onChange={(e) =>
             onUpdate({ proficiency: e.target.value as LanguageProficiency })
           }
-          className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+          className="h-9 rounded-md border-2 border-input bg-secondary px-3 text-sm focus:outline-none focus:border-primary focus:bg-card focus:shadow-offset-sm transition-all duration-150"
         >
           {PROFICIENCY_LEVELS.map((level) => (
             <option key={level.value} value={level.value}>
