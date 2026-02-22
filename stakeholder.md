@@ -9,4 +9,4 @@
 
 # Findings
 - The UI is still not responsive enough. When we make the screen smaller the editor does get smaller but the sidebars aren't. This is not responsive, it is only sloppy. We need to update the UI to be truly responsive
-- the editor pane combinged with the cvs do not match the general deisgn style of the current app and our design system. We should match them so our app looks consistent on all pages
+- the editor pane combined with the cvs do not match the general design style of the current app and our design system. We should match them so our app looks consistent on all pages

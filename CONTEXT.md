@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — T-001–T-012, T-016–T-020, T-023–T-025, T-030 done, 14 tasks in backlog (4 P1, 10 P2; 11 unblocked, 1 blocked, 4 need splitting when picked up)
+**Status:** Task-based workflow active — T-001–T-012, T-016–T-020, T-023–T-025, T-030 done, 13 tasks in backlog (4 P1, 9 P2; 11 unblocked, 1 blocked, 4 need splitting when picked up)
 
 ### What's Working
 
