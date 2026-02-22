@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — T-001–T-012, T-016–T-020, T-023–T-025, T-030 done, 10 tasks in backlog (7 unblocked, 1 blocked, 4 need splitting when picked up)
+**Status:** Task-based workflow active — T-001–T-012, T-016–T-020, T-023–T-025, T-030 done, 14 tasks in backlog (4 P1, 10 P2; 11 unblocked, 1 blocked, 4 need splitting when picked up)
 
 ### What's Working
 
@@ -228,18 +228,26 @@ task api:sqlc          # Generate sqlc code
 |----|------|--------|------------|--------|
 | — | — | — | — | — |
 
+### Backlog — P1 (Should)
+| ID | Task | Blocked By | Size |
+|----|------|------------|------|
+| T-026 | DOCX export styling overhaul — match actual CV templates | — | M |
+| T-015 | Multiple CV support | — | M |
+| T-033 | Editor pane design system alignment | — | S–M |
+| T-034 | Unified header across all pages (including editor) | — | S–M |
+
 ### Backlog — P2 (Features)
 | ID | Task | Blocked By | Size |
 |----|------|------------|------|
+| T-031 | True responsive editor — collapsible sidebars + mobile layout | — | M |
+| T-032 | Section delete button in palette sidebar | — | XS |
 | T-021 | Export markdown + bundle download (PDF+DOCX+JSON+MD zip) | — | S |
 | T-022 | JSON round-trip import | — | S |
-| T-026 | DOCX export styling overhaul — match actual CV templates | — | M |
 | T-027 | Markdown import (parse exported markdown back into CV) | T-021 | S–M |
 | T-028 | CV import from uploaded DOCX/PDF — app-based extraction | — | M |
 | T-029 | Consultant profile CV type — new section structure + template | — | M+ |
 | T-013 | R2 cloud storage implementation | — | M |
 | T-014 | OAuth authentication (Google OIDC) | — | M |
-| T-015 | Multiple CV support | — | M |
 
 ### Done
 | ID | Task | PR |
@@ -317,6 +325,28 @@ task api:sqlc          # Generate sqlc code
 - Full auth flow: login, callback, JWT, middleware
 - Tests: middleware tests, auth flow tests
 
+**T-031: True responsive editor — collapsible sidebars + mobile layout** — M
+- Current T-017 responsive work only shrinks the editor pane; sidebars stay fixed width
+- Need: collapsible sidebars at breakpoints, mobile layout where sidebars become drawers/sheets
+- Touch-friendly interactions for drag & drop on mobile
+- Files: `EditorLayout.tsx`, `SectionPalette.tsx`, `PropertiesPanel.tsx`
+
+**T-032: Section delete button in palette sidebar** — XS
+- Add a small delete icon to each draggable section item in the SectionPalette
+- Allows removing a section directly from the sidebar without opening properties
+- Needs confirmation (reuses existing delete pattern) to prevent accidental removal
+- Files: `SectionPalette.tsx`
+
+**T-033: Editor pane design system alignment** — S–M (P1)
+- Editor layout (SectionPalette, CVPreview, PropertiesPanel) doesn't match the Editorial Craft design system from T-025/T-030
+- Update typography, spacing, colors, borders, and component styles in editor to match dashboard/header
+- Files: `EditorLayout.tsx`, `SectionPalette.tsx`, `PropertiesPanel.tsx`, `CVPreview.tsx`, section editors
+
+**T-034: Unified header across all pages (including editor)** — S–M (P1)
+- Editor page uses a custom `EditorToolbar.tsx` that looks completely different from the shared `Header.tsx` on Dashboard/Templates
+- Unify so all pages share the same header component; editor adds contextual tools (undo/redo, zoom, template selector, color picker, export) within the shared header layout
+- Files: `Header.tsx`, `EditorToolbar.tsx`, `EditorLayout.tsx`, `AppShell.tsx`
+
 **T-015: Multiple CV support** — M (needs splitting when picked up)
 - Dashboard shows list, editor route `/editor/[id]`, create new CV
 - Tests: routing tests, dashboard list test
@@ -324,8 +354,10 @@ task api:sqlc          # Generate sqlc code
 ### Dependency Graph
 ```
 INDEPENDENT (can start anytime):
+  T-026, T-015, T-033, T-034 (P1)
+  T-031, T-032 (P2)
   T-021, T-022, T-028
-  T-013, T-014, T-015
+  T-013, T-014
 
 DEPENDENCY CHAINS:
   T-021 (markdown export) → T-027 (markdown import)
@@ -334,18 +366,23 @@ T-029 (consultant profile): independent but needs splitting when picked up
 ```
 
 ### Recommended Sequencing
-**Phase 1 — Features + polish:**
-1. **T-021** (markdown + bundle) — new capability, unlocks T-027
-2. **T-022** (JSON import) — completes export/import story
+**Phase 1 — P1 priorities:**
+1. **T-033** (editor design alignment) — visual consistency, quick win
+2. **T-034** (unified header) — consistent navigation across all pages
+3. **T-026** (DOCX styling) — export quality
+4. **T-015** (multiple CV support) — core feature, needs splitting
 
-**Phase 2 — Design implementation + blocked tasks:**
-3. **T-026** (DOCX styling)
-4. **T-027** (markdown import)
-5. **T-028** (CV upload/extract)
+**Phase 2 — P2 UX + features:**
+5. **T-032** (section delete button) — XS quick win
+6. **T-031** (responsive/mobile) — bigger UX effort
+7. **T-021** (markdown + bundle) — new capability, unlocks T-027
+8. **T-022** (JSON import) — completes export/import story
 
-**Phase 3 — Infrastructure + architecture:**
-6. **T-013/T-014/T-015** — R2, OAuth, multi-CV
-7. **T-029** (consultant profile) — split into sub-tasks first
+**Phase 3 — Remaining features + infra:**
+9. **T-027** (markdown import)
+10. **T-028** (CV upload/extract)
+11. **T-013/T-014** — R2, OAuth
+12. **T-029** (consultant profile) — split into sub-tasks first
 
 ---
 
