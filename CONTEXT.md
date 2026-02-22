@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — T-001–T-012, T-016–T-020, T-023–T-025, T-030 done, 13 tasks in backlog (4 P1, 9 P2; 11 unblocked, 1 blocked, 4 need splitting when picked up)
+**Status:** Task-based workflow active — T-001–T-012, T-016–T-020, T-023–T-025, T-030, T-033 done, 12 tasks in backlog (3 P1, 9 P2; 10 unblocked, 1 blocked, 4 need splitting when picked up)
 
 ### What's Working
 
@@ -233,7 +233,6 @@ task api:sqlc          # Generate sqlc code
 |----|------|------------|------|
 | T-026 | DOCX export styling overhaul — match actual CV templates | — | M |
 | T-015 | Multiple CV support | — | M |
-| T-033 | Editor pane design system alignment | — | S–M |
 | T-034 | Unified header across all pages (including editor) | — | S–M |
 
 ### Backlog — P2 (Features)
@@ -273,6 +272,7 @@ task api:sqlc          # Generate sqlc code
 | T-018 | Section click UX — single-click opens properties | feat/t-018-020-ux-fixes (#42) |
 | T-019 | Replace date pickers with MonthYearPicker | feat/t-018-020-ux-fixes (#42) |
 | T-020 | Tag input for technologies field | feat/t-018-020-ux-fixes (#42) |
+| T-033 | Editor pane design system alignment | feat/t-033-editor-design-alignment (#43) |
 
 ---
 
@@ -337,11 +337,6 @@ task api:sqlc          # Generate sqlc code
 - Needs confirmation (reuses existing delete pattern) to prevent accidental removal
 - Files: `SectionPalette.tsx`
 
-**T-033: Editor pane design system alignment** — S–M (P1)
-- Editor layout (SectionPalette, CVPreview, PropertiesPanel) doesn't match the Editorial Craft design system from T-025/T-030
-- Update typography, spacing, colors, borders, and component styles in editor to match dashboard/header
-- Files: `EditorLayout.tsx`, `SectionPalette.tsx`, `PropertiesPanel.tsx`, `CVPreview.tsx`, section editors
-
 **T-034: Unified header across all pages (including editor)** — S–M (P1)
 - Editor page uses a custom `EditorToolbar.tsx` that looks completely different from the shared `Header.tsx` on Dashboard/Templates
 - Unify so all pages share the same header component; editor adds contextual tools (undo/redo, zoom, template selector, color picker, export) within the shared header layout
@@ -354,7 +349,7 @@ task api:sqlc          # Generate sqlc code
 ### Dependency Graph
 ```
 INDEPENDENT (can start anytime):
-  T-026, T-015, T-033, T-034 (P1)
+  T-026, T-015, T-034 (P1)
   T-031, T-032 (P2)
   T-021, T-022, T-028
   T-013, T-014
@@ -367,22 +362,21 @@ T-029 (consultant profile): independent but needs splitting when picked up
 
 ### Recommended Sequencing
 **Phase 1 — P1 priorities:**
-1. **T-033** (editor design alignment) — visual consistency, quick win
-2. **T-034** (unified header) — consistent navigation across all pages
-3. **T-026** (DOCX styling) — export quality
-4. **T-015** (multiple CV support) — core feature, needs splitting
+1. **T-034** (unified header) — consistent navigation across all pages
+2. **T-026** (DOCX styling) — export quality
+3. **T-015** (multiple CV support) — core feature, needs splitting
 
 **Phase 2 — P2 UX + features:**
-5. **T-032** (section delete button) — XS quick win
-6. **T-031** (responsive/mobile) — bigger UX effort
-7. **T-021** (markdown + bundle) — new capability, unlocks T-027
-8. **T-022** (JSON import) — completes export/import story
+4. **T-032** (section delete button) — XS quick win
+5. **T-031** (responsive/mobile) — bigger UX effort
+6. **T-021** (markdown + bundle) — new capability, unlocks T-027
+7. **T-022** (JSON import) — completes export/import story
 
 **Phase 3 — Remaining features + infra:**
-9. **T-027** (markdown import)
-10. **T-028** (CV upload/extract)
-11. **T-013/T-014** — R2, OAuth
-12. **T-029** (consultant profile) — split into sub-tasks first
+8. **T-027** (markdown import)
+9. **T-028** (CV upload/extract)
+10. **T-013/T-014** — R2, OAuth
+11. **T-029** (consultant profile) — split into sub-tasks first
 
 ---
 
