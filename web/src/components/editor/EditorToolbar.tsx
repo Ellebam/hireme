@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import {
   Undo2,
   Redo2,
@@ -12,7 +11,6 @@ import {
   Loader2,
   AlertCircle,
   Save,
-  ArrowLeft,
   Palette,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -50,21 +48,6 @@ export function EditorToolbar() {
 
   return (
     <div className="h-[50px] border-b-2 border-ink bg-card px-5 flex items-center gap-1">
-      {/* Back to Dashboard */}
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Link
-            href="/"
-            className="w-8 h-8 flex items-center justify-center border border-transparent bg-transparent text-[hsl(var(--text-secondary))] cursor-pointer transition-all duration-150 hover:text-primary hover:bg-[hsl(var(--vermillion-pale))]"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </TooltipTrigger>
-        <TooltipContent>Back to Dashboard</TooltipContent>
-      </Tooltip>
-
-      <div className="w-px h-5 bg-border mx-1.5" />
-
       {/* Left Panel Toggle */}
       <Tooltip>
         <TooltipTrigger asChild>

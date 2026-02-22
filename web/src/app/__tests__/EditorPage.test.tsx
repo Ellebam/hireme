@@ -64,10 +64,10 @@ vi.mock('@/components/editor', () => ({
   EditorLayout: () => <div data-testid="editor-layout">EditorLayout</div>,
 }));
 
-// Mock TooltipProvider
-vi.mock('@/components/ui/tooltip', () => ({
-  TooltipProvider: ({ children }: { children: React.ReactNode }) => (
-    <>{children}</>
+// Mock AppShell to avoid rendering Header with its dependencies
+vi.mock('@/components/layout', () => ({
+  AppShell: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="app-shell">{children}</div>
   ),
 }));
 
@@ -84,27 +84,31 @@ describe('EditorPage', () => {
     mockReset.mockReset();
   });
 
-  it('shows loading state initially', () => {
+  it('shows loading state initially inside AppShell', () => {
     mockGetCV.mockReturnValue(new Promise(() => {}));
     render(<EditorPage />);
 
+    const appShell = screen.getByTestId('app-shell');
+    expect(appShell).toBeInTheDocument();
     expect(screen.getByText('Loading editor...')).toBeInTheDocument();
   });
 
-  it('renders EditorLayout on success', async () => {
+  it('renders EditorLayout inside AppShell on success', async () => {
     mockGetCV.mockResolvedValue(mockCV);
     render(<EditorPage />);
 
     await waitFor(() => {
+      expect(screen.getByTestId('app-shell')).toBeInTheDocument();
       expect(screen.getByTestId('editor-layout')).toBeInTheDocument();
     });
   });
 
-  it('shows error state on API failure', async () => {
+  it('shows error state on API failure inside AppShell', async () => {
     mockGetCV.mockRejectedValue(new Error('Network error'));
     render(<EditorPage />);
 
     await waitFor(() => {
+      expect(screen.getByTestId('app-shell')).toBeInTheDocument();
       expect(screen.getByText('Something went wrong')).toBeInTheDocument();
     });
   });
