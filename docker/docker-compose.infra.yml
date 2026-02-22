@@ -17,7 +17,9 @@ services:
       POSTGRES_PASSWORD: hireme_dev_password
       POSTGRES_DB: hireme
     ports:
-      - "5432:5432"
+      # TODO: Revert to "5432:5432" before production deployment.
+      # Using 5433 on host to avoid conflict with other local PostgreSQL instances.
+      - "5433:5432"
     volumes:
       - ../data/postgres:/var/lib/postgresql/data
     healthcheck:
