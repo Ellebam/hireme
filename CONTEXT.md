@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** All current tasks done. T-001–T-012, T-015–T-020, T-023–T-026, T-030, T-032–T-034 done.
+**Status:** All current tasks done. T-001–T-012, T-015–T-020, T-023–T-026, T-030, T-032–T-036 done.
 
 ### What's Working
 
@@ -37,6 +37,7 @@
 - ✅ Delete confirmation dialog on CV card
 - ✅ Unified header across all pages (Dashboard, Editor, Templates)
 - ✅ shadcn/ui dropdown-menu component
+- ✅ Smooth dialog animations (no positional flash on open)
 - ✅ 213 passing tests (Vitest)
 - ✅ Build verified, full stack integration tested
 
@@ -233,7 +234,6 @@ task api:sqlc          # Generate sqlc code
 | ID | Task | Blocked By | Size |
 |----|------|------------|------|
 | T-035 | Export save location — user-configurable download path with feature flag | — | S |
-| T-036 | Fix modal animation jank — editor dialogs snap to bottom-right before centering | — | XS–S |
 
 ### Backlog — P2 (Features)
 | ID | Task | Blocked By | Size |
@@ -277,6 +277,7 @@ task api:sqlc          # Generate sqlc code
 | T-032 | Section delete button in palette sidebar | feat/t-032-section-delete-button (#45) |
 | T-026 | DOCX export styling overhaul — match actual CV templates | feat/t-026-docx-styling-overhaul (#46) |
 | T-015 | Multiple CV support | feat/t-015-multiple-cv-support (#47) |
+| T-036 | Fix modal animation jank | fix/t-036-modal-animation-jank (#48) |
 
 ---
 
@@ -335,12 +336,6 @@ task api:sqlc          # Generate sqlc code
 - Enables AI agent QA workflows — agents can download exports to known paths for browser-based side-by-side comparison
 - Files: `ExportModal.tsx`, possibly new settings/preferences UI
 
-**T-036: Fix modal animation jank** — XS–S
-- Editor modals (Experience, Education, etc.) briefly appear in bottom-right corner before jumping to center
-- Reproducible across all editors that open an additional component (dialog/modal pattern)
-- Likely CSS/animation timing issue in dialog mount or radix dialog positioning
-- Files: editor dialog components, possibly shared dialog/modal wrapper
-
 **T-037: Unified export design alignment** — M (blocked by T-035)
 - Make PDF and DOCX exports visually match the editor template designs more closely
 - Builds on T-026 (DOCX styling) work; extends to PDF export as well
@@ -350,7 +345,7 @@ task api:sqlc          # Generate sqlc code
 ### Dependency Graph
 ```text
 INDEPENDENT (can start anytime):
-  T-035, T-036 (P1)
+  T-035 (P1)
   T-031 (P2)
   T-021, T-022, T-028
   T-013, T-014
@@ -364,8 +359,7 @@ T-029 (consultant profile): independent but needs splitting when picked up
 
 ### Recommended Sequencing
 **Phase 1 — P1 priorities:**
-1. **T-036** (modal animation fix) — quick UX bug fix
-2. **T-035** (export save location) — enables QA workflows, unlocks T-037
+1. **T-035** (export save location) — enables QA workflows, unlocks T-037
 
 **Phase 2 — P2 UX + features:**
 3. **T-037** (unified export design) — PDF + DOCX match editors
