@@ -455,6 +455,8 @@ if errors.Is(err, pgx.ErrNoRows) {
 
 ## Development Setup
 
+**PostgreSQL runs on port 5433** (not the default 5432) to avoid conflicts with other local PostgreSQL instances. This is configured in `docker-compose.infra.yml`, `.env`, and `.env.example`. CI and the production `docker-compose.yml` use 5432 since there's no conflict in those environments.
+
 ```bash
 task setup             # Full setup (infra, migrate, seed, deps)
 task dev               # Start everything (API :8080, Web :3000)
