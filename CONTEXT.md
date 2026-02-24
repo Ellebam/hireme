@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** All current tasks done. T-001–T-012, T-015–T-020, T-023–T-026, T-030, T-032–T-034 done.
+**Status:** All current tasks done. T-001–T-012, T-015–T-020, T-023–T-026, T-030, T-032–T-036 done.
 
 ### What's Working
 
@@ -37,6 +37,7 @@
 - ✅ Delete confirmation dialog on CV card
 - ✅ Unified header across all pages (Dashboard, Editor, Templates)
 - ✅ shadcn/ui dropdown-menu component
+- ✅ Smooth dialog animations (no positional flash on open)
 - ✅ 213 passing tests (Vitest)
 - ✅ Build verified, full stack integration tested
 
@@ -229,11 +230,17 @@ task api:sqlc          # Generate sqlc code
 |----|------|--------|------------|--------|
 | — | — | — | — | No active tasks |
 
+### Backlog — P0 (Must)
+| ID | Task | Blocked By | Size |
+|----|------|------------|------|
+| T-038 | Documentation framework — docs folder, architecture docs, UML diagrams | — | M |
+| T-040 | CI/CD — build & push Docker images to GHCR via GitHub Actions | — | S–M |
+| T-041 | First release — deployment-ready docker-compose stack + release tag | T-038, T-040 | S |
+
 ### Backlog — P1 (Should)
 | ID | Task | Blocked By | Size |
 |----|------|------------|------|
 | T-035 | Export save location — user-configurable download path with feature flag | — | S |
-| T-036 | Fix modal animation jank — editor dialogs snap to bottom-right before centering | — | XS–S |
 
 ### Backlog — P2 (Features)
 | ID | Task | Blocked By | Size |
@@ -247,6 +254,7 @@ task api:sqlc          # Generate sqlc code
 | T-013 | R2 cloud storage implementation | — | M |
 | T-014 | OAuth authentication (Google OIDC) | — | M |
 | T-037 | Unified export design alignment — PDF + DOCX match editor templates | T-035 | M |
+| T-039 | API documentation — Swagger/OpenAPI spec generation | — | S |
 
 ### Done
 | ID | Task | PR |
@@ -277,10 +285,35 @@ task api:sqlc          # Generate sqlc code
 | T-032 | Section delete button in palette sidebar | feat/t-032-section-delete-button (#45) |
 | T-026 | DOCX export styling overhaul — match actual CV templates | feat/t-026-docx-styling-overhaul (#46) |
 | T-015 | Multiple CV support | feat/t-015-multiple-cv-support (#47) |
+| T-036 | Fix modal animation jank | fix/t-036-modal-animation-jank (#48) |
 
 ---
 
 ## Task Details
+
+### P0 — Must
+
+**T-038: Documentation framework** — M
+- Create `docs/` folder with structured documentation scaffold
+- Architecture documentation: system overview, data flow, component interactions
+- UML diagrams: class diagrams, sequence diagrams, deployment diagram (use Mermaid for in-repo rendering)
+- Documentation framework should be easy to maintain and extend
+- Goal: junior and senior devs can visually understand the codebase
+- Files: new `docs/` folder, architecture docs, diagram files
+
+**T-040: CI/CD — build & push Docker images to GHCR** — S–M
+- GitHub Actions workflow: build Docker images for API and web
+- Push to GitHub Container Registry (ghcr.io)
+- Trigger on main branch push (or release tags)
+- Multi-stage Dockerfiles for optimized images (Go binary, Next.js standalone)
+- Files: `.github/workflows/build-push.yml`, `api/Dockerfile`, `web/Dockerfile`
+
+**T-041: First release** — S (blocked by T-038, T-040)
+- Deployment-ready `docker-compose.yml` stack (API + web + PostgreSQL + Gotenberg)
+- All images pulled from GHCR (built by T-040 pipeline)
+- Documentation must be complete (T-038)
+- Create GitHub release with tag (v1.0.0) and changelog
+- Verify full stack deploys and runs from compose file
 
 ### P2 — Features
 
@@ -335,27 +368,30 @@ task api:sqlc          # Generate sqlc code
 - Enables AI agent QA workflows — agents can download exports to known paths for browser-based side-by-side comparison
 - Files: `ExportModal.tsx`, possibly new settings/preferences UI
 
-**T-036: Fix modal animation jank** — XS–S
-- Editor modals (Experience, Education, etc.) briefly appear in bottom-right corner before jumping to center
-- Reproducible across all editors that open an additional component (dialog/modal pattern)
-- Likely CSS/animation timing issue in dialog mount or radix dialog positioning
-- Files: editor dialog components, possibly shared dialog/modal wrapper
-
 **T-037: Unified export design alignment** — M (blocked by T-035)
 - Make PDF and DOCX exports visually match the editor template designs more closely
 - Builds on T-026 (DOCX styling) work; extends to PDF export as well
 - Blocked by T-035 (export save location) to enable side-by-side QA comparison workflow
 - Files: `api/internal/export/docx.go`, `api/internal/export/pdf.go`, HTML templates
 
+**T-039: API documentation — Swagger/OpenAPI** — S
+- Generate OpenAPI/Swagger spec from Go API handlers
+- Serve Swagger UI at `/swagger` endpoint (dev only or always)
+- Options: `swaggo/swag` (annotation-based) or hand-written OpenAPI YAML
+- Document all existing endpoints: health, users, CVs, assets, export
+- Files: API handler annotations or `api/docs/swagger.yaml`, `cmd/server/main.go`
+
 ### Dependency Graph
 ```text
 INDEPENDENT (can start anytime):
-  T-035, T-036 (P1)
-  T-031 (P2)
+  T-038, T-040 (P0)
+  T-035 (P1)
+  T-031, T-039 (P2)
   T-021, T-022, T-028
   T-013, T-014
 
 DEPENDENCY CHAINS:
+  T-038 (docs) + T-040 (CI/CD images) → T-041 (first release)
   T-021 (markdown export) → T-027 (markdown import)
   T-035 (export save location) → T-037 (unified export design alignment)
 
@@ -363,21 +399,26 @@ T-029 (consultant profile): independent but needs splitting when picked up
 ```
 
 ### Recommended Sequencing
+**Phase 0 — P0 release blockers (parallel):**
+1. **T-038** (documentation framework) — docs, UML, architecture
+2. **T-040** (CI/CD build & push) — Docker images to GHCR
+3. **T-041** (first release) — after T-038 + T-040
+
 **Phase 1 — P1 priorities:**
-1. **T-036** (modal animation fix) — quick UX bug fix
-2. **T-035** (export save location) — enables QA workflows, unlocks T-037
+4. **T-035** (export save location) — enables QA workflows, unlocks T-037
 
 **Phase 2 — P2 UX + features:**
-3. **T-037** (unified export design) — PDF + DOCX match editors
-4. **T-031** (responsive/mobile) — bigger UX effort
-5. **T-021** (markdown + bundle) — new capability, unlocks T-027
-6. **T-022** (JSON import) — completes export/import story
+5. **T-037** (unified export design) — PDF + DOCX match editors
+6. **T-031** (responsive/mobile) — bigger UX effort
+7. **T-021** (markdown + bundle) — new capability, unlocks T-027
+8. **T-022** (JSON import) — completes export/import story
+9. **T-039** (Swagger/OpenAPI) — API documentation
 
 **Phase 3 — Remaining features + infra:**
-7. **T-027** (markdown import)
-8. **T-028** (CV upload/extract)
-9. **T-013/T-014** — R2, OAuth
-10. **T-029** (consultant profile) — split into sub-tasks first
+10. **T-027** (markdown import)
+11. **T-028** (CV upload/extract)
+12. **T-013/T-014** — R2, OAuth
+13. **T-029** (consultant profile) — split into sub-tasks first
 
 ---
 
@@ -415,6 +456,9 @@ Backlog → Active (in-progress) → QA Review → Tech Lead Approval → Done
 ## Stakeholder Feedback
 
 New feedback: say `stakeholder feedback: [description]` → PM agent creates/updates tasks in the Task Board.
+
+### Processed Feedback
+- **2026-02-24:** Documentation framework (T-038), Swagger API docs (T-039), CI/CD pipeline (T-040), first release (T-041) — from stakeholder session
 
 ---
 
