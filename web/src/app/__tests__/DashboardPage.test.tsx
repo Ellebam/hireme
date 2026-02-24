@@ -85,8 +85,8 @@ describe('DashboardPage', () => {
       expect(screen.getByText('Design CV')).toBeInTheDocument();
     });
 
-    // Document count is dynamic
-    expect(screen.getByText('2')).toBeInTheDocument();
+    // Document count badge is dynamic
+    expect(screen.getByText('2', { selector: 'span' })).toBeInTheDocument();
   });
 
   it('shows empty state when list returns empty array', async () => {

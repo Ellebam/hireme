@@ -11,10 +11,12 @@ vi.mock('next/navigation', () => ({
 
 // Mock API
 const mockGetCV = vi.fn();
+const mockCreateCV = vi.fn();
 vi.mock('@/lib/api', () => ({
   api: {
     cv: {
       get: (...args: unknown[]) => mockGetCV(...args),
+      create: (...args: unknown[]) => mockCreateCV(...args),
     },
   },
   ApiError: class ApiError extends Error {
@@ -78,6 +80,7 @@ const { ApiError } = await import('@/lib/api');
 describe('EditorIdPage', () => {
   beforeEach(() => {
     mockGetCV.mockReset();
+    mockCreateCV.mockReset();
     mockSetCV.mockReset();
     mockReset.mockReset();
     mockReplace.mockReset();
@@ -131,7 +134,6 @@ describe('EditorIdPage', () => {
   });
 
   it('does not auto-create CV on missing', async () => {
-    const mockCreateCV = vi.fn();
     mockGetCV.mockRejectedValue(new ApiError(404, 'not found'));
     render(<EditorIdPage />);
 

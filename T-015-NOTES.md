@@ -231,7 +231,7 @@ This is sized M but should be split. Recommended sub-tasks:
 - **Choice:** Option B — **Rationale:** Minimizes diff. PUT `/cv/{id}`, DELETE `/cv/{id}`, and POST `/cv` stay identical. Only GET changes behavior (returns array instead of single object) and we add one new GET route. Frontend must update the GET call anyway.
 
 **Final API surface:**
-```
+```text
 GET    /api/v1/cv              → List all user's CVs (was: get single)
 GET    /api/v1/cv/{id}         → Get specific CV by ID (NEW)
 POST   /api/v1/cv              → Create new CV (unchanged)
@@ -582,6 +582,7 @@ Add a second CV with `classic` template and different content, using a different
 **Verdict**: FAIL
 
 ### Static Checks
+
 | Check | Result | Details |
 |-------|--------|---------|
 | Go tests | PASS | All packages pass |
@@ -590,6 +591,7 @@ Add a second CV with `classic` template and different content, using a different
 | Production build | PASS | Pre-existing warnings only |
 
 ### E2E Browser Tests
+
 | Test | Result | Details |
 |------|--------|---------|
 | Dashboard loads | FAIL | TypeError crash |

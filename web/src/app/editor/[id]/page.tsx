@@ -25,6 +25,7 @@ function EditorContent() {
     let isActive = true;
 
     async function loadCV() {
+      let redirecting = false;
       logger.info('Editor', 'Loading CV...', { id: params.id });
 
       try {
@@ -40,13 +41,14 @@ function EditorContent() {
         if (!isActive) return;
         if (err instanceof ApiError && (err.isNotFound || err.isForbidden)) {
           logger.warn('Editor', 'CV not found or access denied', { id: params.id });
+          redirecting = true;
           router.replace('/');
           return;
         }
         logger.error('Editor', 'Failed to load CV', err);
         setError('Failed to load CV. Please try again.');
       } finally {
-        if (isActive) {
+        if (isActive && !redirecting) {
           setLoading(false);
         }
       }

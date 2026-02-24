@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus, MoreVertical, Trash2, Edit } from 'lucide-react';
 import { AppShell } from '@/components/layout';
@@ -23,7 +23,6 @@ import {
 } from '@/components/ui/dialog';
 import { api } from '@/lib/api';
 import type { CV } from '@/types/api';
-import { useEffect } from 'react';
 
 export default function DashboardPage() {
   const [cvs, setCVs] = useState<CV[]>([]);
@@ -104,7 +103,7 @@ export default function DashboardPage() {
   );
 }
 
-function DocumentList({ cvs, onDelete }: { cvs: CV[]; onDelete: (id: string) => void }) {
+function DocumentList({ cvs, onDelete }: { cvs: CV[]; onDelete: (id: string) => Promise<void> }) {
   return (
     <>
       {/* Section Header */}
@@ -141,7 +140,7 @@ function DocumentList({ cvs, onDelete }: { cvs: CV[]; onDelete: (id: string) => 
   );
 }
 
-function DocumentRow({ cv, index, onDelete }: { cv: CV; index: number; onDelete: () => void }) {
+function DocumentRow({ cv, index, onDelete }: { cv: CV; index: number; onDelete: () => Promise<void> }) {
   const updatedAt = new Date(cv.updatedAt);
   const relativeTime = getRelativeTime(updatedAt);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -213,8 +212,8 @@ function DocumentRow({ cv, index, onDelete }: { cv: CV; index: number; onDelete:
             </Button>
             <Button
               variant="destructive"
-              onClick={() => {
-                onDelete();
+              onClick={async () => {
+                await onDelete();
                 setDeleteDialogOpen(false);
               }}
             >

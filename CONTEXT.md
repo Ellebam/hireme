@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** T-015 in progress — backend API changes done (list CVs, get by ID, export by CV ID), frontend pending. T-001–T-012, T-016–T-020, T-023–T-026, T-030, T-032–T-034 done.
+**Status:** T-015 in progress — backend + frontend done, PR #47 in review. T-001–T-012, T-016–T-020, T-023–T-026, T-030, T-032–T-034 done.
 
 ### What's Working
 
@@ -227,7 +227,7 @@ task api:sqlc          # Generate sqlc code
 ### Active
 | ID | Task | Branch | Blocked By | Status |
 |----|------|--------|------------|--------|
-| T-015 | Multiple CV support | feat/t-015-multiple-cv-support | — | In progress — PR 1 (backend) done, PR 2 (frontend) pending |
+| T-015 | Multiple CV support | feat/t-015-multiple-cv-support | — | In progress — backend + frontend done, PR #47 in review |
 
 ### Backlog — P1 (Should)
 | ID | Task | Blocked By | Size |
