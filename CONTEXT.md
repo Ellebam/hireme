@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — T-001–T-012, T-016–T-020, T-023–T-025, T-030, T-032–T-034 done, 10 tasks in backlog (2 P1, 8 P2; 8 unblocked, 1 blocked, 4 need splitting when picked up)
+**Status:** Task-based workflow active — T-001–T-012, T-016–T-020, T-023–T-026, T-030, T-032–T-034 done, 12 tasks in backlog (3 P1, 9 P2; 10 unblocked, 2 blocked, 4 need splitting when picked up)
 
 ### What's Working
 
@@ -231,8 +231,9 @@ task api:sqlc          # Generate sqlc code
 ### Backlog — P1 (Should)
 | ID | Task | Blocked By | Size |
 |----|------|------------|------|
-| T-026 | DOCX export styling overhaul — match actual CV templates | — | M |
 | T-015 | Multiple CV support | — | M |
+| T-035 | Export save location — user-configurable download path with feature flag | — | S |
+| T-036 | Fix modal animation jank — editor dialogs snap to bottom-right before centering | — | XS–S |
 
 ### Backlog — P2 (Features)
 | ID | Task | Blocked By | Size |
@@ -245,6 +246,7 @@ task api:sqlc          # Generate sqlc code
 | T-029 | Consultant profile CV type — new section structure + template | — | M+ |
 | T-013 | R2 cloud storage implementation | — | M |
 | T-014 | OAuth authentication (Google OIDC) | — | M |
+| T-037 | Unified export design alignment — PDF + DOCX match editor templates | T-035 | M |
 
 ### Done
 | ID | Task | PR |
@@ -273,6 +275,7 @@ task api:sqlc          # Generate sqlc code
 | T-033 | Editor pane design system alignment | feat/t-033-editor-design-alignment (#43) |
 | T-034 | Unified header across all pages (including editor) | feat/t-034-unified-header (#44) |
 | T-032 | Section delete button in palette sidebar | feat/t-032-section-delete-button (#45) |
+| T-026 | DOCX export styling overhaul — match actual CV templates | feat/t-026-docx-styling-overhaul (#46) |
 
 ---
 
@@ -291,12 +294,6 @@ task api:sqlc          # Generate sqlc code
 - File input → read JSON → validate against CV schema → hydrate editor via `setContent()`
 - Backend validation already exists (`validator.CVValidator`)
 - Files: new import UI (dashboard or editor toolbar), `editor-store.ts`
-
-**T-026: DOCX export styling overhaul** — M
-- Make DOCX output match the finalized CV template designs
-- Backend Go work: map design decisions to `godocx` paragraph/run styles
-- Note: `godocx` may not support multi-column layouts (Visionary template) — scope to best-effort
-- Files: `api/internal/export/docx.go`
 
 **T-027: Markdown import** — S–M (blocked by T-021)
 - Parse previously exported markdown back into `CVContent` structure
@@ -335,27 +332,48 @@ task api:sqlc          # Generate sqlc code
 - Dashboard shows list, editor route `/editor/[id]`, create new CV
 - Tests: routing tests, dashboard list test
 
+**T-035: Export save location** — S
+- Let users choose where exported files are saved (custom download path)
+- Build with feature flag for potential paid version gating
+- Enables AI agent QA workflows — agents can download exports to known paths for browser-based side-by-side comparison
+- Files: `ExportModal.tsx`, possibly new settings/preferences UI
+
+**T-036: Fix modal animation jank** — XS–S
+- Editor modals (Experience, Education, etc.) briefly appear in bottom-right corner before jumping to center
+- Reproducible across all editors that open an additional component (dialog/modal pattern)
+- Likely CSS/animation timing issue in dialog mount or radix dialog positioning
+- Files: editor dialog components, possibly shared dialog/modal wrapper
+
+**T-037: Unified export design alignment** — M (blocked by T-035)
+- Make PDF and DOCX exports visually match the editor template designs more closely
+- Builds on T-026 (DOCX styling) work; extends to PDF export as well
+- Blocked by T-035 (export save location) to enable side-by-side QA comparison workflow
+- Files: `api/internal/export/docx.go`, `api/internal/export/pdf.go`, HTML templates
+
 ### Dependency Graph
-```
+```text
 INDEPENDENT (can start anytime):
-  T-026, T-015 (P1)
+  T-015, T-035, T-036 (P1)
   T-031 (P2)
   T-021, T-022, T-028
   T-013, T-014
 
 DEPENDENCY CHAINS:
   T-021 (markdown export) → T-027 (markdown import)
+  T-035 (export save location) → T-037 (unified export design alignment)
 
 T-029 (consultant profile): independent but needs splitting when picked up
 ```
 
 ### Recommended Sequencing
 **Phase 1 — P1 priorities:**
-1. **T-026** (DOCX styling) — export quality
-2. **T-015** (multiple CV support) — core feature, needs splitting
+1. **T-036** (modal animation fix) — quick UX bug fix
+2. **T-035** (export save location) — enables QA workflows, unlocks T-037
+3. **T-015** (multiple CV support) — core feature, needs splitting
 
 **Phase 2 — P2 UX + features:**
-4. **T-031** (responsive/mobile) — bigger UX effort
+4. **T-037** (unified export design) — PDF + DOCX match editors
+5. **T-031** (responsive/mobile) — bigger UX effort
 6. **T-021** (markdown + bundle) — new capability, unlocks T-027
 7. **T-022** (JSON import) — completes export/import story
 
