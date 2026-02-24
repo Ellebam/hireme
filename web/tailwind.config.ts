@@ -91,8 +91,8 @@ const config: Config = {
           to: { opacity: '1' },
         },
         'modal-drop': {
-          from: { opacity: '0', transform: 'translateY(8px)' },
-          to: { opacity: '1', transform: 'translateY(0)' },
+          from: { opacity: '0', transform: 'translate(-50%, calc(-50% + 8px))' },
+          to: { opacity: '1', transform: 'translate(-50%, -50%)' },
         },
         'accordion-down': {
           from: { height: '0' },
