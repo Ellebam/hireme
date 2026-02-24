@@ -13,16 +13,19 @@ import (
 	"github.com/ellebam/hireme/api/internal/domain"
 )
 
-func TestGetCV_Success(t *testing.T) {
+func TestListCVs_Success_Multiple(t *testing.T) {
 	userID := "user-123"
-	testCV := createTestCV(userID)
+	cv1 := createTestCV(userID)
+	cv1.Title = "CV One"
+	cv2 := createTestCV(userID)
+	cv2.Title = "CV Two"
 
 	mockCVSvc := &MockCVService{
-		GetByUserIDFunc: func(ctx context.Context, uid string) (*domain.CV, error) {
+		ListByUserIDFunc: func(ctx context.Context, uid string) ([]*domain.CV, error) {
 			if uid != userID {
-				t.Errorf("GetByUserID called with wrong userID: got %s, want %s", uid, userID)
+				t.Errorf("ListByUserID called with wrong userID: got %s, want %s", uid, userID)
 			}
-			return testCV, nil
+			return []*domain.CV{cv1, cv2}, nil
 		},
 	}
 
@@ -30,7 +33,7 @@ func TestGetCV_Success(t *testing.T) {
 	req := newAuthenticatedRequest("GET", "/cv", userID, nil)
 	rr := httptest.NewRecorder()
 
-	h.GetCV(rr, req)
+	h.ListCVs(rr, req)
 
 	if rr.Code != http.StatusOK {
 		t.Errorf("expected status %d, got %d", http.StatusOK, rr.Code)
@@ -45,6 +48,116 @@ func TestGetCV_Success(t *testing.T) {
 		t.Errorf("unexpected error in response: %v", resp.Error)
 	}
 
+	// Parse the array from data
+	data, err := json.Marshal(resp.Data)
+	if err != nil {
+		t.Fatalf("failed to marshal data: %v", err)
+	}
+	var cvResponses []CVResponse
+	if err := json.Unmarshal(data, &cvResponses); err != nil {
+		t.Fatalf("failed to parse CV array: %v", err)
+	}
+
+	if len(cvResponses) != 2 {
+		t.Fatalf("expected 2 CVs, got %d", len(cvResponses))
+	}
+	if cvResponses[0].Title != "CV One" {
+		t.Errorf("expected first CV title 'CV One', got %s", cvResponses[0].Title)
+	}
+	if cvResponses[1].Title != "CV Two" {
+		t.Errorf("expected second CV title 'CV Two', got %s", cvResponses[1].Title)
+	}
+}
+
+func TestListCVs_Success_Empty(t *testing.T) {
+	userID := "user-123"
+
+	mockCVSvc := &MockCVService{
+		ListByUserIDFunc: func(ctx context.Context, uid string) ([]*domain.CV, error) {
+			return []*domain.CV{}, nil
+		},
+	}
+
+	h := NewTestHandler(nil, mockCVSvc, nil, nil)
+	req := newAuthenticatedRequest("GET", "/cv", userID, nil)
+	rr := httptest.NewRecorder()
+
+	h.ListCVs(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, rr.Code)
+	}
+
+	resp, err := parseJSONResponse(rr.Body)
+	if err != nil {
+		t.Fatalf("failed to parse response: %v", err)
+	}
+
+	data, err := json.Marshal(resp.Data)
+	if err != nil {
+		t.Fatalf("failed to marshal data: %v", err)
+	}
+	var cvResponses []CVResponse
+	if err := json.Unmarshal(data, &cvResponses); err != nil {
+		t.Fatalf("failed to parse CV array: %v", err)
+	}
+
+	if len(cvResponses) != 0 {
+		t.Errorf("expected 0 CVs, got %d", len(cvResponses))
+	}
+}
+
+func TestListCVs_ServiceError(t *testing.T) {
+	userID := "user-123"
+
+	mockCVSvc := &MockCVService{
+		ListByUserIDFunc: func(ctx context.Context, uid string) ([]*domain.CV, error) {
+			return nil, domain.ErrInternal
+		},
+	}
+
+	h := NewTestHandler(nil, mockCVSvc, nil, nil)
+	req := newAuthenticatedRequest("GET", "/cv", userID, nil)
+	rr := httptest.NewRecorder()
+
+	h.ListCVs(rr, req)
+
+	if rr.Code != http.StatusInternalServerError {
+		t.Errorf("expected status %d, got %d", http.StatusInternalServerError, rr.Code)
+	}
+}
+
+func TestGetCVByID_Success(t *testing.T) {
+	userID := "user-123"
+	testCV := createTestCV(userID)
+
+	mockCVSvc := &MockCVService{
+		GetByIDFunc: func(ctx context.Context, id uuid.UUID, uid string) (*domain.CV, error) {
+			if id != testCV.ID {
+				t.Errorf("GetByID called with wrong ID: got %s, want %s", id, testCV.ID)
+			}
+			if uid != userID {
+				t.Errorf("GetByID called with wrong userID: got %s, want %s", uid, userID)
+			}
+			return testCV, nil
+		},
+	}
+
+	h := NewTestHandler(nil, mockCVSvc, nil, nil)
+	req := newAuthenticatedRequestWithParams("GET", "/cv/"+testCV.ID.String(), userID, nil, map[string]string{"id": testCV.ID.String()})
+	rr := httptest.NewRecorder()
+
+	h.GetCVByID(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, rr.Code)
+	}
+
+	resp, err := parseJSONResponse(rr.Body)
+	if err != nil {
+		t.Fatalf("failed to parse response: %v", err)
+	}
+
 	cvResp, err := parseCVResponse(resp)
 	if err != nil {
 		t.Fatalf("failed to parse CV response: %v", err)
@@ -56,37 +169,61 @@ func TestGetCV_Success(t *testing.T) {
 	if cvResp.Title != testCV.Title {
 		t.Errorf("expected title %s, got %s", testCV.Title, cvResp.Title)
 	}
-	if cvResp.SchemaVersion != testCV.SchemaVersion {
-		t.Errorf("expected schema version %s, got %s", testCV.SchemaVersion, cvResp.SchemaVersion)
+}
+
+func TestGetCVByID_InvalidID(t *testing.T) {
+	userID := "user-123"
+
+	h := NewTestHandler(nil, &MockCVService{}, nil, nil)
+	req := newAuthenticatedRequestWithParams("GET", "/cv/not-a-uuid", userID, nil, map[string]string{"id": "not-a-uuid"})
+	rr := httptest.NewRecorder()
+
+	h.GetCVByID(rr, req)
+
+	if rr.Code != http.StatusBadRequest {
+		t.Errorf("expected status %d, got %d", http.StatusBadRequest, rr.Code)
 	}
 }
 
-func TestGetCV_NotFound(t *testing.T) {
+func TestGetCVByID_NotFound(t *testing.T) {
 	userID := "user-123"
+	cvID := uuid.New()
 
 	mockCVSvc := &MockCVService{
-		GetByUserIDFunc: func(ctx context.Context, uid string) (*domain.CV, error) {
+		GetByIDFunc: func(ctx context.Context, id uuid.UUID, uid string) (*domain.CV, error) {
 			return nil, domain.ErrNotFound
 		},
 	}
 
 	h := NewTestHandler(nil, mockCVSvc, nil, nil)
-	req := newAuthenticatedRequest("GET", "/cv", userID, nil)
+	req := newAuthenticatedRequestWithParams("GET", "/cv/"+cvID.String(), userID, nil, map[string]string{"id": cvID.String()})
 	rr := httptest.NewRecorder()
 
-	h.GetCV(rr, req)
+	h.GetCVByID(rr, req)
 
 	if rr.Code != http.StatusNotFound {
 		t.Errorf("expected status %d, got %d", http.StatusNotFound, rr.Code)
 	}
+}
 
-	resp, err := parseJSONResponse(rr.Body)
-	if err != nil {
-		t.Fatalf("failed to parse response: %v", err)
+func TestGetCVByID_Forbidden(t *testing.T) {
+	userID := "user-123"
+	cvID := uuid.New()
+
+	mockCVSvc := &MockCVService{
+		GetByIDFunc: func(ctx context.Context, id uuid.UUID, uid string) (*domain.CV, error) {
+			return nil, domain.ErrForbidden
+		},
 	}
 
-	if resp.Error == nil {
-		t.Error("expected error in response")
+	h := NewTestHandler(nil, mockCVSvc, nil, nil)
+	req := newAuthenticatedRequestWithParams("GET", "/cv/"+cvID.String(), userID, nil, map[string]string{"id": cvID.String()})
+	rr := httptest.NewRecorder()
+
+	h.GetCVByID(rr, req)
+
+	if rr.Code != http.StatusForbidden {
+		t.Errorf("expected status %d, got %d", http.StatusForbidden, rr.Code)
 	}
 }
 

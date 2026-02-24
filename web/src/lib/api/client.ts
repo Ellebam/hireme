@@ -245,8 +245,11 @@ export const userApi = {
 // ============================================================================
 
 export const cvApi = {
-  /** Get current user's CV */
-  get: () => client.get<CV>('/api/v1/cv'),
+  /** List all user's CVs */
+  list: () => client.get<CV[]>('/api/v1/cv'),
+
+  /** Get a specific CV by ID */
+  get: (id: string) => client.get<CV>(`/api/v1/cv/${id}`),
 
   /** Create a new CV */
   create: (data: CreateCVRequest) => client.post<CV>('/api/v1/cv', data),
@@ -285,7 +288,7 @@ export const assetApi = {
 export const exportApi = {
   /** Export CV to specified format */
   export: async (cvId: string, format: ExportFormat): Promise<Blob> => {
-    const url = `${API_BASE}/api/v1/export/${format}`;
+    const url = `${API_BASE}/api/v1/cv/${cvId}/export/${format}`;
     logger.debug('API', `Export ${format}`, { cvId });
 
     const controller = new AbortController();
@@ -295,7 +298,6 @@ export const exportApi = {
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cvId }),
         credentials: 'include',
         signal: controller.signal,
       });
@@ -326,8 +328,8 @@ export const exportApi = {
   },
 
   /** Get download URL for export */
-  getDownloadUrl: (format: ExportFormat) =>
-    `${API_BASE}/api/v1/export/${format}`,
+  getDownloadUrl: (cvId: string, format: ExportFormat) =>
+    `${API_BASE}/api/v1/cv/${cvId}/export/${format}`,
 };
 
 // ============================================================================

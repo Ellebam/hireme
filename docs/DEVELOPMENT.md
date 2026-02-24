@@ -96,7 +96,7 @@ task infra:up
 ```
 
 This starts:
-- **PostgreSQL** on `localhost:5432`
+- **PostgreSQL** on `localhost:5433` (non-standard port to avoid conflicts with other local PostgreSQL instances)
 - **Gotenberg** on `localhost:3001`
 
 ### Start Development Servers
@@ -308,8 +308,8 @@ task infra:logs     # Container logs
 ### PostgreSQL won't start
 
 ```bash
-# Check if port 5432 is in use
-lsof -i :5432
+# Check if port 5433 is in use (HireMe uses non-standard port)
+lsof -i :5433
 
 # Remove stale data and restart
 task infra:clean

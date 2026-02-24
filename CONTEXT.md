@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** Task-based workflow active — T-001–T-012, T-016–T-020, T-023–T-026, T-030, T-032–T-034 done, 12 tasks in backlog (3 P1, 9 P2; 10 unblocked, 2 blocked, 4 need splitting when picked up)
+**Status:** T-015 in progress — backend + frontend done, PR #47 in review. T-001–T-012, T-016–T-020, T-023–T-026, T-030, T-032–T-034 done.
 
 ### What's Working
 
@@ -178,14 +178,15 @@ GET  /health                    → {"data": {"status": "healthy"}}
 GET  /ready                     → {"data": {"status": "ready"}}
 GET  /api/v1/users/me           → Current user profile
 PATCH /api/v1/users/me          → Update user profile
-GET  /api/v1/cv                 → User's active CV
+GET  /api/v1/cv                 → List all user's CVs
+GET  /api/v1/cv/{id}            → Get specific CV by ID
 POST /api/v1/cv                 → Create new CV
 PUT  /api/v1/cv/{id}            → Update CV
 DELETE /api/v1/cv/{id}          → Delete CV
+POST /api/v1/cv/{id}/export/{format} → Export specific CV (pdf, docx)
 POST /api/v1/assets             → Upload asset (image)
 GET  /api/v1/assets/{id}        → Get asset metadata
 DELETE /api/v1/assets/{id}      → Delete asset
-POST /api/v1/export/{format}    → Export CV (pdf, docx)
 ```
 
 ---
@@ -226,12 +227,11 @@ task api:sqlc          # Generate sqlc code
 ### Active
 | ID | Task | Branch | Blocked By | Status |
 |----|------|--------|------------|--------|
-| — | — | — | — | — |
+| T-015 | Multiple CV support | feat/t-015-multiple-cv-support | — | In progress — backend + frontend done, PR #47 in review |
 
 ### Backlog — P1 (Should)
 | ID | Task | Blocked By | Size |
 |----|------|------------|------|
-| T-015 | Multiple CV support | — | M |
 | T-035 | Export save location — user-configurable download path with feature flag | — | S |
 | T-036 | Fix modal animation jank — editor dialogs snap to bottom-right before centering | — | XS–S |
 
@@ -454,6 +454,8 @@ if errors.Is(err, pgx.ErrNoRows) {
 ---
 
 ## Development Setup
+
+**PostgreSQL runs on port 5433** (not the default 5432) to avoid conflicts with other local PostgreSQL instances. This is configured in `docker-compose.infra.yml`, `.env`, and `.env.example`. CI and the production `docker-compose.yml` use 5432 since there's no conflict in those environments.
 
 ```bash
 task setup             # Full setup (infra, migrate, seed, deps)

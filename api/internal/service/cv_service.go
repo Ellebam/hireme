@@ -52,6 +52,11 @@ func (s *CVService) GetByUserID(ctx context.Context, userID string) (*domain.CV,
 	return s.cvRepo.GetByUserID(ctx, userID)
 }
 
+// ListByUserID returns all CVs for a user
+func (s *CVService) ListByUserID(ctx context.Context, userID string) ([]*domain.CV, error) {
+	return s.cvRepo.ListByUserID(ctx, userID)
+}
+
 // Create creates a new CV for a user
 func (s *CVService) Create(ctx context.Context, userID, title string, content json.RawMessage) (*domain.CV, error) {
 	// Get user to check limits

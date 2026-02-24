@@ -11,25 +11,26 @@ import (
 	"github.com/ellebam/hireme/api/internal/domain"
 )
 
-// mockCVRepo implements repository.CVRepository for testing
-type mockCVRepo struct {
-	GetByUserIDFunc func(ctx context.Context, userID string) (*domain.CV, error)
+// exportMockCVRepo implements repository.CVRepository for export testing
+type exportMockCVRepo struct {
+	GetByIDFunc func(ctx context.Context, id uuid.UUID) (*domain.CV, error)
 }
 
-func (m *mockCVRepo) GetByUserID(ctx context.Context, userID string) (*domain.CV, error) {
-	return m.GetByUserIDFunc(ctx, userID)
+func (m *exportMockCVRepo) GetByID(ctx context.Context, id uuid.UUID) (*domain.CV, error) {
+	return m.GetByIDFunc(ctx, id)
 }
-
-func (m *mockCVRepo) GetByID(ctx context.Context, id uuid.UUID) (*domain.CV, error) {
+func (m *exportMockCVRepo) GetByUserID(ctx context.Context, userID string) (*domain.CV, error) {
 	return nil, nil
 }
-func (m *mockCVRepo) ListByUserID(ctx context.Context, userID string) ([]*domain.CV, error) {
+func (m *exportMockCVRepo) ListByUserID(ctx context.Context, userID string) ([]*domain.CV, error) {
 	return nil, nil
 }
-func (m *mockCVRepo) CountByUserID(ctx context.Context, userID string) (int, error) { return 0, nil }
-func (m *mockCVRepo) Create(ctx context.Context, cv *domain.CV) error              { return nil }
-func (m *mockCVRepo) Update(ctx context.Context, cv *domain.CV) error              { return nil }
-func (m *mockCVRepo) Delete(ctx context.Context, id uuid.UUID) error               { return nil }
+func (m *exportMockCVRepo) CountByUserID(ctx context.Context, userID string) (int, error) {
+	return 0, nil
+}
+func (m *exportMockCVRepo) Create(ctx context.Context, cv *domain.CV) error  { return nil }
+func (m *exportMockCVRepo) Update(ctx context.Context, cv *domain.CV) error  { return nil }
+func (m *exportMockCVRepo) Delete(ctx context.Context, id uuid.UUID) error   { return nil }
 
 // mockRenderer implements HTMLRenderer for testing
 type mockRenderer struct {
@@ -55,10 +56,15 @@ func exportTestCVContent() json.RawMessage {
 
 func TestExportPDF_Success(t *testing.T) {
 	expectedPDF := []byte("%PDF-1.4 test")
+	cvID := uuid.New()
+	userID := "user-1"
 
-	repo := &mockCVRepo{
-		GetByUserIDFunc: func(ctx context.Context, userID string) (*domain.CV, error) {
-			return &domain.CV{ID: uuid.New(), UserID: userID, Content: exportTestCVContent()}, nil
+	repo := &exportMockCVRepo{
+		GetByIDFunc: func(ctx context.Context, id uuid.UUID) (*domain.CV, error) {
+			if id != cvID {
+				t.Errorf("expected cvID %s, got %s", cvID, id)
+			}
+			return &domain.CV{ID: cvID, UserID: userID, Content: exportTestCVContent()}, nil
 		},
 	}
 	renderer := &mockRenderer{
@@ -76,7 +82,7 @@ func TestExportPDF_Success(t *testing.T) {
 	}
 
 	svc := NewExportService(repo, renderer, pdf, nil)
-	result, err := svc.ExportPDF(context.Background(), "user-1")
+	result, err := svc.ExportPDF(context.Background(), cvID, userID)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -86,8 +92,10 @@ func TestExportPDF_Success(t *testing.T) {
 }
 
 func TestExportPDF_CVNotFound(t *testing.T) {
-	repo := &mockCVRepo{
-		GetByUserIDFunc: func(ctx context.Context, userID string) (*domain.CV, error) {
+	cvID := uuid.New()
+
+	repo := &exportMockCVRepo{
+		GetByIDFunc: func(ctx context.Context, id uuid.UUID) (*domain.CV, error) {
 			return nil, domain.ErrNotFound
 		},
 	}
@@ -95,7 +103,7 @@ func TestExportPDF_CVNotFound(t *testing.T) {
 	pdf := &mockPDFConverter{ConvertFunc: func(context.Context, string) ([]byte, error) { return nil, nil }}
 
 	svc := NewExportService(repo, renderer, pdf, nil)
-	_, err := svc.ExportPDF(context.Background(), "user-1")
+	_, err := svc.ExportPDF(context.Background(), cvID, "user-1")
 	if err == nil {
 		t.Fatal("expected error, got nil")
 	}
@@ -104,10 +112,36 @@ func TestExportPDF_CVNotFound(t *testing.T) {
 	}
 }
 
+func TestExportPDF_WrongUser(t *testing.T) {
+	cvID := uuid.New()
+	ownerID := "owner-user"
+	requestingUserID := "different-user"
+
+	repo := &exportMockCVRepo{
+		GetByIDFunc: func(ctx context.Context, id uuid.UUID) (*domain.CV, error) {
+			return &domain.CV{ID: cvID, UserID: ownerID, Content: exportTestCVContent()}, nil
+		},
+	}
+	renderer := &mockRenderer{RenderFunc: func(domain.CVContent) (string, error) { return "", nil }}
+	pdf := &mockPDFConverter{ConvertFunc: func(context.Context, string) ([]byte, error) { return nil, nil }}
+
+	svc := NewExportService(repo, renderer, pdf, nil)
+	_, err := svc.ExportPDF(context.Background(), cvID, requestingUserID)
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+	if !errors.Is(err, domain.ErrForbidden) {
+		t.Errorf("expected ErrForbidden, got %v", err)
+	}
+}
+
 func TestExportPDF_RenderError(t *testing.T) {
-	repo := &mockCVRepo{
-		GetByUserIDFunc: func(ctx context.Context, userID string) (*domain.CV, error) {
-			return &domain.CV{ID: uuid.New(), Content: exportTestCVContent()}, nil
+	cvID := uuid.New()
+	userID := "user-1"
+
+	repo := &exportMockCVRepo{
+		GetByIDFunc: func(ctx context.Context, id uuid.UUID) (*domain.CV, error) {
+			return &domain.CV{ID: cvID, UserID: userID, Content: exportTestCVContent()}, nil
 		},
 	}
 	renderer := &mockRenderer{
@@ -118,7 +152,7 @@ func TestExportPDF_RenderError(t *testing.T) {
 	pdf := &mockPDFConverter{ConvertFunc: func(context.Context, string) ([]byte, error) { return nil, nil }}
 
 	svc := NewExportService(repo, renderer, pdf, nil)
-	_, err := svc.ExportPDF(context.Background(), "user-1")
+	_, err := svc.ExportPDF(context.Background(), cvID, userID)
 	if err == nil {
 		t.Fatal("expected error, got nil")
 	}
@@ -128,9 +162,12 @@ func TestExportPDF_RenderError(t *testing.T) {
 }
 
 func TestExportPDF_ConvertError(t *testing.T) {
-	repo := &mockCVRepo{
-		GetByUserIDFunc: func(ctx context.Context, userID string) (*domain.CV, error) {
-			return &domain.CV{ID: uuid.New(), Content: exportTestCVContent()}, nil
+	cvID := uuid.New()
+	userID := "user-1"
+
+	repo := &exportMockCVRepo{
+		GetByIDFunc: func(ctx context.Context, id uuid.UUID) (*domain.CV, error) {
+			return &domain.CV{ID: cvID, UserID: userID, Content: exportTestCVContent()}, nil
 		},
 	}
 	renderer := &mockRenderer{
@@ -143,7 +180,7 @@ func TestExportPDF_ConvertError(t *testing.T) {
 	}
 
 	svc := NewExportService(repo, renderer, pdf, nil)
-	_, err := svc.ExportPDF(context.Background(), "user-1")
+	_, err := svc.ExportPDF(context.Background(), cvID, userID)
 	if err == nil {
 		t.Fatal("expected error, got nil")
 	}
@@ -153,25 +190,31 @@ func TestExportPDF_ConvertError(t *testing.T) {
 }
 
 func TestExportPDF_ParseContentError(t *testing.T) {
-	repo := &mockCVRepo{
-		GetByUserIDFunc: func(ctx context.Context, userID string) (*domain.CV, error) {
-			return &domain.CV{ID: uuid.New(), Content: json.RawMessage("not json")}, nil
+	cvID := uuid.New()
+	userID := "user-1"
+
+	repo := &exportMockCVRepo{
+		GetByIDFunc: func(ctx context.Context, id uuid.UUID) (*domain.CV, error) {
+			return &domain.CV{ID: cvID, UserID: userID, Content: json.RawMessage("not json")}, nil
 		},
 	}
 	renderer := &mockRenderer{RenderFunc: func(domain.CVContent) (string, error) { return "", nil }}
 	pdf := &mockPDFConverter{ConvertFunc: func(context.Context, string) ([]byte, error) { return nil, nil }}
 
 	svc := NewExportService(repo, renderer, pdf, nil)
-	_, err := svc.ExportPDF(context.Background(), "user-1")
+	_, err := svc.ExportPDF(context.Background(), cvID, userID)
 	if err == nil {
 		t.Fatal("expected error from invalid JSON, got nil")
 	}
 }
 
 func TestExportPDF_EmptyHTML(t *testing.T) {
-	repo := &mockCVRepo{
-		GetByUserIDFunc: func(ctx context.Context, userID string) (*domain.CV, error) {
-			return &domain.CV{ID: uuid.New(), Content: exportTestCVContent()}, nil
+	cvID := uuid.New()
+	userID := "user-1"
+
+	repo := &exportMockCVRepo{
+		GetByIDFunc: func(ctx context.Context, id uuid.UUID) (*domain.CV, error) {
+			return &domain.CV{ID: cvID, UserID: userID, Content: exportTestCVContent()}, nil
 		},
 	}
 	renderer := &mockRenderer{
@@ -184,7 +227,7 @@ func TestExportPDF_EmptyHTML(t *testing.T) {
 	}
 
 	svc := NewExportService(repo, renderer, pdf, nil)
-	result, err := svc.ExportPDF(context.Background(), "user-1")
+	result, err := svc.ExportPDF(context.Background(), cvID, userID)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -204,10 +247,15 @@ func (m *mockDOCXGenerator) Generate(content domain.CVContent) ([]byte, error) {
 
 func TestExportDOCX_Success(t *testing.T) {
 	expectedDOCX := []byte("PK fake docx")
+	cvID := uuid.New()
+	userID := "user-1"
 
-	repo := &mockCVRepo{
-		GetByUserIDFunc: func(ctx context.Context, userID string) (*domain.CV, error) {
-			return &domain.CV{ID: uuid.New(), UserID: userID, Content: exportTestCVContent()}, nil
+	repo := &exportMockCVRepo{
+		GetByIDFunc: func(ctx context.Context, id uuid.UUID) (*domain.CV, error) {
+			if id != cvID {
+				t.Errorf("expected cvID %s, got %s", cvID, id)
+			}
+			return &domain.CV{ID: cvID, UserID: userID, Content: exportTestCVContent()}, nil
 		},
 	}
 	renderer := &mockRenderer{
@@ -229,7 +277,7 @@ func TestExportDOCX_Success(t *testing.T) {
 	}
 
 	svc := NewExportService(repo, renderer, nil, docx)
-	result, err := svc.ExportDOCX(context.Background(), "user-1")
+	result, err := svc.ExportDOCX(context.Background(), cvID, userID)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -239,8 +287,10 @@ func TestExportDOCX_Success(t *testing.T) {
 }
 
 func TestExportDOCX_CVNotFound(t *testing.T) {
-	repo := &mockCVRepo{
-		GetByUserIDFunc: func(ctx context.Context, userID string) (*domain.CV, error) {
+	cvID := uuid.New()
+
+	repo := &exportMockCVRepo{
+		GetByIDFunc: func(ctx context.Context, id uuid.UUID) (*domain.CV, error) {
 			return nil, domain.ErrNotFound
 		},
 	}
@@ -248,7 +298,7 @@ func TestExportDOCX_CVNotFound(t *testing.T) {
 	docx := &mockDOCXGenerator{GenerateFunc: func(domain.CVContent) ([]byte, error) { return nil, nil }}
 
 	svc := NewExportService(repo, renderer, nil, docx)
-	_, err := svc.ExportDOCX(context.Background(), "user-1")
+	_, err := svc.ExportDOCX(context.Background(), cvID, "user-1")
 	if err == nil {
 		t.Fatal("expected error, got nil")
 	}
@@ -257,10 +307,36 @@ func TestExportDOCX_CVNotFound(t *testing.T) {
 	}
 }
 
+func TestExportDOCX_WrongUser(t *testing.T) {
+	cvID := uuid.New()
+	ownerID := "owner-user"
+	requestingUserID := "different-user"
+
+	repo := &exportMockCVRepo{
+		GetByIDFunc: func(ctx context.Context, id uuid.UUID) (*domain.CV, error) {
+			return &domain.CV{ID: cvID, UserID: ownerID, Content: exportTestCVContent()}, nil
+		},
+	}
+	renderer := &mockRenderer{RenderFunc: func(domain.CVContent) (string, error) { return "", nil }}
+	docx := &mockDOCXGenerator{GenerateFunc: func(domain.CVContent) ([]byte, error) { return nil, nil }}
+
+	svc := NewExportService(repo, renderer, nil, docx)
+	_, err := svc.ExportDOCX(context.Background(), cvID, requestingUserID)
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+	if !errors.Is(err, domain.ErrForbidden) {
+		t.Errorf("expected ErrForbidden, got %v", err)
+	}
+}
+
 func TestExportDOCX_GenerateError(t *testing.T) {
-	repo := &mockCVRepo{
-		GetByUserIDFunc: func(ctx context.Context, userID string) (*domain.CV, error) {
-			return &domain.CV{ID: uuid.New(), Content: exportTestCVContent()}, nil
+	cvID := uuid.New()
+	userID := "user-1"
+
+	repo := &exportMockCVRepo{
+		GetByIDFunc: func(ctx context.Context, id uuid.UUID) (*domain.CV, error) {
+			return &domain.CV{ID: cvID, UserID: userID, Content: exportTestCVContent()}, nil
 		},
 	}
 	renderer := &mockRenderer{RenderFunc: func(domain.CVContent) (string, error) { return "", nil }}
@@ -271,7 +347,7 @@ func TestExportDOCX_GenerateError(t *testing.T) {
 	}
 
 	svc := NewExportService(repo, renderer, nil, docx)
-	_, err := svc.ExportDOCX(context.Background(), "user-1")
+	_, err := svc.ExportDOCX(context.Background(), cvID, userID)
 	if err == nil {
 		t.Fatal("expected error, got nil")
 	}
@@ -281,25 +357,31 @@ func TestExportDOCX_GenerateError(t *testing.T) {
 }
 
 func TestExportDOCX_ParseContentError(t *testing.T) {
-	repo := &mockCVRepo{
-		GetByUserIDFunc: func(ctx context.Context, userID string) (*domain.CV, error) {
-			return &domain.CV{ID: uuid.New(), Content: json.RawMessage("not json")}, nil
+	cvID := uuid.New()
+	userID := "user-1"
+
+	repo := &exportMockCVRepo{
+		GetByIDFunc: func(ctx context.Context, id uuid.UUID) (*domain.CV, error) {
+			return &domain.CV{ID: cvID, UserID: userID, Content: json.RawMessage("not json")}, nil
 		},
 	}
 	renderer := &mockRenderer{RenderFunc: func(domain.CVContent) (string, error) { return "", nil }}
 	docx := &mockDOCXGenerator{GenerateFunc: func(domain.CVContent) ([]byte, error) { return nil, nil }}
 
 	svc := NewExportService(repo, renderer, nil, docx)
-	_, err := svc.ExportDOCX(context.Background(), "user-1")
+	_, err := svc.ExportDOCX(context.Background(), cvID, userID)
 	if err == nil {
 		t.Fatal("expected error from invalid JSON, got nil")
 	}
 }
 
 func TestExportDOCX_EmptySections(t *testing.T) {
-	repo := &mockCVRepo{
-		GetByUserIDFunc: func(ctx context.Context, userID string) (*domain.CV, error) {
-			return &domain.CV{ID: uuid.New(), Content: exportTestCVContent()}, nil
+	cvID := uuid.New()
+	userID := "user-1"
+
+	repo := &exportMockCVRepo{
+		GetByIDFunc: func(ctx context.Context, id uuid.UUID) (*domain.CV, error) {
+			return &domain.CV{ID: cvID, UserID: userID, Content: exportTestCVContent()}, nil
 		},
 	}
 	renderer := &mockRenderer{
@@ -315,7 +397,7 @@ func TestExportDOCX_EmptySections(t *testing.T) {
 	}
 
 	svc := NewExportService(repo, renderer, nil, docx)
-	result, err := svc.ExportDOCX(context.Background(), "user-1")
+	result, err := svc.ExportDOCX(context.Background(), cvID, userID)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

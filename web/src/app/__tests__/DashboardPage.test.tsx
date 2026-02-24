@@ -2,12 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@/test/utils';
 
 // Mock API
-const mockGetCV = vi.fn();
+const mockListCVs = vi.fn();
 const mockDeleteCV = vi.fn();
 vi.mock('@/lib/api', () => ({
   api: {
     cv: {
-      get: (...args: unknown[]) => mockGetCV(...args),
+      list: (...args: unknown[]) => mockListCVs(...args),
       delete: (...args: unknown[]) => mockDeleteCV(...args),
     },
   },
@@ -48,27 +48,23 @@ vi.mock('next/link', () => ({
 }));
 
 import DashboardPage from '../page';
-import { mockCV } from '@/test/mocks/cv';
-
-// Import the mocked ApiError for use in tests
-const { ApiError } = await import('@/lib/api');
+import { mockCV, createMockCV } from '@/test/mocks/cv';
 
 describe('DashboardPage', () => {
   beforeEach(() => {
-    mockGetCV.mockReset();
+    mockListCVs.mockReset();
     mockDeleteCV.mockReset();
   });
 
   it('shows loading skeleton initially', () => {
-    mockGetCV.mockReturnValue(new Promise(() => {})); // never resolves
+    mockListCVs.mockReturnValue(new Promise(() => {})); // never resolves
     render(<DashboardPage />);
 
-    // During loading, the heading is still shown but content is skeleton
     expect(screen.getByText('Your Workspace')).toBeInTheDocument();
   });
 
   it('renders CV card after data loads', async () => {
-    mockGetCV.mockResolvedValue(mockCV);
+    mockListCVs.mockResolvedValue([mockCV]);
     render(<DashboardPage />);
 
     await waitFor(() => {
@@ -79,23 +75,63 @@ describe('DashboardPage', () => {
     expect(screen.getByText('8 sections')).toBeInTheDocument();
   });
 
-  it('shows empty state when API returns 404', async () => {
-    mockGetCV.mockRejectedValue(new ApiError(404, 'not found'));
+  it('renders multiple CV cards', async () => {
+    const cv2 = createMockCV({ id: 'cv-456', title: 'Design CV' });
+    mockListCVs.mockResolvedValue([mockCV, cv2]);
     render(<DashboardPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('No CV yet')).toBeInTheDocument();
+      expect(screen.getByText('Software Engineer CV')).toBeInTheDocument();
+      expect(screen.getByText('Design CV')).toBeInTheDocument();
+    });
+
+    // Document count badge is dynamic
+    expect(screen.getByText('2', { selector: 'span' })).toBeInTheDocument();
+  });
+
+  it('shows empty state when list returns empty array', async () => {
+    mockListCVs.mockResolvedValue([]);
+    render(<DashboardPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('No CVs yet')).toBeInTheDocument();
     });
   });
 
   it('shows error state on API failure', async () => {
-    mockGetCV.mockRejectedValue(new Error('Network error'));
+    mockListCVs.mockRejectedValue(new Error('Network error'));
     render(<DashboardPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Failed to load CV')).toBeInTheDocument();
+      expect(screen.getByText('Failed to load CVs')).toBeInTheDocument();
     });
 
     expect(screen.getByText('Try Again')).toBeInTheDocument();
+  });
+
+  it('edit links include CV ID', async () => {
+    mockListCVs.mockResolvedValue([mockCV]);
+    render(<DashboardPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Software Engineer CV')).toBeInTheDocument();
+    });
+
+    const editLinks = screen.getAllByRole('link').filter(
+      (link) => link.getAttribute('href') === `/editor/${mockCV.id}`
+    );
+    expect(editLinks.length).toBeGreaterThan(0);
+  });
+
+  it('create links point to /templates', async () => {
+    mockListCVs.mockResolvedValue([mockCV]);
+    render(<DashboardPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Software Engineer CV')).toBeInTheDocument();
+    });
+
+    const createLink = screen.getByText('Create New Document').closest('a');
+    expect(createLink).toHaveAttribute('href', '/templates');
   });
 });

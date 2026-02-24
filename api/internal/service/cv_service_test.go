@@ -697,3 +697,69 @@ func TestCVService_Delete_NotFound(t *testing.T) {
 		t.Errorf("expected ErrNotFound, got %v", err)
 	}
 }
+
+func TestCVService_ListByUserID_Success(t *testing.T) {
+	userID := "user-123"
+
+	cv1 := &domain.CV{
+		ID:     uuid.New(),
+		UserID: userID,
+		Title:  "CV One",
+	}
+	cv2 := &domain.CV{
+		ID:     uuid.New(),
+		UserID: userID,
+		Title:  "CV Two",
+	}
+
+	mockCVRepo := &MockCVRepository{
+		ListByUserIDFunc: func(ctx context.Context, uid string) ([]*domain.CV, error) {
+			if uid != userID {
+				t.Errorf("expected userID %s, got %s", userID, uid)
+			}
+			return []*domain.CV{cv1, cv2}, nil
+		},
+	}
+
+	mockUserRepo := &MockUserRepository{}
+	cvValidator := createTestCVValidator(t)
+
+	svc := NewCVService(mockCVRepo, mockUserRepo, cvValidator)
+
+	cvs, err := svc.ListByUserID(context.Background(), userID)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if len(cvs) != 2 {
+		t.Fatalf("expected 2 CVs, got %d", len(cvs))
+	}
+	if cvs[0].Title != "CV One" {
+		t.Errorf("expected first CV title 'CV One', got '%s'", cvs[0].Title)
+	}
+	if cvs[1].Title != "CV Two" {
+		t.Errorf("expected second CV title 'CV Two', got '%s'", cvs[1].Title)
+	}
+}
+
+func TestCVService_ListByUserID_Empty(t *testing.T) {
+	userID := "user-123"
+
+	mockCVRepo := &MockCVRepository{
+		ListByUserIDFunc: func(ctx context.Context, uid string) ([]*domain.CV, error) {
+			return []*domain.CV{}, nil
+		},
+	}
+
+	mockUserRepo := &MockUserRepository{}
+	cvValidator := createTestCVValidator(t)
+
+	svc := NewCVService(mockCVRepo, mockUserRepo, cvValidator)
+
+	cvs, err := svc.ListByUserID(context.Background(), userID)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if len(cvs) != 0 {
+		t.Errorf("expected 0 CVs, got %d", len(cvs))
+	}
+}

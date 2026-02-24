@@ -29,6 +29,8 @@ type UserServiceInterface interface {
 // CVServiceInterface defines the CV service methods used by handlers
 type CVServiceInterface interface {
 	GetByUserID(ctx context.Context, userID string) (*domain.CV, error)
+	GetByID(ctx context.Context, id uuid.UUID, userID string) (*domain.CV, error)
+	ListByUserID(ctx context.Context, userID string) ([]*domain.CV, error)
 	Create(ctx context.Context, userID, title string, content json.RawMessage) (*domain.CV, error)
 	Update(ctx context.Context, id uuid.UUID, userID string, title *string, content *json.RawMessage) (*domain.CV, error)
 	Delete(ctx context.Context, id uuid.UUID, userID string) error
@@ -44,8 +46,8 @@ type AssetServiceInterface interface {
 
 // ExportServiceInterface defines the export service methods used by handlers
 type ExportServiceInterface interface {
-	ExportPDF(ctx context.Context, userID string) ([]byte, error)
-	ExportDOCX(ctx context.Context, userID string) ([]byte, error)
+	ExportPDF(ctx context.Context, cvID uuid.UUID, userID string) ([]byte, error)
+	ExportDOCX(ctx context.Context, cvID uuid.UUID, userID string) ([]byte, error)
 }
 
 // MockUserService is a mock implementation of UserServiceInterface
@@ -71,6 +73,8 @@ func (m *MockUserService) Update(ctx context.Context, id string, displayName, lo
 // MockCVService is a mock implementation of CVServiceInterface
 type MockCVService struct {
 	GetByUserIDFunc func(ctx context.Context, userID string) (*domain.CV, error)
+	GetByIDFunc     func(ctx context.Context, id uuid.UUID, userID string) (*domain.CV, error)
+	ListByUserIDFunc func(ctx context.Context, userID string) ([]*domain.CV, error)
 	CreateFunc      func(ctx context.Context, userID, title string, content json.RawMessage) (*domain.CV, error)
 	UpdateFunc      func(ctx context.Context, id uuid.UUID, userID string, title *string, content *json.RawMessage) (*domain.CV, error)
 	DeleteFunc      func(ctx context.Context, id uuid.UUID, userID string) error
@@ -81,6 +85,20 @@ func (m *MockCVService) GetByUserID(ctx context.Context, userID string) (*domain
 		return m.GetByUserIDFunc(ctx, userID)
 	}
 	return nil, domain.ErrNotFound
+}
+
+func (m *MockCVService) GetByID(ctx context.Context, id uuid.UUID, userID string) (*domain.CV, error) {
+	if m.GetByIDFunc != nil {
+		return m.GetByIDFunc(ctx, id, userID)
+	}
+	return nil, domain.ErrNotFound
+}
+
+func (m *MockCVService) ListByUserID(ctx context.Context, userID string) ([]*domain.CV, error) {
+	if m.ListByUserIDFunc != nil {
+		return m.ListByUserIDFunc(ctx, userID)
+	}
+	return []*domain.CV{}, nil
 }
 
 func (m *MockCVService) Create(ctx context.Context, userID, title string, content json.RawMessage) (*domain.CV, error) {
@@ -142,20 +160,20 @@ func (m *MockAssetService) Delete(ctx context.Context, id uuid.UUID, userID stri
 
 // MockExportService is a mock implementation of ExportServiceInterface
 type MockExportService struct {
-	ExportPDFFunc  func(ctx context.Context, userID string) ([]byte, error)
-	ExportDOCXFunc func(ctx context.Context, userID string) ([]byte, error)
+	ExportPDFFunc  func(ctx context.Context, cvID uuid.UUID, userID string) ([]byte, error)
+	ExportDOCXFunc func(ctx context.Context, cvID uuid.UUID, userID string) ([]byte, error)
 }
 
-func (m *MockExportService) ExportPDF(ctx context.Context, userID string) ([]byte, error) {
+func (m *MockExportService) ExportPDF(ctx context.Context, cvID uuid.UUID, userID string) ([]byte, error) {
 	if m.ExportPDFFunc != nil {
-		return m.ExportPDFFunc(ctx, userID)
+		return m.ExportPDFFunc(ctx, cvID, userID)
 	}
 	return nil, domain.ErrNotFound
 }
 
-func (m *MockExportService) ExportDOCX(ctx context.Context, userID string) ([]byte, error) {
+func (m *MockExportService) ExportDOCX(ctx context.Context, cvID uuid.UUID, userID string) ([]byte, error) {
 	if m.ExportDOCXFunc != nil {
-		return m.ExportDOCXFunc(ctx, userID)
+		return m.ExportDOCXFunc(ctx, cvID, userID)
 	}
 	return nil, domain.ErrNotFound
 }
@@ -236,12 +254,45 @@ func (h *TestHandler) UpdateCurrentUser(w http.ResponseWriter, r *http.Request) 
 	httputil.JSON(w, http.StatusOK, response)
 }
 
-// GetCV returns the authenticated user's active CV
-func (h *TestHandler) GetCV(w http.ResponseWriter, r *http.Request) {
+// ListCVs returns all CVs for the authenticated user
+func (h *TestHandler) ListCVs(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userID := middleware.MustGetUserID(ctx)
 
-	cv, err := h.cvService.GetByUserID(ctx, userID)
+	cvs, err := h.cvService.ListByUserID(ctx, userID)
+	if err != nil {
+		httputil.HandleError(w, err)
+		return
+	}
+
+	responses := make([]CVResponse, len(cvs))
+	for i, cv := range cvs {
+		responses[i] = CVResponse{
+			ID:            cv.ID.String(),
+			Title:         cv.Title,
+			SchemaVersion: cv.SchemaVersion,
+			Content:       cv.Content,
+			CreatedAt:     cv.CreatedAt.Format("2006-01-02T15:04:05Z"),
+			UpdatedAt:     cv.UpdatedAt.Format("2006-01-02T15:04:05Z"),
+		}
+	}
+
+	httputil.JSON(w, http.StatusOK, responses)
+}
+
+// GetCVByID returns a specific CV by ID
+func (h *TestHandler) GetCVByID(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	userID := middleware.MustGetUserID(ctx)
+
+	idParam := chi.URLParam(r, "id")
+	cvID, err := uuid.Parse(idParam)
+	if err != nil {
+		httputil.Error(w, http.StatusBadRequest, "invalid CV ID")
+		return
+	}
+
+	cv, err := h.cvService.GetByID(ctx, cvID, userID)
 	if err != nil {
 		httputil.HandleError(w, err)
 		return
@@ -494,12 +545,23 @@ func (h *TestHandler) Ready(w http.ResponseWriter, r *http.Request) {
 
 // CreateExport handles export requests in tests
 func (h *TestHandler) CreateExport(w http.ResponseWriter, r *http.Request) {
+	// Parse CV ID from URL
+	idParam := chi.URLParam(r, "id")
+	cvID, err := uuid.Parse(idParam)
+	if err != nil {
+		httputil.Error(w, http.StatusBadRequest, "invalid CV ID")
+		return
+	}
+
 	format := chi.URLParam(r, "format")
 
 	if !domain.IsValidExportFormat(format) {
 		httputil.Error(w, http.StatusBadRequest, "invalid export format")
 		return
 	}
+
+	ctx := r.Context()
+	userID := middleware.MustGetUserID(ctx)
 
 	switch format {
 	case domain.ExportFormatPDF:
@@ -508,10 +570,7 @@ func (h *TestHandler) CreateExport(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		ctx := r.Context()
-		userID := middleware.MustGetUserID(ctx)
-
-		pdfBytes, err := h.exportService.ExportPDF(ctx, userID)
+		pdfBytes, err := h.exportService.ExportPDF(ctx, cvID, userID)
 		if err != nil {
 			httputil.HandleError(w, err)
 			return
@@ -527,10 +586,7 @@ func (h *TestHandler) CreateExport(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		ctx := r.Context()
-		userID := middleware.MustGetUserID(ctx)
-
-		docxBytes, err := h.exportService.ExportDOCX(ctx, userID)
+		docxBytes, err := h.exportService.ExportDOCX(ctx, cvID, userID)
 		if err != nil {
 			httputil.HandleError(w, err)
 			return

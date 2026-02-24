@@ -63,17 +63,47 @@ describe('ApiClient', () => {
   });
 
   describe('cvApi', () => {
-    it('should get CV and unwrap data', async () => {
+    it('should list CVs and unwrap data', async () => {
+      const mockCVs = [
+        { id: 'cv-1', title: 'CV One' },
+        { id: 'cv-2', title: 'CV Two' },
+      ];
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ data: mockCVs }),
+      });
+
+      const result = await api.cv.list();
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/api/v1/cv'),
+        expect.objectContaining({ method: 'GET' })
+      );
+      expect(result).toEqual(mockCVs);
+      expect(result).toHaveLength(2);
+    });
+
+    it('should list CVs and return empty array', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ data: [] }),
+      });
+
+      const result = await api.cv.list();
+      expect(result).toEqual([]);
+    });
+
+    it('should get CV by ID and unwrap data', async () => {
       const mockCV = { id: 'cv-123', title: 'My CV' };
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve({ data: mockCV }),
       });
 
-      const result = await api.cv.get();
+      const result = await api.cv.get('cv-123');
 
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('/api/v1/cv'),
+        expect.stringContaining('/api/v1/cv/cv-123'),
         expect.objectContaining({ method: 'GET' })
       );
       expect(result).toEqual(mockCV);
@@ -145,7 +175,7 @@ describe('ApiClient', () => {
       });
 
       try {
-        await api.cv.get();
+        await api.cv.get('cv-999');
         expect.fail('Should have thrown');
       } catch (err) {
         expect(err).toBeInstanceOf(ApiError);
@@ -185,7 +215,7 @@ describe('ApiClient', () => {
       });
 
       try {
-        await api.cv.get();
+        await api.cv.list();
         expect.fail('Should have thrown');
       } catch (err) {
         expect(err).toBeInstanceOf(ApiError);
@@ -198,7 +228,7 @@ describe('ApiClient', () => {
       mockFetch.mockRejectedValueOnce(new Error('Network failure'));
 
       try {
-        await api.cv.get();
+        await api.cv.list();
         expect.fail('Should have thrown');
       } catch (err) {
         expect(err).toBeInstanceOf(ApiError);
@@ -220,15 +250,12 @@ describe('ApiClient', () => {
 
       expect(result).toBe(mockBlob);
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('/api/v1/export/pdf'),
-        expect.objectContaining({
-          method: 'POST',
-          body: JSON.stringify({ cvId: 'cv-123' }),
-        })
+        expect.stringContaining('/api/v1/cv/cv-123/export/pdf'),
+        expect.objectContaining({ method: 'POST' })
       );
     });
 
-    it('should send correct request body for docx', async () => {
+    it('should send correct URL for docx export', async () => {
       const mockBlob = new Blob(['docx-data']);
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -238,10 +265,8 @@ describe('ApiClient', () => {
       await api.export.export('cv-456', 'docx');
 
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('/api/v1/export/docx'),
-        expect.objectContaining({
-          body: JSON.stringify({ cvId: 'cv-456' }),
-        })
+        expect.stringContaining('/api/v1/cv/cv-456/export/docx'),
+        expect.objectContaining({ method: 'POST' })
       );
     });
 
@@ -283,8 +308,6 @@ describe('ApiClient', () => {
     });
 
     it('should throw ApiError on abort (timeout path)', async () => {
-      // Directly test the abort error handling path:
-      // When fetch rejects with AbortError, export should throw ApiError
       mockFetch.mockRejectedValueOnce(
         new DOMException('The operation was aborted.', 'AbortError')
       );
