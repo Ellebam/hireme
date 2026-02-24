@@ -721,7 +721,9 @@ func postProcessVisionary(docxBytes []byte, primaryColor string) ([]byte, error)
 			return nil, fmt.Errorf("opening %s: %w", file.Name, err)
 		}
 		data, err := io.ReadAll(rc)
-		rc.Close()
+		if closeErr := rc.Close(); closeErr != nil {
+			return nil, fmt.Errorf("closing %s: %w", file.Name, closeErr)
+		}
 		if err != nil {
 			return nil, fmt.Errorf("reading %s: %w", file.Name, err)
 		}
