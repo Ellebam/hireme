@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -160,8 +161,8 @@ func resolveDocxStyle(content domain.CVContent) docxStyle {
 	}
 
 	return docxStyle{
-		primaryColor:   stripHash(primaryColor),
-		secondaryColor: stripHash(secondaryColor),
+		primaryColor:   sanitizeHexColor(primaryColor, strings.TrimPrefix(defaultPrimaryColor, "#")),
+		secondaryColor: sanitizeHexColor(secondaryColor, strings.TrimPrefix(defaultSecondaryColor, "#")),
 		templateID:     templateID,
 		nameSizePt:     nameSizePt,
 		titleSizePt:    titleSizePt,
@@ -195,9 +196,16 @@ func writerFromCell(cell *docx.Cell) docWriter {
 	}
 }
 
-// stripHash removes a leading "#" from a hex color string.
-func stripHash(color string) string {
-	return strings.TrimPrefix(color, "#")
+var hexColorRe = regexp.MustCompile(`^[0-9a-fA-F]{3,8}$`)
+
+// sanitizeHexColor strips a leading "#" and validates the value is a hex color.
+// Returns the fallback if the color is invalid.
+func sanitizeHexColor(color, fallback string) string {
+	color = strings.TrimPrefix(color, "#")
+	if hexColorRe.MatchString(color) {
+		return color
+	}
+	return fallback
 }
 
 func ensureParaProps(para *docx.Paragraph) {

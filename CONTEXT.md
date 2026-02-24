@@ -351,7 +351,7 @@ task api:sqlc          # Generate sqlc code
 - Files: `api/internal/export/docx.go`, `api/internal/export/pdf.go`, HTML templates
 
 ### Dependency Graph
-```
+```text
 INDEPENDENT (can start anytime):
   T-015, T-035, T-036 (P1)
   T-031 (P2)

@@ -380,20 +380,28 @@ func docxContentWithTemplate(templateID string, styling *domain.CVStyling, secti
 
 // --- Unit tests for helpers ---
 
-func TestStripHash(t *testing.T) {
+func TestSanitizeHexColor(t *testing.T) {
+	fallback := "2563eb"
 	tests := []struct {
 		input, want string
 	}{
 		{"#c0392b", "c0392b"},
 		{"c0392b", "c0392b"},
-		{"", ""},
-		{"#", ""},
 		{"#FF0000", "FF0000"},
+		{"abc", "abc"},
+		{"AABBCC", "AABBCC"},
+		// Invalid inputs fall back to default
+		{"", fallback},
+		{"#", fallback},
+		{"not-hex", fallback},
+		{"<script>", fallback},
+		{`"inject&`, fallback},
+		{"12345g", fallback},
 	}
 	for _, tt := range tests {
-		got := stripHash(tt.input)
+		got := sanitizeHexColor(tt.input, fallback)
 		if got != tt.want {
-			t.Errorf("stripHash(%q) = %q, want %q", tt.input, got, tt.want)
+			t.Errorf("sanitizeHexColor(%q, %q) = %q, want %q", tt.input, fallback, got, tt.want)
 		}
 	}
 }
@@ -815,18 +823,21 @@ func TestPostProcessVisionary_PreservesAllFiles(t *testing.T) {
 		t.Fatalf("invalid ZIP: %v", err)
 	}
 
-	expectedFiles := map[string]bool{
-		"word/document.xml": false,
-	}
+	fileNames := make(map[string]bool)
 	for _, f := range zr.File {
-		if _, ok := expectedFiles[f.Name]; ok {
-			expectedFiles[f.Name] = true
+		fileNames[f.Name] = true
+	}
+	for _, required := range []string{
+		"word/document.xml",
+		"[Content_Types].xml",
+		"_rels/.rels",
+	} {
+		if !fileNames[required] {
+			t.Errorf("expected file %q not found in ZIP", required)
 		}
 	}
-	for name, found := range expectedFiles {
-		if !found {
-			t.Errorf("expected file %q not found in ZIP", name)
-		}
+	if len(fileNames) < 3 {
+		t.Errorf("expected at least 3 files in ZIP, got %d", len(fileNames))
 	}
 
 	// Verify document.xml has the injected properties
