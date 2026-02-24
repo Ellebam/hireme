@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status:** T-015 in progress — backend + frontend done, PR #47 in review. T-001–T-012, T-016–T-020, T-023–T-026, T-030, T-032–T-034 done.
+**Status:** All current tasks done. T-001–T-012, T-015–T-020, T-023–T-026, T-030, T-032–T-034 done.
 
 ### What's Working
 
@@ -32,12 +32,12 @@
 - ✅ Logging system with configurable levels
 - ✅ Save error feedback — tooltip on error icon, click-to-retry
 - ✅ Dashboard is root page (`/`), `/dashboard` redirects
-- ✅ Edit button links to `/editor` (not `/editor/${cv.id}`)
+- ✅ Multiple CV support — dashboard lists all CVs, editor at `/editor/[id]`, create from templates
 - ✅ Burger menu (MoreVertical) has DropdownMenu with Edit/Delete
 - ✅ Delete confirmation dialog on CV card
 - ✅ Unified header across all pages (Dashboard, Editor, Templates)
 - ✅ shadcn/ui dropdown-menu component
-- ✅ 200 passing tests (Vitest)
+- ✅ 213 passing tests (Vitest)
 - ✅ Build verified, full stack integration tested
 
 ### Remaining Work
@@ -227,7 +227,7 @@ task api:sqlc          # Generate sqlc code
 ### Active
 | ID | Task | Branch | Blocked By | Status |
 |----|------|--------|------------|--------|
-| T-015 | Multiple CV support | feat/t-015-multiple-cv-support | — | In progress — backend + frontend done, PR #47 in review |
+| — | — | — | — | No active tasks |
 
 ### Backlog — P1 (Should)
 | ID | Task | Blocked By | Size |
@@ -276,6 +276,7 @@ task api:sqlc          # Generate sqlc code
 | T-034 | Unified header across all pages (including editor) | feat/t-034-unified-header (#44) |
 | T-032 | Section delete button in palette sidebar | feat/t-032-section-delete-button (#45) |
 | T-026 | DOCX export styling overhaul — match actual CV templates | feat/t-026-docx-styling-overhaul (#46) |
+| T-015 | Multiple CV support | feat/t-015-multiple-cv-support (#47) |
 
 ---
 
@@ -328,10 +329,6 @@ task api:sqlc          # Generate sqlc code
 - Touch-friendly interactions for drag & drop on mobile
 - Files: `EditorLayout.tsx`, `SectionPalette.tsx`, `PropertiesPanel.tsx`
 
-**T-015: Multiple CV support** — M (needs splitting when picked up)
-- Dashboard shows list, editor route `/editor/[id]`, create new CV
-- Tests: routing tests, dashboard list test
-
 **T-035: Export save location** — S
 - Let users choose where exported files are saved (custom download path)
 - Build with feature flag for potential paid version gating
@@ -353,7 +350,7 @@ task api:sqlc          # Generate sqlc code
 ### Dependency Graph
 ```text
 INDEPENDENT (can start anytime):
-  T-015, T-035, T-036 (P1)
+  T-035, T-036 (P1)
   T-031 (P2)
   T-021, T-022, T-028
   T-013, T-014
@@ -369,19 +366,18 @@ T-029 (consultant profile): independent but needs splitting when picked up
 **Phase 1 — P1 priorities:**
 1. **T-036** (modal animation fix) — quick UX bug fix
 2. **T-035** (export save location) — enables QA workflows, unlocks T-037
-3. **T-015** (multiple CV support) — core feature, needs splitting
 
 **Phase 2 — P2 UX + features:**
-4. **T-037** (unified export design) — PDF + DOCX match editors
-5. **T-031** (responsive/mobile) — bigger UX effort
-6. **T-021** (markdown + bundle) — new capability, unlocks T-027
-7. **T-022** (JSON import) — completes export/import story
+3. **T-037** (unified export design) — PDF + DOCX match editors
+4. **T-031** (responsive/mobile) — bigger UX effort
+5. **T-021** (markdown + bundle) — new capability, unlocks T-027
+6. **T-022** (JSON import) — completes export/import story
 
 **Phase 3 — Remaining features + infra:**
-8. **T-027** (markdown import)
-9. **T-028** (CV upload/extract)
-10. **T-013/T-014** — R2, OAuth
-11. **T-029** (consultant profile) — split into sub-tasks first
+7. **T-027** (markdown import)
+8. **T-028** (CV upload/extract)
+9. **T-013/T-014** — R2, OAuth
+10. **T-029** (consultant profile) — split into sub-tasks first
 
 ---
 
