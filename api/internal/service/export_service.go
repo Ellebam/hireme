@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/uuid"
+
 	"github.com/ellebam/hireme/api/internal/domain"
 	"github.com/ellebam/hireme/api/internal/export"
 	"github.com/ellebam/hireme/api/internal/repository"
@@ -32,11 +34,15 @@ func NewExportService(cvRepo repository.CVRepository, renderer HTMLRenderer, pdf
 	}
 }
 
-// fetchCVContent fetches the user's CV and parses its structured content.
-func (s *ExportService) fetchCVContent(ctx context.Context, userID string) (*domain.CVContent, error) {
-	cv, err := s.cvRepo.GetByUserID(ctx, userID)
+// fetchCVContent fetches a specific CV by ID, verifies ownership, and parses its structured content.
+func (s *ExportService) fetchCVContent(ctx context.Context, cvID uuid.UUID, userID string) (*domain.CVContent, error) {
+	cv, err := s.cvRepo.GetByID(ctx, cvID)
 	if err != nil {
 		return nil, fmt.Errorf("fetching CV: %w", err)
+	}
+
+	if cv.UserID != userID {
+		return nil, domain.ErrForbidden
 	}
 
 	content, err := cv.ParseContent()
@@ -47,9 +53,9 @@ func (s *ExportService) fetchCVContent(ctx context.Context, userID string) (*dom
 	return content, nil
 }
 
-// renderHTML fetches the user's CV, parses its content, and renders it to HTML.
-func (s *ExportService) renderHTML(ctx context.Context, userID string) (string, error) {
-	content, err := s.fetchCVContent(ctx, userID)
+// renderHTML fetches a specific CV, parses its content, and renders it to HTML.
+func (s *ExportService) renderHTML(ctx context.Context, cvID uuid.UUID, userID string) (string, error) {
+	content, err := s.fetchCVContent(ctx, cvID, userID)
 	if err != nil {
 		return "", err
 	}
@@ -62,9 +68,9 @@ func (s *ExportService) renderHTML(ctx context.Context, userID string) (string, 
 	return html, nil
 }
 
-// ExportPDF generates a PDF for the user's active CV.
-func (s *ExportService) ExportPDF(ctx context.Context, userID string) ([]byte, error) {
-	html, err := s.renderHTML(ctx, userID)
+// ExportPDF generates a PDF for a specific CV.
+func (s *ExportService) ExportPDF(ctx context.Context, cvID uuid.UUID, userID string) ([]byte, error) {
+	html, err := s.renderHTML(ctx, cvID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -77,9 +83,9 @@ func (s *ExportService) ExportPDF(ctx context.Context, userID string) ([]byte, e
 	return pdf, nil
 }
 
-// ExportDOCX generates a DOCX for the user's active CV.
-func (s *ExportService) ExportDOCX(ctx context.Context, userID string) ([]byte, error) {
-	content, err := s.fetchCVContent(ctx, userID)
+// ExportDOCX generates a DOCX for a specific CV.
+func (s *ExportService) ExportDOCX(ctx context.Context, cvID uuid.UUID, userID string) ([]byte, error) {
+	content, err := s.fetchCVContent(ctx, cvID, userID)
 	if err != nil {
 		return nil, err
 	}

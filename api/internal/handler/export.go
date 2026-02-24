@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 
 	"github.com/ellebam/hireme/api/internal/domain"
 	"github.com/ellebam/hireme/api/internal/middleware"
@@ -20,14 +21,25 @@ type ExportResponse struct {
 	CreatedAt string  `json:"createdAt"`
 }
 
-// CreateExport handles synchronous export requests
+// CreateExport handles synchronous export requests for a specific CV
 func (h *Handler) CreateExport(w http.ResponseWriter, r *http.Request) {
+	// Parse CV ID from URL
+	idParam := chi.URLParam(r, "id")
+	cvID, err := uuid.Parse(idParam)
+	if err != nil {
+		httputil.Error(w, http.StatusBadRequest, "invalid CV ID")
+		return
+	}
+
 	format := chi.URLParam(r, "format")
 
 	if !domain.IsValidExportFormat(format) {
 		httputil.Error(w, http.StatusBadRequest, "invalid export format")
 		return
 	}
+
+	ctx := r.Context()
+	userID := middleware.MustGetUserID(ctx)
 
 	switch format {
 	case domain.ExportFormatPDF:
@@ -36,10 +48,7 @@ func (h *Handler) CreateExport(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		ctx := r.Context()
-		userID := middleware.MustGetUserID(ctx)
-
-		pdfBytes, err := h.exportService.ExportPDF(ctx, userID)
+		pdfBytes, err := h.exportService.ExportPDF(ctx, cvID, userID)
 		if err != nil {
 			httputil.HandleError(w, err)
 			return
@@ -55,10 +64,7 @@ func (h *Handler) CreateExport(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		ctx := r.Context()
-		userID := middleware.MustGetUserID(ctx)
-
-		docxBytes, err := h.exportService.ExportDOCX(ctx, userID)
+		docxBytes, err := h.exportService.ExportDOCX(ctx, cvID, userID)
 		if err != nil {
 			httputil.HandleError(w, err)
 			return

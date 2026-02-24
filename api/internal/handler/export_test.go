@@ -6,6 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/google/uuid"
+
 	"github.com/ellebam/hireme/api/internal/config"
 	"github.com/ellebam/hireme/api/internal/domain"
 )
@@ -13,9 +15,13 @@ import (
 func TestCreateExport_PDF_Success(t *testing.T) {
 	expectedPDF := []byte("%PDF-1.4 test content")
 	userID := "user-123"
+	cvID := uuid.New()
 
 	mockExportSvc := &MockExportService{
-		ExportPDFFunc: func(ctx context.Context, uid string) ([]byte, error) {
+		ExportPDFFunc: func(ctx context.Context, id uuid.UUID, uid string) ([]byte, error) {
+			if id != cvID {
+				t.Errorf("expected cvID %s, got %s", cvID, id)
+			}
 			if uid != userID {
 				t.Errorf("expected userID %q, got %q", userID, uid)
 			}
@@ -25,7 +31,7 @@ func TestCreateExport_PDF_Success(t *testing.T) {
 
 	h := NewTestHandler(nil, nil, nil, mockExportSvc)
 
-	req := newAuthenticatedRequestWithParams("POST", "/export/pdf", userID, nil, map[string]string{"format": "pdf"})
+	req := newAuthenticatedRequestWithParams("POST", "/cv/"+cvID.String()+"/export/pdf", userID, nil, map[string]string{"id": cvID.String(), "format": "pdf"})
 	rr := httptest.NewRecorder()
 
 	h.CreateExport(rr, req)
@@ -44,12 +50,26 @@ func TestCreateExport_PDF_Success(t *testing.T) {
 	}
 }
 
+func TestCreateExport_InvalidCVID(t *testing.T) {
+	h := NewTestHandler(nil, nil, nil, &MockExportService{})
+
+	req := newAuthenticatedRequestWithParams("POST", "/cv/not-a-uuid/export/pdf", "user-1", nil, map[string]string{"id": "not-a-uuid", "format": "pdf"})
+	rr := httptest.NewRecorder()
+
+	h.CreateExport(rr, req)
+
+	if rr.Code != http.StatusBadRequest {
+		t.Errorf("expected 400, got %d", rr.Code)
+	}
+}
+
 func TestCreateExport_InvalidFormat(t *testing.T) {
+	cvID := uuid.New()
 	formats := []string{"", "html", "exe", "PDF"}
 	for _, format := range formats {
 		t.Run(format, func(t *testing.T) {
-			h := NewTestHandler(nil, nil, nil, nil)
-			req := newAuthenticatedRequestWithParams("POST", "/export/"+format, "user-1", nil, map[string]string{"format": format})
+			h := NewTestHandler(nil, nil, nil, &MockExportService{})
+			req := newAuthenticatedRequestWithParams("POST", "/cv/"+cvID.String()+"/export/"+format, "user-1", nil, map[string]string{"id": cvID.String(), "format": format})
 			rr := httptest.NewRecorder()
 
 			h.CreateExport(rr, req)
@@ -62,12 +82,13 @@ func TestCreateExport_InvalidFormat(t *testing.T) {
 }
 
 func TestCreateExport_PDF_FeatureDisabled(t *testing.T) {
+	cvID := uuid.New()
 	h := NewTestHandler(nil, nil, nil, &MockExportService{})
 	h.config = &config.Config{
 		Features: config.FeaturesConfig{EnableExportPDF: false},
 	}
 
-	req := newAuthenticatedRequestWithParams("POST", "/export/pdf", "user-1", nil, map[string]string{"format": "pdf"})
+	req := newAuthenticatedRequestWithParams("POST", "/cv/"+cvID.String()+"/export/pdf", "user-1", nil, map[string]string{"id": cvID.String(), "format": "pdf"})
 	rr := httptest.NewRecorder()
 
 	h.CreateExport(rr, req)
@@ -78,15 +99,16 @@ func TestCreateExport_PDF_FeatureDisabled(t *testing.T) {
 }
 
 func TestCreateExport_PDF_ServiceError(t *testing.T) {
+	cvID := uuid.New()
 	mockExportSvc := &MockExportService{
-		ExportPDFFunc: func(ctx context.Context, userID string) ([]byte, error) {
+		ExportPDFFunc: func(ctx context.Context, id uuid.UUID, userID string) ([]byte, error) {
 			return nil, domain.ErrNotFound
 		},
 	}
 
 	h := NewTestHandler(nil, nil, nil, mockExportSvc)
 
-	req := newAuthenticatedRequestWithParams("POST", "/export/pdf", "user-1", nil, map[string]string{"format": "pdf"})
+	req := newAuthenticatedRequestWithParams("POST", "/cv/"+cvID.String()+"/export/pdf", "user-1", nil, map[string]string{"id": cvID.String(), "format": "pdf"})
 	rr := httptest.NewRecorder()
 
 	h.CreateExport(rr, req)
@@ -99,9 +121,13 @@ func TestCreateExport_PDF_ServiceError(t *testing.T) {
 func TestCreateExport_DOCX_Success(t *testing.T) {
 	expectedDOCX := []byte("PK fake docx content")
 	userID := "user-123"
+	cvID := uuid.New()
 
 	mockExportSvc := &MockExportService{
-		ExportDOCXFunc: func(ctx context.Context, uid string) ([]byte, error) {
+		ExportDOCXFunc: func(ctx context.Context, id uuid.UUID, uid string) ([]byte, error) {
+			if id != cvID {
+				t.Errorf("expected cvID %s, got %s", cvID, id)
+			}
 			if uid != userID {
 				t.Errorf("expected userID %q, got %q", userID, uid)
 			}
@@ -111,7 +137,7 @@ func TestCreateExport_DOCX_Success(t *testing.T) {
 
 	h := NewTestHandler(nil, nil, nil, mockExportSvc)
 
-	req := newAuthenticatedRequestWithParams("POST", "/export/docx", userID, nil, map[string]string{"format": "docx"})
+	req := newAuthenticatedRequestWithParams("POST", "/cv/"+cvID.String()+"/export/docx", userID, nil, map[string]string{"id": cvID.String(), "format": "docx"})
 	rr := httptest.NewRecorder()
 
 	h.CreateExport(rr, req)
@@ -131,12 +157,13 @@ func TestCreateExport_DOCX_Success(t *testing.T) {
 }
 
 func TestCreateExport_DOCX_FeatureDisabled(t *testing.T) {
+	cvID := uuid.New()
 	h := NewTestHandler(nil, nil, nil, &MockExportService{})
 	h.config = &config.Config{
 		Features: config.FeaturesConfig{EnableExportDOCX: false},
 	}
 
-	req := newAuthenticatedRequestWithParams("POST", "/export/docx", "user-1", nil, map[string]string{"format": "docx"})
+	req := newAuthenticatedRequestWithParams("POST", "/cv/"+cvID.String()+"/export/docx", "user-1", nil, map[string]string{"id": cvID.String(), "format": "docx"})
 	rr := httptest.NewRecorder()
 
 	h.CreateExport(rr, req)
@@ -147,15 +174,16 @@ func TestCreateExport_DOCX_FeatureDisabled(t *testing.T) {
 }
 
 func TestCreateExport_DOCX_ServiceError(t *testing.T) {
+	cvID := uuid.New()
 	mockExportSvc := &MockExportService{
-		ExportDOCXFunc: func(ctx context.Context, userID string) ([]byte, error) {
+		ExportDOCXFunc: func(ctx context.Context, id uuid.UUID, userID string) ([]byte, error) {
 			return nil, domain.ErrNotFound
 		},
 	}
 
 	h := NewTestHandler(nil, nil, nil, mockExportSvc)
 
-	req := newAuthenticatedRequestWithParams("POST", "/export/docx", "user-1", nil, map[string]string{"format": "docx"})
+	req := newAuthenticatedRequestWithParams("POST", "/cv/"+cvID.String()+"/export/docx", "user-1", nil, map[string]string{"id": cvID.String(), "format": "docx"})
 	rr := httptest.NewRecorder()
 
 	h.CreateExport(rr, req)

@@ -33,12 +33,45 @@ type UpdateCVRequest struct {
 	Content *json.RawMessage `json:"content,omitempty"`
 }
 
-// GetCV returns the authenticated user's active CV
-func (h *Handler) GetCV(w http.ResponseWriter, r *http.Request) {
+// ListCVs returns all CVs for the authenticated user
+func (h *Handler) ListCVs(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userID := middleware.MustGetUserID(ctx)
 
-	cv, err := h.cvService.GetByUserID(ctx, userID)
+	cvs, err := h.cvService.ListByUserID(ctx, userID)
+	if err != nil {
+		httputil.HandleError(w, err)
+		return
+	}
+
+	responses := make([]CVResponse, len(cvs))
+	for i, cv := range cvs {
+		responses[i] = CVResponse{
+			ID:            cv.ID.String(),
+			Title:         cv.Title,
+			SchemaVersion: cv.SchemaVersion,
+			Content:       cv.Content,
+			CreatedAt:     cv.CreatedAt.Format("2006-01-02T15:04:05Z"),
+			UpdatedAt:     cv.UpdatedAt.Format("2006-01-02T15:04:05Z"),
+		}
+	}
+
+	httputil.JSON(w, http.StatusOK, responses)
+}
+
+// GetCVByID returns a specific CV by ID
+func (h *Handler) GetCVByID(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	userID := middleware.MustGetUserID(ctx)
+
+	idParam := chi.URLParam(r, "id")
+	cvID, err := uuid.Parse(idParam)
+	if err != nil {
+		httputil.Error(w, http.StatusBadRequest, "invalid CV ID")
+		return
+	}
+
+	cv, err := h.cvService.GetByID(ctx, cvID, userID)
 	if err != nil {
 		httputil.HandleError(w, err)
 		return

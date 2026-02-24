@@ -227,19 +227,19 @@ func setupRouter(cfg *config.Config, h *handler.Handler) *chi.Mux {
 		r.Patch("/users/me", h.UpdateCurrentUser)
 
 		// CV routes
-		r.Get("/cv", h.GetCV)
+		r.Get("/cv", h.ListCVs)
+		r.Get("/cv/{id}", h.GetCVByID)
 		r.Post("/cv", h.CreateCV)
 		r.Put("/cv/{id}", h.UpdateCV)
 		r.Delete("/cv/{id}", h.DeleteCV)
+
+		// Export routes (nested under CV)
+		r.Post("/cv/{id}/export/{format}", h.CreateExport)
 
 		// Asset routes
 		r.Post("/assets", h.UploadAsset)
 		r.Get("/assets/{id}", h.GetAsset)
 		r.Delete("/assets/{id}", h.DeleteAsset)
-
-		// Export routes
-		r.Post("/export/{format}", h.CreateExport)
-		r.Get("/export/{id}", h.GetExport)
 	})
 
 	return r
