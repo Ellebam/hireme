@@ -1,11 +1,16 @@
 'use client';
 
-import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 import { AppShell } from '@/components/layout';
+import { api, ApiError } from '@/lib/api';
+import { starterTemplate } from '@/lib/templates';
+import type { TemplateId } from '@/types/cv';
 
 const templates = [
   {
-    id: 'classic',
+    id: 'classic' as TemplateId,
     name: 'Classic',
     number: '01',
     description:
@@ -13,7 +18,7 @@ const templates = [
     tag: 'Popular',
   },
   {
-    id: 'modern',
+    id: 'modern' as TemplateId,
     name: 'Modern',
     number: '02',
     description:
@@ -21,7 +26,7 @@ const templates = [
     tag: 'Recommended',
   },
   {
-    id: 'visionary',
+    id: 'visionary' as TemplateId,
     name: 'Visionary',
     number: '03',
     description:
@@ -88,6 +93,33 @@ const previewComponents: Record<string, () => React.JSX.Element> = {
 };
 
 export default function TemplatesPage() {
+  const router = useRouter();
+  const [creating, setCreating] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleTemplateClick(templateId: TemplateId) {
+    if (creating) return;
+    setCreating(templateId);
+    setError(null);
+
+    try {
+      const content = starterTemplate();
+      content.templateId = templateId;
+      const newCV = await api.cv.create({
+        title: 'Untitled CV',
+        content,
+      });
+      router.push(`/editor/${newCV.id}`);
+    } catch (err) {
+      if (err instanceof ApiError && err.isForbidden) {
+        setError('CV limit reached. Delete an existing CV to create a new one.');
+      } else {
+        setError('Failed to create CV. Please try again.');
+      }
+      setCreating(null);
+    }
+  }
+
   return (
     <AppShell>
       <div className="max-w-[960px] px-10 pt-[60px] pb-20">
@@ -108,19 +140,31 @@ export default function TemplatesPage() {
           Each template shapes perception. The right one amplifies your story.
         </p>
 
+        {error && (
+          <div className="mb-6 p-4 border border-destructive/20 bg-destructive/5 rounded-lg text-sm text-destructive">
+            {error}
+          </div>
+        )}
+
         {/* Template Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-slide-in opacity-0 [animation-delay:0.45s]">
           {templates.map((template) => {
             const Preview = previewComponents[template.id];
+            const isCreating = creating === template.id;
             return (
-              <Link
+              <button
                 key={template.id}
-                href={`/editor?template=${template.id}`}
-                className="group bg-card border border-border rounded-lg cursor-pointer transition-all duration-[250ms] ease-out hover:border-accent/20 hover:shadow-[0_12px_32px_rgba(192,57,43,0.08)] hover:-translate-y-1"
+                onClick={() => handleTemplateClick(template.id)}
+                disabled={creating !== null}
+                className="group bg-card border border-border rounded-lg cursor-pointer transition-all duration-[250ms] ease-out hover:border-accent/20 hover:shadow-[0_12px_32px_rgba(192,57,43,0.08)] hover:-translate-y-1 text-left disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {/* Preview Area */}
                 <div className="h-[200px] bg-secondary flex items-center justify-center rounded-t-lg">
-                  <Preview />
+                  {isCreating ? (
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  ) : (
+                    <Preview />
+                  )}
                 </div>
 
                 {/* Info */}
@@ -138,7 +182,7 @@ export default function TemplatesPage() {
                     {template.tag}
                   </span>
                 </div>
-              </Link>
+              </button>
             );
           })}
         </div>

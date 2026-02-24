@@ -191,10 +191,97 @@ INSERT INTO cvs (
     content = EXCLUDED.content,
     updated_at = NOW();
 
+-- Create second sample CV (classic template, different content)
+INSERT INTO cvs (
+    id,
+    user_id,
+    title,
+    schema_version,
+    content,
+    is_active
+) VALUES (
+    'b1ffbc99-9c0b-4ef8-bb6d-6bb9bd380a22',
+    'dev-user-001',
+    'Design Portfolio CV',
+    '1.0.0',
+    '{
+        "schemaVersion": "1.0.0",
+        "templateId": "classic",
+        "locale": "en",
+        "sections": [
+            {
+                "id": "sec-personal-002",
+                "type": "personal",
+                "order": 0,
+                "visible": true,
+                "content": {
+                    "firstName": "Max",
+                    "lastName": "Developer",
+                    "jobTitle": "UX/UI Designer",
+                    "email": "max.design@example.com",
+                    "phone": "+49 123 456789",
+                    "location": "Berlin, Germany",
+                    "links": [
+                        {"type": "portfolio", "url": "https://maxdesign.dev"},
+                        {"type": "linkedin", "url": "https://linkedin.com/in/maxdesign"}
+                    ]
+                }
+            },
+            {
+                "id": "sec-summary-002",
+                "type": "summary",
+                "order": 1,
+                "visible": true,
+                "content": {
+                    "text": "Creative designer with a passion for user-centered design. 5+ years crafting intuitive interfaces for web and mobile applications."
+                }
+            },
+            {
+                "id": "sec-skills-002",
+                "type": "skills",
+                "order": 2,
+                "visible": true,
+                "content": {
+                    "categories": [
+                        {
+                            "id": "cat-003",
+                            "name": "Design Tools",
+                            "skills": [
+                                {"name": "Figma", "level": "expert"},
+                                {"name": "Sketch", "level": "advanced"},
+                                {"name": "Adobe XD", "level": "advanced"}
+                            ]
+                        },
+                        {
+                            "id": "cat-004",
+                            "name": "Frontend",
+                            "skills": [
+                                {"name": "HTML/CSS", "level": "expert"},
+                                {"name": "Tailwind CSS", "level": "advanced"},
+                                {"name": "React", "level": "intermediate"}
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "styling": {
+            "primaryColor": "#8b5cf6",
+            "fontFamily": "inter",
+            "fontSize": "medium",
+            "showIcons": true
+        }
+    }'::jsonb,
+    true
+) ON CONFLICT (id) DO UPDATE SET
+    content = EXCLUDED.content,
+    updated_at = NOW();
+
 -- Log completion
 DO $$
 BEGIN
     RAISE NOTICE '✅ Development seed data loaded successfully';
     RAISE NOTICE '   User: dev-user-001 (dev@hireme.local)';
-    RAISE NOTICE '   CV: My Professional CV';
+    RAISE NOTICE '   CV 1: My Professional CV (modern)';
+    RAISE NOTICE '   CV 2: Design Portfolio CV (classic)';
 END $$;

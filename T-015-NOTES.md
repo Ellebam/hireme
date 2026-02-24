@@ -576,3 +576,46 @@ Add a second CV with `classic` template and different content, using a different
 9. **Run `npm test`** — all tests pass.
 10. **Run `npx next build`** — verify build.
 11. **Manual test** — Start full stack, verify multi-CV flow end-to-end.
+
+## Local QA Review (2026-02-24)
+
+**Verdict**: FAIL
+
+### Static Checks
+| Check | Result | Details |
+|-------|--------|---------|
+| Go tests | PASS | All packages pass |
+| Frontend unit tests | PASS | 205/205 passed (19 files) |
+| TypeScript | PASS | Zero errors |
+| Production build | PASS | Pre-existing warnings only |
+
+### E2E Browser Tests
+| Test | Result | Details |
+|------|--------|---------|
+| Dashboard loads | FAIL | TypeError crash |
+| Editor loads | FAIL | Preview stuck on "Loading..." |
+| Section editing | SKIP | Blocked by editor failure |
+| Template switching | SKIP | Blocked by editor failure |
+| Data persistence | SKIP | Blocked |
+| Navigation | PASS | Nav links and routing work |
+
+### Findings Requiring Attention
+
+**(blocking) Dashboard crashes — `GET /cv` returns array, frontend expects single object**
+- `TypeError: Cannot read properties of undefined (reading 'sections')` at `src/app/page.tsx:141`
+- Backend `GET /api/v1/cv` changed to `ListCVs` (returns `{data: [...]}`), but frontend `cvApi.get()` (`web/src/lib/api/client.ts:249`) still expects `{data: {...}}` (single CV)
+- Dashboard shows error overlay instead of CV list
+
+**(blocking) Editor preview fails to load CV data**
+- Editor shell renders but preview shows "Loading..." permanently, console: `[Store] CV content is missing`
+- Same root cause: `cvApi.get()` returns array, editor store can't parse it as a single CV
+
+**(blocking) Export endpoint URL mismatch**
+- Frontend `exportApi.export()` (`client.ts:288`) calls `POST /api/v1/export/{format}` (old URL)
+- Backend moved to `POST /api/v1/cv/{id}/export/{format}` (new URL)
+- Export would 404 if attempted
+
+**Resolution**: These are all expected for a "backend-only first PR" — the frontend updates are planned for PR 2 (T-015b). However, this PR cannot be merged alone without breaking the app. Options:
+1. Ship both PRs together (backend + frontend) as a single PR
+2. Add backward-compatible shim: keep old `GET /cv` returning single CV alongside new `ListCVs`
+3. Merge backend first behind a feature flag (not implemented)

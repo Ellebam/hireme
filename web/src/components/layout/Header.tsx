@@ -9,7 +9,6 @@ import { useState } from 'react';
 
 const navItems = [
   { href: '/', label: 'Dashboard' },
-  { href: '/editor', label: 'Editor' },
   { href: '/templates', label: 'Templates' },
 ];
 
@@ -59,7 +58,7 @@ export function Header() {
         {/* New CV Button + User Avatar */}
         <div className="hidden md:flex items-center gap-3">
           <Button asChild size="sm">
-            <Link href="/editor">
+            <Link href="/templates">
               <Plus className="h-3.5 w-3.5 mr-1.5" />
               New CV
             </Link>

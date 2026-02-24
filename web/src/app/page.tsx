@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { Plus, MoreVertical, Trash2, Edit } from 'lucide-react';
 import { AppShell } from '@/components/layout';
@@ -21,41 +21,35 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { api, ApiError } from '@/lib/api';
+import { api } from '@/lib/api';
 import type { CV } from '@/types/api';
+import { useEffect } from 'react';
 
 export default function DashboardPage() {
-  const [cv, setCV] = useState<CV | null>(null);
+  const [cvs, setCVs] = useState<CV[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function loadCV() {
+    async function loadCVs() {
       try {
-        const data = await api.cv.get();
-        setCV(data);
-      } catch (err) {
-        if (err instanceof ApiError && err.isNotFound) {
-          setCV(null);
-        } else {
-          setError('Failed to load CV');
-          console.error('Error loading CV:', err);
-        }
+        const data = await api.cv.list();
+        setCVs(data);
+      } catch {
+        setError('Failed to load CVs');
       } finally {
         setLoading(false);
       }
     }
 
-    loadCV();
+    loadCVs();
   }, []);
 
-  const handleDelete = async () => {
-    if (!cv) return;
+  const handleDelete = async (id: string) => {
     try {
-      await api.cv.delete(cv.id);
-      setCV(null);
-    } catch (err) {
-      console.error('Failed to delete CV:', err);
+      await api.cv.delete(id);
+      setCVs((prev) => prev.filter((cv) => cv.id !== id));
+    } catch {
       setError('Failed to delete CV');
     }
   };
@@ -79,9 +73,9 @@ export default function DashboardPage() {
           </p>
           <div className="flex gap-3 mb-14 animate-slide-in opacity-0 [animation-delay:0.45s]">
             <Button asChild variant="accent">
-              <Link href="/editor">
+              <Link href="/templates">
                 <Plus className="mr-2 h-4 w-4" />
-                {cv ? 'Edit CV' : 'Create CV'}
+                Create CV
               </Link>
             </Button>
             <Button asChild variant="outline">
@@ -100,8 +94,8 @@ export default function DashboardPage() {
           <DashboardSkeleton />
         ) : error ? (
           <ErrorState message={error} />
-        ) : cv ? (
-          <DocumentList cv={cv} onDelete={handleDelete} />
+        ) : cvs.length > 0 ? (
+          <DocumentList cvs={cvs} onDelete={handleDelete} />
         ) : (
           <EmptyState />
         )}
@@ -110,11 +104,7 @@ export default function DashboardPage() {
   );
 }
 
-function DocumentList({ cv, onDelete }: { cv: CV; onDelete: () => void }) {
-  const updatedAt = new Date(cv.updatedAt);
-  const relativeTime = getRelativeTime(updatedAt);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-
+function DocumentList({ cvs, onDelete }: { cvs: CV[]; onDelete: (id: string) => void }) {
   return (
     <>
       {/* Section Header */}
@@ -123,26 +113,58 @@ function DocumentList({ cv, onDelete }: { cv: CV; onDelete: () => void }) {
           Documents
         </h2>
         <span className="font-mono text-xs text-muted-foreground bg-secondary px-2 py-0.5">
-          1
+          {cvs.length}
         </span>
       </div>
 
-      {/* Document Row */}
+      {/* Document Rows */}
+      {cvs.map((cv, index) => (
+        <DocumentRow
+          key={cv.id}
+          cv={cv}
+          index={index}
+          onDelete={() => onDelete(cv.id)}
+        />
+      ))}
+
+      {/* Create Row */}
       <Link
-        href="/editor"
+        href="/templates"
+        className="flex items-center gap-4 py-6 cursor-pointer text-muted-foreground transition-all duration-200 hover:text-accent"
+      >
+        <span className="font-serif text-2xl font-light">+</span>
+        <span className="text-[0.8125rem] font-semibold uppercase tracking-[0.0625em]">
+          Create New Document
+        </span>
+      </Link>
+    </>
+  );
+}
+
+function DocumentRow({ cv, index, onDelete }: { cv: CV; index: number; onDelete: () => void }) {
+  const updatedAt = new Date(cv.updatedAt);
+  const relativeTime = getRelativeTime(updatedAt);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  return (
+    <>
+      <Link
+        href={`/editor/${cv.id}`}
         className="grid grid-cols-[48px_1fr_120px_100px_40px] items-center gap-5 py-5 border-b border-dashed border-border cursor-pointer transition-all duration-200 hover:bg-[hsl(var(--vermillion-pale))] hover:pl-3 hover:-ml-3 hover:-mr-3 hover:pr-3 hover:shadow-offset-md"
       >
-        <span className="font-mono text-[0.8125rem] text-muted-foreground">01</span>
+        <span className="font-mono text-[0.8125rem] text-muted-foreground">
+          {String(index + 1).padStart(2, '0')}
+        </span>
         <div>
           <span className="font-serif text-[1.1875rem] font-semibold text-primary tracking-[-0.01em]">
             {cv.title}
           </span>
           <span className="block text-[0.8125rem] text-[hsl(var(--text-secondary))]">
-            {cv.content.sections?.length || 0} sections
+            {cv.content?.sections?.length || 0} sections
           </span>
         </div>
         <span className="text-[0.8125rem] font-medium text-[hsl(var(--text-secondary))]">
-          {cv.content.templateId}
+          {cv.content?.templateId}
         </span>
         <span className="font-mono text-xs text-muted-foreground">
           {relativeTime}
@@ -156,7 +178,7 @@ function DocumentList({ cv, onDelete }: { cv: CV; onDelete: () => void }) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem asChild>
-                <Link href="/editor" className="flex items-center gap-2">
+                <Link href={`/editor/${cv.id}`} className="flex items-center gap-2">
                   <Edit className="h-4 w-4" />
                   Edit
                 </Link>
@@ -172,17 +194,6 @@ function DocumentList({ cv, onDelete }: { cv: CV; onDelete: () => void }) {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      </Link>
-
-      {/* Create Row */}
-      <Link
-        href="/editor"
-        className="flex items-center gap-4 py-6 cursor-pointer text-muted-foreground transition-all duration-200 hover:text-accent"
-      >
-        <span className="font-serif text-2xl font-light">+</span>
-        <span className="text-[0.8125rem] font-semibold uppercase tracking-[0.0625em]">
-          Create New Document
-        </span>
       </Link>
 
       {/* Delete Confirmation Dialog */}
@@ -220,12 +231,12 @@ function EmptyState() {
   return (
     <div className="py-16 border-t border-dashed border-border">
       <div className="flex flex-col items-center justify-center text-center">
-        <h3 className="font-serif text-xl font-semibold mb-2">No CV yet</h3>
+        <h3 className="font-serif text-xl font-semibold mb-2">No CVs yet</h3>
         <p className="text-[hsl(var(--text-secondary))] max-w-sm mb-6">
           Create your first professional CV and start landing your dream job.
         </p>
         <Button asChild>
-          <Link href="/editor">
+          <Link href="/templates">
             <Plus className="mr-2 h-4 w-4" />
             Create Your CV
           </Link>
