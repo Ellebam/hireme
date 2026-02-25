@@ -473,13 +473,13 @@ tasks:
   docker:build:api:
     desc: Build API Docker image
     cmds:
-      - docker build -f docker/Dockerfile.api -t hireme-api:local .
+      - docker build -f docker/Dockerfile.api -t hireme-api:local api
       - 'echo "✅ API image built: hireme-api:local"'
 
   docker:build:web:
     desc: Build Web Docker image
     cmds:
-      - docker build -f docker/Dockerfile.web -t hireme-web:local .
+      - docker build -f docker/Dockerfile.web -t hireme-web:local web
       - 'echo "✅ Web image built: hireme-web:local"'
 
   docker:build:
