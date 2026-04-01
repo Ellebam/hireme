@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HireMe — Design Prototypes</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #0a0a0a;
+    color: #e5e5e5;
+    min-height: 100vh;
+    padding: 60px 40px;
+  }
+  .overline {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: #737373;
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    color: #fafafa;
+  }
+  .subtitle {
+    font-size: 18px;
+    color: #737373;
+    max-width: 560px;
+    line-height: 1.6;
+    margin-bottom: 60px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 24px;
+  }
+  .card {
+    background: #171717;
+    border: 1px solid #262626;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .card:hover {
+    border-color: #404040;
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  .card-preview {
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .card-info {
+    padding: 24px;
+  }
+  .card-num {
+    font-size: 12px;
+    font-weight: 600;
+    color: #525252;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .card-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fafafa;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  .card-desc {
+    font-size: 14px;
+    color: #737373;
+    line-height: 1.55;
+    margin-bottom: 16px;
+  }
+  .card-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .tag {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid;
+  }
+
+  /* Preview backgrounds */
+  .p1 { background: linear-gradient(135deg, #0d0d14, #1e1e38); }
+  .p1::after {
+    content: '';
+    position: absolute;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(201, 168, 76, 0.15), transparent 70%);
+    top: 20%; right: 20%;
+  }
+  .p2 {
+    background: linear-gradient(135deg, #f0e6ff, #e0f5e0, #ffe8d0);
+    position: relative;
+  }
+  .p2::before {
+    content: '';
+    position: absolute;
+    width: 150px; height: 150px;
+    border-radius: 50%;
+    background: rgba(124, 58, 237, 0.15);
+    filter: blur(40px);
+    top: 20%; left: 20%;
+  }
+  .p2::after {
+    content: '';
+    position: absolute;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(34, 197, 94, 0.15);
+    filter: blur(40px);
+    bottom: 20%; right: 25%;
+  }
+  .p3 { background: #f8f4ec; }
+  .p3::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000' fill-opacity='0.03'%3E%3Cpath d='M20 20h20v20H20z'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  .p4 {
+    background: linear-gradient(135deg, #0f0f23, #1a1040, #0f2040);
+  }
+  .p4::before {
+    content: '';
+    position: absolute;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.25), transparent 60%);
+    top: 10%; right: 15%;
+  }
+  .p4::after {
+    content: '';
+    position: absolute;
+    width: 150px; height: 150px;
+    background: radial-gradient(circle, rgba(236, 72, 153, 0.2), transparent 60%);
+    bottom: 15%; left: 20%;
+  }
+  .p5 { background: #fafaf9; border-bottom: 2px solid #1c1917; }
+
+  .preview-label {
+    position: relative;
+    z-index: 1;
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+  .pl-1 { color: #c9a84c; font-family: 'Georgia', serif; font-style: italic; }
+  .pl-2 { color: #7c3aed; opacity: 0.7; }
+  .pl-3 { color: #a0522d; font-family: 'Georgia', serif; }
+  .pl-4 {
+    background: linear-gradient(135deg, #a78bfa, #f9a8d4, #67e8f9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .pl-5 { color: #1c1917; font-family: 'Georgia', serif; font-weight: 700; }
+
+  .t-gold { color: #c9a84c; border-color: rgba(201, 168, 76, 0.3); background: rgba(201, 168, 76, 0.08); }
+  .t-lavender { color: #7c3aed; border-color: rgba(124, 58, 237, 0.3); background: rgba(124, 58, 237, 0.08); }
+  .t-sienna { color: #a0522d; border-color: rgba(160, 82, 45, 0.3); background: rgba(160, 82, 45, 0.08); }
+  .t-gradient { color: #ec4899; border-color: rgba(236, 72, 153, 0.3); background: rgba(236, 72, 153, 0.08); }
+  .t-vermillion { color: #dc2626; border-color: rgba(220, 38, 38, 0.3); background: rgba(220, 38, 38, 0.08); }
+  .t-neutral { color: #a1a1aa; border-color: #3f3f46; background: rgba(161, 161, 170, 0.06); }
+
+  .hint {
+    margin-top: 48px;
+    font-size: 13px;
+    color: #525252;
+    line-height: 1.6;
+  }
+  .hint strong { color: #737373; }
+</style>
+</head>
+<body>
+  <div class="overline">T-024 Design Direction</div>
+  <h1>Design Prototypes</h1>
+  <p class="subtitle">Five distinct design directions for HireMe. Each prototype includes dashboard, editor, templates, and export modal — fully interactive. Click to explore.</p>
+
+  <div class="grid">
+    <a href="01-noir-luxe.html" class="card">
+      <div class="card-preview p1">
+        <span class="preview-label pl-1">Noir Luxe</span>
+      </div>
+      <div class="card-info">
+        <div class="card-num">Design 01</div>
+        <div class="card-name">Noir Luxe</div>
+        <div class="card-desc">Dark luxury with gold accents. Playfair Display serif headings, deep charcoal surfaces, subtle gold shimmer effects. Sophisticated and premium — like a high-end portfolio.</div>
+        <div class="card-tags">
+          <span class="tag t-gold">Dark Mode</span>
+          <span class="tag t-gold">Serif</span>
+          <span class="tag t-gold">Gold Accents</span>
+          <span class="tag t-neutral">Luxury</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="02-glass-garden.html" class="card">
+      <div class="card-preview p2">
+        <span class="preview-label pl-2">Glass Garden</span>
+      </div>
+      <div class="card-info">
+        <div class="card-num">Design 02</div>
+        <div class="card-name">Glass Garden</div>
+        <div class="card-desc">Glassmorphism with organic floating shapes. Animated gradient blobs, frosted glass panels, soft pastels. Ethereal and dreamy — like a modern art gallery meets productivity tool.</div>
+        <div class="card-tags">
+          <span class="tag t-lavender">Glassmorphism</span>
+          <span class="tag t-lavender">Animated BG</span>
+          <span class="tag t-lavender">Pastels</span>
+          <span class="tag t-neutral">Organic</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="03-paper-craft.html" class="card">
+      <div class="card-preview p3">
+        <span class="preview-label pl-3">Paper Craft</span>
+      </div>
+      <div class="card-info">
+        <div class="card-num">Design 03</div>
+        <div class="card-name">Paper Craft</div>
+        <div class="card-desc">Warm, tactile, artisanal feel. Cream textures, Fraunces serif, burnt sienna accents, offset box shadows. Like beautifully designed stationery — approachable and distinctive.</div>
+        <div class="card-tags">
+          <span class="tag t-sienna">Warm Tones</span>
+          <span class="tag t-sienna">Textured</span>
+          <span class="tag t-sienna">Monospace</span>
+          <span class="tag t-neutral">Artisanal</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="04-chromatic-wave.html" class="card">
+      <div class="card-preview p4">
+        <span class="preview-label pl-4">Chromatic Wave</span>
+      </div>
+      <div class="card-info">
+        <div class="card-num">Design 04</div>
+        <div class="card-name">Chromatic Wave</div>
+        <div class="card-desc">Bold gradients, dynamic shapes, bouncy animations. Purple-pink-cyan color shifts, wavy hero banner, springy micro-interactions. Energetic and vibrant — Spotify meets Notion.</div>
+        <div class="card-tags">
+          <span class="tag t-gradient">Gradients</span>
+          <span class="tag t-gradient">Bouncy</span>
+          <span class="tag t-gradient">Dark Hero</span>
+          <span class="tag t-neutral">Energetic</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="05-editorial.html" class="card">
+      <div class="card-preview p5">
+        <span class="preview-label pl-5">Editorial</span>
+      </div>
+      <div class="card-info">
+        <div class="card-num">Design 05</div>
+        <div class="card-name">Editorial</div>
+        <div class="card-desc">Magazine-grade typography, dramatic whitespace, monochrome with vermillion accent. Newsreader serif, sharp borders, no rounded corners. Publication-quality — Bloomberg meets CV builder.</div>
+        <div class="card-tags">
+          <span class="tag t-vermillion">Typography-First</span>
+          <span class="tag t-vermillion">Monochrome</span>
+          <span class="tag t-vermillion">Sharp Edges</span>
+          <span class="tag t-neutral">Editorial</span>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <p class="hint"><strong>How to review:</strong> Click any card to open the prototype. Each has 3 pages (Dashboard, Editor, Templates) + export modal. Use the navigation bar to switch between pages. All interactions are functional.</p>
+</body>
+</html>
